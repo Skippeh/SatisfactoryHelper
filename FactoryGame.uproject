@@ -15,9 +15,15 @@
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "ExampleMod",
+			"Name": "SatisfactoryHelper",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"CoreUObject",
+				"Slate",
+				"SlateCore",
+				"UMG"
+			]
 		}
 	],
 	"Plugins": [
@@ -44,6 +50,10 @@
 		{
 			"Name": "Alpakit",
 			"Enabled": true
+		},
+		{
+			"Name": "SteamVR",
+			"Enabled": false
 		}
 	]
 }
