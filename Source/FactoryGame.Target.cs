@@ -9,9 +9,9 @@ public class FactoryGameTarget : TargetRules
 	{
 		Type = TargetType.Game;
 		LinkType = TargetLinkType.Modular;
-		
+
+		ExtraModuleNames.AddRange( new string[] { "FactoryGame", "SML", "SatisfactoryHelper" } );
 		CppStandard = CppStandardVersion.Cpp17;
-		ExtraModuleNames.AddRange(new[] {"FactoryGame"});
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		
 		bOverrideAppNameForSharedBuild = true;

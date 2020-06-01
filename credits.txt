@@ -22,6 +22,9 @@ gallexme
 === Special Thanks ===
 Markus Rännare and the rest of the Satisfactory team :D
 
+=== SatisfactoryHelper ===
+Skipcast <Skippy#0002 (discord) / Skippeh (github)>
+
 === Technologies used ===
 kubo/funchook
 ttvfs/ttvfs
