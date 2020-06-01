@@ -8,6 +8,17 @@
 			"Name": "FactoryGame",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "SatisfactoryHelper",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"CoreUObject",
+				"Slate",
+				"SlateCore",
+				"UMG"
+			]
 		}
 	],
 	"Plugins": [
@@ -38,6 +49,10 @@
 		{
 			"Name": "SML",
 			"Enabled": true
+		},
+		{
+			"Name": "SteamVR",
+			"Enabled": false
 		}
 	]
 }
