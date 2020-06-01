@@ -13,7 +13,7 @@ public class FactoryGameTarget : TargetRules
 		//default link type for game is static, but we need modular
 		//to get attachable module dll for mod loading
 		LinkType = TargetLinkType.Modular;
-		//Add your Mod modules here after FactoryGame and SML
-		ExtraModuleNames.AddRange(new[] {"FactoryGame", "SML", "ExampleMod"});
+
+		ExtraModuleNames.AddRange( new string[] { "FactoryGame", "SML", "SatisfactoryHelper" } );
 	}
 }
