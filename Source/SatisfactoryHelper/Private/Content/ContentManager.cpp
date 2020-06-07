@@ -64,7 +64,7 @@ void UContentManager::SearchAssetsForChildClasses(UClass* parent, TArray<TAssetS
 
 void UContentManager::FindAllDescriptors(TArray<TSoftClassPtr<UFGItemDescriptor>>& outArray, bool sortByDisplayName)
 {
-	if (cachedDescriptors == nullptr)
+	if (!cachedDescriptors)
 	{
 		cachedDescriptors = new TArray<TSoftClassPtr<class UFGItemDescriptor>>();
 		SearchAssetsForChildClasses<UFGItemDescriptor>(UFGItemDescriptor::StaticClass(), *cachedDescriptors);

@@ -19,10 +19,8 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"CoreUObject",
-				"Slate",
-				"SlateCore",
-				"UMG"
+				"Engine",
+				"FactoryGame"
 			]
 		}
 	],
