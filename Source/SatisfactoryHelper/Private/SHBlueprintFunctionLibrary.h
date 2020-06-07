@@ -4,6 +4,7 @@
 #include "SHBlueprintFunctionLibrary.generated.h"
 
 class UContentManager;
+class ASHInit;
 
 UCLASS()
 class USHBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
@@ -16,4 +17,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper")
 	static UContentManager* GetContentManager();
+
+	static ASHInit* GetInit();
 };
