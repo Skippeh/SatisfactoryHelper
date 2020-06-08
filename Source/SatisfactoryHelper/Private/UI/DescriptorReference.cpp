@@ -2,6 +2,6 @@
 #include "Resources/FGItemDescriptor.h"
 
 UDescriptorReference::UDescriptorReference()
+	: ItemDescriptorClass(nullptr)
 {
-	ItemDescriptorClass = nullptr;
 }
