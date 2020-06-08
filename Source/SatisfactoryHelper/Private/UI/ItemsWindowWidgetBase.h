@@ -65,7 +65,6 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void UpdateItemView(TSubclassOf<class UFGItemDescriptor> descriptorClass, class UImage* imageWidget, class UTextBlock* nameWidget, class UTextBlock* descriptionWidget);
 
-	UPROPERTY()
 	FTimerHandle FadeTimerHandle;
 
 	void OnFadeOutFinished();

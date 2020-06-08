@@ -20,6 +20,9 @@ protected:
 	TSubclassOf<class UItemsWindowWidgetBase> ItemsWindowClass;
 
 private:
+	UPROPERTY()
 	class AFGPlayerController* PlayerController;
+
+	UPROPERTY()
 	class UItemsWindowWidgetBase* ItemsWindow;
 };
