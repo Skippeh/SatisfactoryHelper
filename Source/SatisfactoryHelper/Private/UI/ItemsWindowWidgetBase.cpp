@@ -5,6 +5,8 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "util/Logging.h"
+#include "SHInit.h"
+#include "UI/UIManager.h"
 
 #pragma region Empty blueprint implementations
 void UItemsWindowWidgetBase::ClearItemSelection_Implementation() { }
@@ -36,6 +38,7 @@ void UItemsWindowWidgetBase::FilterItems(FString searchText, const TArray<UDescr
 		if (itemName.StartsWith(searchText, ESearchCase::IgnoreCase))
 			score += 2;
 
+		// Todo: Implement fuzzy search instead of contains
 		if (itemName.Contains(searchText, ESearchCase::IgnoreCase) || itemDescription.Contains(searchText, ESearchCase::IgnoreCase))
 			score += 1;
 
@@ -65,6 +68,7 @@ void UItemsWindowWidgetBase::FilterItems(FString searchText, const TArray<UDescr
 int32 UItemsWindowWidgetBase::FindItemIndexInList(TSubclassOf<class UFGItemDescriptor> searchClass, UListView* inListView)
 {
 	// todo: implement
+	unimplemented();
 	return -1;
 }
 
@@ -80,10 +84,15 @@ bool UItemsWindowWidgetBase::ShowWindow()
 	if (bIsFading || IsInViewport())
 		return false;
 
+	ASHInit::GetSingleton()->GetUIManager()->ToggleCursor(true);
+
 	SML::Logging::debug(*FString::Printf(TEXT("FadeIn IsValid: %d"), IsValid(FadeInAnimation)));
 	AddToViewport(1000);
-	PlayAnimation(FadeInAnimation);
-	GetOuter()->GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, this, &UItemsWindowWidgetBase::OnFadeFinished, FadeInAnimationLength);
+
+	if (IsValid(FadeInAnimation))
+		PlayAnimation(FadeInAnimation);
+
+	GetOuter()->GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, this, &UItemsWindowWidgetBase::OnFadeFinished, IsValid(FadeInAnimation) ? FadeInAnimationLength : 0);
 	bIsFading = true;
 	return true;
 }
@@ -92,9 +101,13 @@ bool UItemsWindowWidgetBase::HideWindow()
 {
 	if (bIsFading || !IsInViewport())
 		return false;
+
+	ASHInit::GetSingleton()->GetUIManager()->ToggleCursor(false);
 	
-	PlayAnimation(FadeOutAnimation);
-	GetOuter()->GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, this, &UItemsWindowWidgetBase::OnFadeOutFinished, FadeOutAnimationLength);
+	if (IsValid(FadeOutAnimation))
+		PlayAnimation(FadeOutAnimation);
+
+	GetOuter()->GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, this, &UItemsWindowWidgetBase::OnFadeOutFinished, IsValid(FadeOutAnimation) ? FadeOutAnimationLength : 0);
 	bIsFading = true;
 	return true;
 }
