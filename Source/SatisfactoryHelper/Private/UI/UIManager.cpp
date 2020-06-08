@@ -2,6 +2,7 @@
 #include "FGPlayerController.h"
 #include "UI/ItemsWindowWidgetBase.h"
 #include "util/Logging.h"
+#include "UI/FGVirtualCursorFunctionLibrary.h"
 
 void AUIManager::BeginPlay()
 {
@@ -15,4 +16,20 @@ void AUIManager::BeginPlay()
 UItemsWindowWidgetBase* AUIManager::GetItemsWindow() const
 {
 	return ItemsWindow;
+}
+
+void AUIManager::ToggleCursor(bool bShowCursor)
+{
+	CursorShowAmount = FMath::Max(0, CursorShowAmount + (bShowCursor ? 1 : -1));
+
+	if (CursorShowAmount > 0)
+	{
+		PlayerController->bShowMouseCursor = true;
+		PlayerController->SetIgnoreLookInput(true);
+	}
+	else
+	{
+		PlayerController->bShowMouseCursor = false;
+		PlayerController->SetIgnoreLookInput(false);
+	}
 }

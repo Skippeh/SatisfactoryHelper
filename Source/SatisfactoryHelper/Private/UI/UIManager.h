@@ -15,6 +15,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class UItemsWindowWidgetBase* GetItemsWindow() const;
 
+	/** Show or hide the cursor. If ToggleCursor(true) is called twice, ToggleCursor(false) will have to be called twice as well to hide the cursor. */
+	UFUNCTION(BlueprintCallable)
+	void ToggleCursor(bool bShowCursor);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class UItemsWindowWidgetBase> ItemsWindowClass;
@@ -25,4 +29,7 @@ private:
 
 	UPROPERTY()
 	class UItemsWindowWidgetBase* ItemsWindow;
+
+	/** If > 0 it means the cursor is visible. Used in ToggleCursor */
+	int32 CursorShowAmount = 0;
 };
