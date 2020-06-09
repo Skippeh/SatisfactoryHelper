@@ -9,12 +9,13 @@
 #include "UI/UIManager.h"
 
 #pragma region Empty blueprint implementations
-void UItemsWindowWidgetBase::ClearItemSelection_Implementation() { }
+void UItemsWindowWidgetBase::ClearItemSelection_Implementation() { unimplemented(); }
 bool UItemsWindowWidgetBase::SelectItem_Implementation(TSubclassOf<UFGItemDescriptor> searchClass) { unimplemented(); return bool(); }
 bool UItemsWindowWidgetBase::SelectIndex_Implementation(int32 listIndex) { unimplemented(); return bool(); }
+void UItemsWindowWidgetBase::OnToggleWindowVisibility_Implementation(bool bIsVisible) { }
 #pragma endregion
 
-void UItemsWindowWidgetBase::FilterItems(FString searchText, const TArray<UDescriptorReference*>& inItemsArray, TArray<UDescriptorReference*>& outItemsArray)
+void UItemsWindowWidgetBase::FilterItems(FString searchText, const TArray<UDescriptorReference*>& inItemsArray, TArray<UDescriptorReference*>& outItemsArray) const
 {
 	searchText.TrimStartAndEndInline();
 
@@ -28,8 +29,8 @@ void UItemsWindowWidgetBase::FilterItems(FString searchText, const TArray<UDescr
 
 	for (UDescriptorReference* descriptorReference : inItemsArray)
 	{
-		FString itemName = UFGItemDescriptor::GetItemName(descriptorReference->ItemDescriptorClass).ToLower().ToString();
-		FString itemDescription = UFGItemDescriptor::GetItemDescription(descriptorReference->ItemDescriptorClass).ToLower().ToString();
+		FString itemName = UFGItemDescriptor::GetItemName(descriptorReference->ItemDescriptorClass).ToString();
+		FString itemDescription = UFGItemDescriptor::GetItemDescription(descriptorReference->ItemDescriptorClass).ToString();
 		int32 score = 0;
 
 		if (itemName.Equals(searchText, ESearchCase::IgnoreCase))
@@ -94,6 +95,7 @@ bool UItemsWindowWidgetBase::ShowWindow()
 
 	GetOuter()->GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, this, &UItemsWindowWidgetBase::OnFadeFinished, IsValid(FadeInAnimation) ? FadeInAnimationLength : 0);
 	bIsFading = true;
+	OnToggleWindowVisibility(false);
 	return true;
 }
 
@@ -109,6 +111,7 @@ bool UItemsWindowWidgetBase::HideWindow()
 
 	GetOuter()->GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, this, &UItemsWindowWidgetBase::OnFadeOutFinished, IsValid(FadeOutAnimation) ? FadeOutAnimationLength : 0);
 	bIsFading = true;
+	OnToggleWindowVisibility(false);
 	return true;
 }
 
@@ -131,5 +134,5 @@ void UItemsWindowWidgetBase::OnFadeFinished()
 void UItemsWindowWidgetBase::OnFadeOutFinished()
 {
 	OnFadeFinished();
-	RemoveFromViewport();
+	RemoveFromParent();
 }
