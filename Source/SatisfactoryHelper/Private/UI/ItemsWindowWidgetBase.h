@@ -60,6 +60,9 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnToggleWindowVisibility(bool bIsVisible);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UTexture2D* MissingIconTexture;
 	
 private:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -74,4 +77,5 @@ private:
 	void OnFadeFinished();
 
 	bool bIsFading = false;
+	bool bIsVisible = false;
 };
