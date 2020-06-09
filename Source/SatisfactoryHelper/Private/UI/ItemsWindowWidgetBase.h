@@ -52,15 +52,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UWidgetAnimation* FadeOutAnimation;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float FadeInAnimationLength;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float FadeOutAnimationLength;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnToggleWindowVisibility(bool bIsVisible);
 	
 private:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void FilterItems(FString searchText, const TArray<class UDescriptorReference*>& inItemsArray, TArray<class UDescriptorReference*>& outItemsArray);
+	void FilterItems(FString searchText, const TArray<class UDescriptorReference*>& inItemsArray, TArray<class UDescriptorReference*>& outItemsArray) const;
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateItemView(TSubclassOf<class UFGItemDescriptor> descriptorClass, class UImage* imageWidget, class UTextBlock* nameWidget, class UTextBlock* descriptionWidget);

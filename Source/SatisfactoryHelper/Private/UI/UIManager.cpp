@@ -10,7 +10,8 @@ void AUIManager::BeginPlay()
 	PlayerController = CastChecked<AFGPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
 	
 	check(IsValid(ItemsWindowClass));
-	ItemsWindow = NewObject<UItemsWindowWidgetBase>(this, ItemsWindowClass);
+	ItemsWindow = NewObject<UItemsWindowWidgetBase>(PlayerController, ItemsWindowClass);
+	ItemsWindow->SetOwningPlayer(PlayerController);
 }
 
 UItemsWindowWidgetBase* AUIManager::GetItemsWindow() const
@@ -24,12 +25,22 @@ void AUIManager::ToggleCursor(bool bShowCursor)
 
 	if (CursorShowAmount > 0)
 	{
-		PlayerController->bShowMouseCursor = true;
 		PlayerController->SetIgnoreLookInput(true);
+		SetInputEnabled(false);
+		UFGVirtualCursorFunctionLibrary::EnableVirtualCursor(PlayerController);
+		PlayerController->bShowMouseCursor = true;
 	}
 	else
 	{
-		PlayerController->bShowMouseCursor = false;
 		PlayerController->SetIgnoreLookInput(false);
+		SetInputEnabled(true);
+		UFGVirtualCursorFunctionLibrary::DisableVirtualCursor(PlayerController);
+		PlayerController->bShowMouseCursor = false;
 	}
+}
+
+void AUIManager::SetInputEnabled(bool bInputEnabled)
+{
+	FDisabledInputGate DisabledInput(!bInputEnabled);
+	PlayerController->SetDisabledInputGate(DisabledInput);
 }

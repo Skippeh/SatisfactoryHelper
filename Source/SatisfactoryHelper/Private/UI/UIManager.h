@@ -32,4 +32,6 @@ private:
 
 	/** If > 0 it means the cursor is visible. Used in ToggleCursor */
 	int32 CursorShowAmount = 0;
+
+	void SetInputEnabled(bool bInputEnabled);
 };
