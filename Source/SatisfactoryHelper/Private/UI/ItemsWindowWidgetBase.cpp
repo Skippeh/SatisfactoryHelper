@@ -75,42 +75,56 @@ int32 UItemsWindowWidgetBase::FindItemIndexInList(TSubclassOf<class UFGItemDescr
 
 void UItemsWindowWidgetBase::UpdateItemView(TSubclassOf<UFGItemDescriptor> descriptorClass, UImage* imageWidget, UTextBlock* nameWidget, UTextBlock* descriptionWidget)
 {
+	if (!IsValid(descriptorClass))
+		return;
+
 	nameWidget->SetText(UFGItemDescriptor::GetItemName(descriptorClass));
 	descriptionWidget->SetText(UFGItemDescriptor::GetItemDescription(descriptorClass));
-	imageWidget->Brush.SetResourceObject(UFGItemDescriptor::GetBigIcon(descriptorClass));
+
+	UTexture2D* BigIcon = UFGItemDescriptor::GetBigIcon(descriptorClass);
+
+	if (!IsValid(BigIcon))
+	{
+		BigIcon = MissingIconTexture;
+	}
+
+	imageWidget->Brush.SetResourceObject(BigIcon);
+	imageWidget->Brush.ImageSize = FVector2D(BigIcon->GetSizeX(), BigIcon->GetSizeY());
 }
 
 bool UItemsWindowWidgetBase::ShowWindow()
 {
-	if (bIsFading || IsInViewport())
+	if (bIsFading || bIsVisible)
 		return false;
 
-	ASHInit::GetSingleton()->GetUIManager()->ToggleCursor(true);
+	if (!IsInViewport())
+		AddToViewport(1000);
 
-	SML::Logging::debug(*FString::Printf(TEXT("FadeIn IsValid: %d"), IsValid(FadeInAnimation)));
-	AddToViewport(1000);
+	SetVisibility(ESlateVisibility::Visible);
 
 	if (IsValid(FadeInAnimation))
 		PlayAnimation(FadeInAnimation);
 
+	ASHInit::GetSingleton()->GetUIManager()->ToggleCursor(true);
 	GetOuter()->GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, this, &UItemsWindowWidgetBase::OnFadeFinished, IsValid(FadeInAnimation) ? FadeInAnimationLength : 0);
 	bIsFading = true;
+	bIsVisible = true;
 	OnToggleWindowVisibility(false);
 	return true;
 }
 
 bool UItemsWindowWidgetBase::HideWindow()
 {
-	if (bIsFading || !IsInViewport())
+	if (bIsFading || !bIsVisible)
 		return false;
-
-	ASHInit::GetSingleton()->GetUIManager()->ToggleCursor(false);
 	
 	if (IsValid(FadeOutAnimation))
 		PlayAnimation(FadeOutAnimation);
 
+	ASHInit::GetSingleton()->GetUIManager()->ToggleCursor(false);
 	GetOuter()->GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, this, &UItemsWindowWidgetBase::OnFadeOutFinished, IsValid(FadeOutAnimation) ? FadeOutAnimationLength : 0);
 	bIsFading = true;
+	bIsVisible = false;
 	OnToggleWindowVisibility(false);
 	return true;
 }
@@ -120,7 +134,7 @@ bool UItemsWindowWidgetBase::ToggleWindowVisibility()
 	if (bIsFading)
 		return false;
 
-	if (IsInViewport())
+	if (bIsVisible)
 		return HideWindow();
 	else
 		return ShowWindow();
@@ -134,5 +148,5 @@ void UItemsWindowWidgetBase::OnFadeFinished()
 void UItemsWindowWidgetBase::OnFadeOutFinished()
 {
 	OnFadeFinished();
-	RemoveFromParent();
+	SetVisibility(ESlateVisibility::Hidden);
 }
