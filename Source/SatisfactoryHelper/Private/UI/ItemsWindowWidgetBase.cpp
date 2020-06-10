@@ -15,54 +15,85 @@ bool UItemsWindowWidgetBase::SelectIndex_Implementation(int32 listIndex) { unimp
 void UItemsWindowWidgetBase::OnToggleWindowVisibility_Implementation(bool bIsVisible) { }
 #pragma endregion
 
-void UItemsWindowWidgetBase::FilterItems(FString searchText, const TArray<UDescriptorReference*>& inItemsArray, TArray<UDescriptorReference*>& outItemsArray) const
+void UItemsWindowWidgetBase::FilterItems(FString SearchText, const TArray<UDescriptorReference*>& InItemsArray, TArray<UDescriptorReference*>& OutItemsArray) const
 {
-	searchText.TrimStartAndEndInline();
+	SearchText.TrimStartAndEndInline();
 
-	if (searchText.IsEmpty())
+	if (SearchText.IsEmpty())
 	{
-		outItemsArray.Append(inItemsArray);
+		OutItemsArray.Append(InItemsArray);
 		return;
 	}
 
-	TArray<FSearchResult> searchArray;
+	TArray<FSearchResult> SearchArray;
 
-	for (UDescriptorReference* descriptorReference : inItemsArray)
+	for (UDescriptorReference* DescriptorReference : InItemsArray)
 	{
-		FString itemName = UFGItemDescriptor::GetItemName(descriptorReference->ItemDescriptorClass).ToString();
-		FString itemDescription = UFGItemDescriptor::GetItemDescription(descriptorReference->ItemDescriptorClass).ToString();
-		int32 score = 0;
+		FString ItemName = UFGItemDescriptor::GetItemName(DescriptorReference->ItemDescriptorClass).ToString();
+		FString ItemDescription = UFGItemDescriptor::GetItemDescription(DescriptorReference->ItemDescriptorClass).ToString();
+		int32 Score = 0;
+		int32 ItemNameIndex = 0;
+		int32 ConsecutiveChars = 0;
 
-		if (itemName.Equals(searchText, ESearchCase::IgnoreCase))
-			score += 4;
-
-		if (itemName.StartsWith(searchText, ESearchCase::IgnoreCase))
-			score += 2;
-
-		// Todo: Implement fuzzy search instead of contains
-		if (itemName.Contains(searchText, ESearchCase::IgnoreCase) || itemDescription.Contains(searchText, ESearchCase::IgnoreCase))
-			score += 1;
-
-		if (score > 0)
+		for (int32 SearchTextIndex = 0; SearchTextIndex < SearchText.Len(); /* increment i conditionally in loop */ )
 		{
-			searchArray.Add(FSearchResult(score, descriptorReference));
+			// If search text is longer than item name skip this item
+			if (SearchTextIndex >= ItemName.Len())
+			{
+				Score = 0;
+				break;
+			}
+
+			// Create FStrings from TCHAR to support unicode comparison
+			FString NameChar;
+			NameChar.AppendChar(ItemName[ItemNameIndex]);
+			FString SearchChar;
+			SearchChar.AppendChar(SearchText[SearchTextIndex]);
+
+			if (NameChar.Equals(SearchChar, ESearchCase::IgnoreCase))
+			{
+				if (ItemNameIndex == SearchTextIndex)
+					++Score;
+
+				++SearchTextIndex;
+				++Score;
+				++ConsecutiveChars;
+
+				if (ConsecutiveChars >= 2)
+					++Score;
+			}
+			else
+			{
+				ConsecutiveChars = 0;
+			}
+
+			++ItemNameIndex;
+
+			// Break out of loop if the current item char index is >= item name length
+			if (ItemNameIndex >= ItemName.Len())
+				break;
+		}
+
+		if (Score > 0)
+		{
+			SearchArray.Add(FSearchResult(Score, DescriptorReference));
 		}
 	}
 
-	searchArray.Sort([](const FSearchResult& a, const FSearchResult& b)
+	SearchArray.Sort([](const FSearchResult& a, const FSearchResult& b)
 	{
 		if (a.Score != b.Score)
 			return a.Score > b.Score;
 
-		FString itemAName = UFGItemDescriptor::GetItemName(a.DescriptorReference->ItemDescriptorClass).ToString();
-		FString itemBName = UFGItemDescriptor::GetItemName(b.DescriptorReference->ItemDescriptorClass).ToString();
+		FString ItemAName = UFGItemDescriptor::GetItemName(a.DescriptorReference->ItemDescriptorClass).ToString();
+		FString ItemBName = UFGItemDescriptor::GetItemName(b.DescriptorReference->ItemDescriptorClass).ToString();
 
-		return itemAName < itemBName;
+		return ItemAName < ItemBName;
 	});
 
-	for (FSearchResult& searchResult : searchArray)
+	for (FSearchResult& SearchResult : SearchArray)
 	{
-		outItemsArray.Add(searchResult.DescriptorReference);
+		OutItemsArray.Add(SearchResult.DescriptorReference);
 	}
 }
 
