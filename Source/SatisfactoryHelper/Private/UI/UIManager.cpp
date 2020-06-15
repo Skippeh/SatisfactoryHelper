@@ -3,15 +3,21 @@
 #include "UI/ItemsWindowWidgetBase.h"
 #include "util/Logging.h"
 #include "UI/FGVirtualCursorFunctionLibrary.h"
+#include "FGHUD.h"
 
 void AUIManager::BeginPlay()
 {
 	Super::BeginPlay();
 	PlayerController = CastChecked<AFGPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
-	
+	HUD = CastChecked<AFGHUD>(PlayerController->GetHUD());
+
+	check(IsValid(PlayerController));
+	check(IsValid(HUD));
 	check(IsValid(ItemsWindowClass));
+
 	ItemsWindow = NewObject<UItemsWindowWidgetBase>(PlayerController, ItemsWindowClass);
 	ItemsWindow->SetOwningPlayer(PlayerController);
+	ItemsWindow->AddToViewport();
 }
 
 UItemsWindowWidgetBase* AUIManager::GetItemsWindow() const
@@ -32,10 +38,16 @@ void AUIManager::ToggleCursor(bool bShowCursor)
 	}
 	else
 	{
-		PlayerController->SetIgnoreLookInput(false);
 		SetInputEnabled(true);
-		UFGVirtualCursorFunctionLibrary::DisableVirtualCursor(PlayerController);
-		PlayerController->bShowMouseCursor = false;
+
+		bool bIsGamePaused = false; // todo: find out if the game is paused
+
+		if (!bIsGamePaused)
+		{
+			PlayerController->SetIgnoreLookInput(false);
+			UFGVirtualCursorFunctionLibrary::DisableVirtualCursor(PlayerController);
+			PlayerController->bShowMouseCursor = false;
+		}
 	}
 }
 
