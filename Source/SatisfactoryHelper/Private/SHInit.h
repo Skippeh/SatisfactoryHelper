@@ -2,11 +2,26 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/LocalPlayerSubsystem.h"
+#include "Subsystems/SHCheatSubsystem.h"
 #include "SHInit.generated.h"
 
 class AUIManager;
 class ASHInputManager;
 class UContentManager;
+
+USTRUCT(BlueprintType)
+struct FSHConfig
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	FEnabledCheats Cheats;
+
+	FSHConfig()
+		: Cheats(false)
+	{
+	}
+};
 
 UCLASS(Blueprintable, Abstract)
 class ASHInit : public AActor
@@ -15,10 +30,15 @@ class ASHInit : public AActor
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	AUIManager* GetUIManager();
+	AUIManager* GetUIManager() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ASHInputManager* GetInputManager();
+	ASHInputManager* GetInputManager() const;
+
+	UContentManager* GetContentManager() const;
+
+	UPROPERTY(BlueprintReadOnly)
+	FSHConfig Config;
 
 protected:
 	void BeginPlay() override;
@@ -29,18 +49,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<ASHInputManager> InputManagerClass;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	FSHConfig LoadConfig();
+
 private:
 	UPROPERTY()
 	AUIManager* UIManager;
 
 	UPROPERTY()
 	ASHInputManager* InputManager;
+
+	UPROPERTY()
+	UContentManager* ContentManager;
 	
 #pragma region Singleton
 public:
-	static ASHInit* GetSingleton() { return Instance; }
-
-private:
-	static ASHInit* Instance;
+	static ASHInit* GetSingleton(const UObject* InWorldContext);
 #pragma endregion
 };

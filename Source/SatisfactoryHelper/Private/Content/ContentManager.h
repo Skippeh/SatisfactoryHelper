@@ -14,16 +14,16 @@ class UContentManager : public UObject
 public:
 	template<class TParentClass>
 	UFUNCTION(BlueprintCallable)
-	void SearchAssetsForChildClasses(UClass* parent, TArray<TSoftClassPtr<TParentClass>>& outArray);
+	void SearchAssetsForChildClasses(UClass* InBaseClass, TArray<TSoftClassPtr<TParentClass>>& OutArray);
 
 	UFUNCTION(BlueprintCallable)
-	void FindAllDescriptors(TArray<TSoftClassPtr<class UFGItemDescriptor>>& outArray, bool sortByDisplayName);
+	void FindAllDescriptors(TArray<TSubclassOf<class UFGItemDescriptor>>& OutArray, bool bSortByDisplayName);
 
-	static UContentManager* GetSingleton();
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Resources")
+	static TArray<TSubclassOf<UFGItemDescriptor>> GetInvalidItemDescriptorClasses();
+
+	static UContentManager* GetSingleton(UObject* InWorldContext);
 
 private:
-	static void InitializeSingleton();
-	static UContentManager* Instance;
-
-	TArray<TSoftClassPtr<class UFGItemDescriptor>>* cachedDescriptors;
+	TArray<TSubclassOf<class UFGItemDescriptor>>* CachedDescriptors;
 };

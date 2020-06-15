@@ -23,10 +23,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class UItemsWindowWidgetBase> ItemsWindowClass;
 
-private:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	class AFGPlayerController* PlayerController;
 
+	UPROPERTY(BlueprintReadOnly)
+	class AFGHUD* HUD;
+
+private:
 	UPROPERTY()
 	class UItemsWindowWidgetBase* ItemsWindow;
 

@@ -7,6 +7,7 @@
 #include "util/Logging.h"
 #include "SHInit.h"
 #include "UI/UIManager.h"
+#include "FGHUD.h"
 
 #pragma region Empty blueprint implementations
 void UItemsWindowWidgetBase::ClearItemSelection_Implementation() { unimplemented(); }
@@ -128,15 +129,12 @@ bool UItemsWindowWidgetBase::ShowWindow()
 	if (bIsFading || bIsVisible)
 		return false;
 
-	if (!IsInViewport())
-		AddToViewport(1000);
-
-	SetVisibility(ESlateVisibility::Visible);
+	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
 	if (IsValid(FadeInAnimation))
 		PlayAnimation(FadeInAnimation);
 
-	ASHInit::GetSingleton()->GetUIManager()->ToggleCursor(true);
+	ASHInit::GetSingleton(GetOuter()->GetWorld())->GetUIManager()->ToggleCursor(true);
 	GetOuter()->GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, this, &UItemsWindowWidgetBase::OnFadeFinished, IsValid(FadeInAnimation) ? FadeInAnimationLength : 0);
 	bIsFading = true;
 	bIsVisible = true;
@@ -152,7 +150,7 @@ bool UItemsWindowWidgetBase::HideWindow()
 	if (IsValid(FadeOutAnimation))
 		PlayAnimation(FadeOutAnimation);
 
-	ASHInit::GetSingleton()->GetUIManager()->ToggleCursor(false);
+	ASHInit::GetSingleton(GetOuter()->GetWorld())->GetUIManager()->ToggleCursor(false);
 	GetOuter()->GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, this, &UItemsWindowWidgetBase::OnFadeOutFinished, IsValid(FadeOutAnimation) ? FadeOutAnimationLength : 0);
 	bIsFading = true;
 	bIsVisible = false;

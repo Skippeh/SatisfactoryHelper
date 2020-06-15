@@ -3,113 +3,140 @@
 #include "IAssetRegistry.h"
 #include "FactoryGame/Public/Resources/FGItemDescriptor.h"
 #include "SML/util/Logging.h"
+#include "SHInit.h"
+#include "Resources/FGAnyUndefinedDescriptor.h"
+#include "Resources/FGNoneDescriptor.h"
+#include "Resources/FGWildCardDescriptor.h"
+#include "Resources/FGResourceDescriptor.h"
 
 using namespace SML;
 
-UContentManager* UContentManager::Instance = nullptr;
-TArray<TAssetSubclassOf<class UFGItemDescriptor>>* cachedDescriptors = nullptr;
+TArray<TAssetSubclassOf<class UFGItemDescriptor>>* CachedDescriptors = nullptr;
 
 template<class TParentClass>
-void UContentManager::SearchAssetsForChildClasses(UClass* parent, TArray<TAssetSubclassOf<TParentClass>>& outArray)
+void UContentManager::SearchAssetsForChildClasses(UClass* InBaseClass, TArray<TSoftClassPtr<TParentClass>>& OutArray)
 {
 	// Search blueprint classes using the asset registry
-	FAssetRegistryModule& assetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
-	IAssetRegistry& assetRegistry = assetRegistryModule.Get();
-	FName baseClassName = parent->GetFName();
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
+	IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
+	FName BaseClassName = InBaseClass->GetFName();
 
 	// Get derived class names
-	TSet<FName> derivedNames;
+	TSet<FName> DerivedNames;
 	{
-		TArray<FName> baseNames;
-		baseNames.Add(baseClassName);
+		TArray<FName> BaseNames;
+		BaseNames.Add(BaseClassName);
 
-		TSet<FName> excludedNames;
+		TSet<FName> ExcludedNames;
 		// Add excluded names here if needed
 
-		assetRegistry.GetDerivedClassNames(baseNames, excludedNames, derivedNames);
+		AssetRegistry.GetDerivedClassNames(BaseNames, ExcludedNames, DerivedNames);
 	}
 
 	// Fetch all assets from registry deriving from UBlueprint (aka blueprint classes)
-	FARFilter filter;
-	filter.ClassNames.Add(UBlueprint::StaticClass()->GetFName());
-	filter.bRecursiveClasses = true;
-	TArray<FAssetData> assetList;
-	assetRegistry.GetAssets(filter, assetList);
+	FARFilter Filter;
+	Filter.ClassNames.Add(UBlueprint::StaticClass()->GetFName());
+	Filter.bRecursiveClasses = true;
+	TArray<FAssetData> AssetList;
+	AssetRegistry.GetAssets(Filter, AssetList);
 
 	// Iterate through blueprint assets
-	for (FAssetData const& asset : assetList)
+	for (FAssetData const& Asset : AssetList)
 	{
 		// Get the text path of the generated class and get the class object path and name from it
-		const FString* generatedClassPathPtr = asset.TagsAndValues.Find(TEXT("GeneratedClass"));
-		if (!generatedClassPathPtr)
+		const FString* GeneratedClassPathPtr = Asset.TagsAndValues.Find(TEXT("GeneratedClass"));
+		if (!GeneratedClassPathPtr)
 			continue;
 
-		const FString classObjectPath = FPackageName::ExportTextPathToObjectPath(*generatedClassPathPtr);
-		const FString className = FPackageName::ObjectPathToObjectName(classObjectPath);
+		const FString ClassObjectPath = FPackageName::ExportTextPathToObjectPath(*GeneratedClassPathPtr);
+		const FString ClassName = FPackageName::ObjectPathToObjectName(ClassObjectPath);
 
 		// Make sure the derived class names contains the current class
-		if (!derivedNames.Contains(*className))
+		if (!DerivedNames.Contains(*ClassName))
 			continue;
 
 		// Create soft class pointer reference and add to out array
-		TSoftClassPtr<TParentClass> result = TSoftClassPtr<TParentClass>(FStringAssetReference(classObjectPath));
+		TSoftClassPtr<TParentClass> Result = TSoftClassPtr<TParentClass>(FStringAssetReference(ClassObjectPath));
+		UClass* ItemClass = Result.Get();
 
-		UFGItemDescriptor* itemDescriptor = Cast<UFGItemDescriptor>(result.Get());
+		if (!IsValid(ItemClass))
+			continue;
 
-		// todo: Check if item is in use in game if possible
+		if (ItemClass->HasAnyClassFlags(EClassFlags::CLASS_Deprecated | EClassFlags::CLASS_Abstract))
+			continue;
 
-		outArray.Add(result);
+		OutArray.Add(Result);
 	}
 }
 
-void UContentManager::FindAllDescriptors(TArray<TSoftClassPtr<UFGItemDescriptor>>& outArray, bool sortByDisplayName)
+void UContentManager::FindAllDescriptors(TArray<TSubclassOf<UFGItemDescriptor>>& OutArray, bool bSortByDisplayName)
 {
-	if (!cachedDescriptors)
+	if (!CachedDescriptors)
 	{
-		cachedDescriptors = new TArray<TSoftClassPtr<class UFGItemDescriptor>>();
-		SearchAssetsForChildClasses<UFGItemDescriptor>(UFGItemDescriptor::StaticClass(), *cachedDescriptors);
+		auto AllDescriptors = TArray<TSoftClassPtr<class UFGItemDescriptor>>();
+		SearchAssetsForChildClasses<UFGItemDescriptor>(UFGItemDescriptor::StaticClass(), AllDescriptors);
+		CachedDescriptors = new TArray<TSubclassOf<UFGItemDescriptor>>();
+		auto InvalidItemClasses = GetInvalidItemDescriptorClasses();
+
+		// Exclude invalid descriptor types
+		for (auto DescriptorClassRef : AllDescriptors)
+		{
+			auto DescriptorClass = DescriptorClassRef.Get();
+			bool bShouldSkipDescriptor = false;
+
+			// Check if class inherits from a non valid item type
+			for (TSubclassOf<UFGItemDescriptor> InvalidClass : InvalidItemClasses)
+			{
+				if (DescriptorClass->IsChildOf(InvalidClass))
+				{
+					bShouldSkipDescriptor = true;
+					break;
+				}
+			}
+
+			if (bShouldSkipDescriptor)
+				continue;
+
+			CachedDescriptors->Add(DescriptorClass);
+		}
 	}
 
-	outArray.Append(*cachedDescriptors);
+	OutArray.Append(*CachedDescriptors);
 
-	if (sortByDisplayName)
+	if (bSortByDisplayName)
 	{
-		outArray.Sort([](const TSoftClassPtr<UFGItemDescriptor>& a, const TSoftClassPtr<UFGItemDescriptor>& b)
+		OutArray.Sort([](const TSubclassOf<UFGItemDescriptor>& ClassA, const TSubclassOf<UFGItemDescriptor>& ClassB)
 		{
-			const auto classA = TSubclassOf<UFGItemDescriptor>(a.Get());
-			const auto classB = TSubclassOf<UFGItemDescriptor>(b.Get());
-			UFGItemDescriptor* itemA = classA->GetDefaultObject<UFGItemDescriptor>();
-			UFGItemDescriptor* itemB = classB->GetDefaultObject<UFGItemDescriptor>();
+			FString NameA = UFGItemDescriptor::GetItemName(ClassA).ToString();
+			FString NameB = UFGItemDescriptor::GetItemName(ClassB).ToString();
 
-			FString nameA = UFGItemDescriptor::GetItemName(classA).ToString();
-			FString nameB = UFGItemDescriptor::GetItemName(classB).ToString();
-
-			return nameA < nameB;
+			return NameA < NameB;
 		});
 	}
 }
 
+TArray<TSubclassOf<UFGItemDescriptor>> UContentManager::GetInvalidItemDescriptorClasses()
+{
+	TArray<TSubclassOf<UFGItemDescriptor>> Classes;
+
+	Classes.Add(UFGAnyUndefinedDescriptor::StaticClass());
+	Classes.Add(UFGNoneDescriptor::StaticClass());
+	Classes.Add(UFGWildCardDescriptor::StaticClass());
+
+	return Classes;
+}
+
 UContentManager::~UContentManager()
 {
-	if (cachedDescriptors != nullptr)
-		delete cachedDescriptors;
+	if (CachedDescriptors)
+		delete CachedDescriptors;
 }
 
 #pragma region Singleton implementation
-void UContentManager::InitializeSingleton()
+
+UContentManager* UContentManager::GetSingleton(UObject* InWorldContext)
 {
-	auto* world = GEngine->GetWorld();
-	auto* contentManager = NewObject<UContentManager>();
-	Instance = contentManager;
+	return ASHInit::GetSingleton(InWorldContext)->GetContentManager();
 }
 
-UContentManager* UContentManager::GetSingleton()
-{
-	if (Instance == nullptr)
-	{
-		InitializeSingleton();
-	}
-
-	return Instance;
-}
 #pragma endregion
