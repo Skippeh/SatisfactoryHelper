@@ -52,5 +52,10 @@ USHSubsystemHolder* USHBlueprintFunctionLibrary::GetSHSubsystemHolder(UObject* W
 
 ASHCheatSubsystem* USHBlueprintFunctionLibrary::GetCheatSubsystem(UObject* WorldContext)
 {
-	return GetSHSubsystemHolder(WorldContext)->GetCheatSubsystem();
+	auto SubsystemHolder = GetSHSubsystemHolder(WorldContext);
+
+	if (!IsValid(SubsystemHolder))
+		return nullptr;
+
+	return SubsystemHolder->GetCheatSubsystem();
 }
