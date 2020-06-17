@@ -8,10 +8,12 @@
 #include "Content/ContentManager.h"
 #include "SHBlueprintFunctionLibrary.h"
 #include "Subsystems/SHCheatSubsystem.h"
+#include "ItemInfoData/SHItemInfoManager.h"
 
 AUIManager* ASHInit::GetUIManager() const { return UIManager; }
 ASHInputManager* ASHInit::GetInputManager() const { return InputManager; }
 UContentManager* ASHInit::GetContentManager() const { return ContentManager; }
+ASHItemInfoManager* ASHInit::GetItemInfoManager() const { return ItemInfoManager; }
 
 void ASHInit::BeginPlay()
 {
@@ -20,6 +22,7 @@ void ASHInit::BeginPlay()
 	ContentManager = NewObject<UContentManager>(this);
 	UIManager = GetWorld()->SpawnActor<AUIManager>(UIManagerClass);
 	InputManager = GetWorld()->SpawnActor<ASHInputManager>(InputManagerClass);
+	ItemInfoManager = GetWorld()->SpawnActor<ASHItemInfoManager>(ASHItemInfoManager::StaticClass());
 
 	Config = LoadConfig();
 

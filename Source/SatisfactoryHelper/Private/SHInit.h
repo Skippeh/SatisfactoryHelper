@@ -8,6 +8,7 @@
 class AUIManager;
 class ASHInputManager;
 class UContentManager;
+class ASHItemInfoManager;
 
 USTRUCT(BlueprintType)
 struct FSHConfig
@@ -35,7 +36,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ASHInputManager* GetInputManager() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UContentManager* GetContentManager() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ASHItemInfoManager* GetItemInfoManager() const;
 
 	UPROPERTY(BlueprintReadOnly)
 	FSHConfig Config;
@@ -62,6 +67,9 @@ private:
 	UPROPERTY()
 	UContentManager* ContentManager;
 	
+	UPROPERTY()
+	ASHItemInfoManager* ItemInfoManager;
+
 #pragma region Singleton
 public:
 	static ASHInit* GetSingleton(const UObject* InWorldContext);
