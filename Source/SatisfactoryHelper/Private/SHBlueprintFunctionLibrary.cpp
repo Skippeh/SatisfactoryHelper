@@ -8,6 +8,7 @@
 #include "FGSubsystem.h"
 #include "SHSubsystemHolder.h"
 #include "Subsystems/SHCheatSubsystem.h"
+#include "ItemInfoData/SHItemInfoManager.h"
 
 UContentManager* USHBlueprintFunctionLibrary::GetContentManager(UObject* InWorldContext)
 {
@@ -58,4 +59,9 @@ ASHCheatSubsystem* USHBlueprintFunctionLibrary::GetCheatSubsystem(UObject* World
 		return nullptr;
 
 	return SubsystemHolder->GetCheatSubsystem();
+}
+
+USHItemData* USHBlueprintFunctionLibrary::GetItemData(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor, TSubclassOf<USHItemData> DataClass)
+{
+	return GetInit(WorldContextObject)->GetItemInfoManager()->GetItemData(ItemDescriptor, DataClass);
 }

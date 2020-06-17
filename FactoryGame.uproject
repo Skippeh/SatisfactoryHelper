@@ -21,7 +21,9 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"FactoryGame",
-				"SML"
+				"SML",
+				"UMG",
+				"CoreUObject"
 			]
 		}
 	],
