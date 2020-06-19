@@ -27,4 +27,17 @@ public:
 	// Gets whether the widget is currently expanded.
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	bool IsExpanded();
+
+	// Sets the content of this widget.
+	UFUNCTION(BlueprintCallable)
+	void SetContent(UWidget* ContentWidget);
+
+	// Sets the title shown in the header.
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetTitle(const FText& Title);
+
+protected:
+	/** Returns the container that displays the content of this widget. */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintPure)
+	UPanelWidget* GetContentContainer() const;
 };

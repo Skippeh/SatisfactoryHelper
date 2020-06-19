@@ -8,21 +8,23 @@
 #include "Content/ContentManager.h"
 #include "SHBlueprintFunctionLibrary.h"
 #include "Subsystems/SHCheatSubsystem.h"
-#include "ItemInfoData/SHItemInfoManager.h"
+#include "ItemInfoData/SHItemInfoSubsystem.h"
 
 AUIManager* ASHInit::GetUIManager() const { return UIManager; }
 ASHInputManager* ASHInit::GetInputManager() const { return InputManager; }
 UContentManager* ASHInit::GetContentManager() const { return ContentManager; }
-ASHItemInfoManager* ASHInit::GetItemInfoManager() const { return ItemInfoManager; }
 
 void ASHInit::BeginPlay()
 {
-	check(IsValid(UIManagerClass));
-	check(IsValid(InputManagerClass));
+	verify(IsValid(UIManagerClass));
+	verify(IsValid(InputManagerClass));
 	ContentManager = NewObject<UContentManager>(this);
+
+	auto ItemInfoSubsystem = USHBlueprintFunctionLibrary::GetItemInfoSubsystem(GetWorld());
+	ItemInfoSubsystem->RegisterItemInfoClasses(ItemInfoClasses);
+
 	UIManager = GetWorld()->SpawnActor<AUIManager>(UIManagerClass);
 	InputManager = GetWorld()->SpawnActor<ASHInputManager>(InputManagerClass);
-	ItemInfoManager = GetWorld()->SpawnActor<ASHItemInfoManager>(ASHItemInfoManager::StaticClass());
 
 	Config = LoadConfig();
 
@@ -36,7 +38,7 @@ void ASHInit::BeginPlay()
 
 	// Cache all item descriptors (subsequent calls returns from cache instead of searching assets again)
 	TArray<TSubclassOf<UFGItemDescriptor>> Descriptors;
-	UContentManager::GetSingleton(GetWorld())->FindAllDescriptors(Descriptors, false);
+	ContentManager->FindAllDescriptors(Descriptors, false);
 
 	SML::Logging::debug(*FString::Printf(TEXT("Found %d descriptor(s)"), Descriptors.Num()));
 }

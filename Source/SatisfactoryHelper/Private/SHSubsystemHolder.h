@@ -14,7 +14,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class ASHCheatSubsystem* GetCheatSubsystem() const { return CheatSubsystem; }
+	class ASHItemInfoSubsystem* GetItemInfoSubsystem() const { return ItemInfoSubsystem; }
 
 private:
 	class ASHCheatSubsystem* CheatSubsystem;
+	class ASHItemInfoSubsystem* ItemInfoSubsystem;
 };

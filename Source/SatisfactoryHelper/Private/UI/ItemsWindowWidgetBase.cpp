@@ -8,6 +8,10 @@
 #include "SHInit.h"
 #include "UI/UIManager.h"
 #include "FGHUD.h"
+#include "ItemInfoData/SHItemInfoSubsystem.h"
+#include "UI/ItemInfos/SHItemInfo.h"
+#include "UI/Partials/CollapsableWidgetBase.h"
+#include "SHBlueprintFunctionLibrary.h"
 
 #pragma region Empty blueprint implementations
 void UItemsWindowWidgetBase::ClearItemSelection_Implementation() { unimplemented(); }
@@ -15,6 +19,37 @@ bool UItemsWindowWidgetBase::SelectItem_Implementation(TSubclassOf<UFGItemDescri
 bool UItemsWindowWidgetBase::SelectIndex_Implementation(int32 listIndex) { unimplemented(); return bool(); }
 void UItemsWindowWidgetBase::OnToggleWindowVisibility_Implementation(bool bIsVisible) { }
 #pragma endregion
+
+void UItemsWindowWidgetBase::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	verify(IsValid(CollapsableWidgetClass));
+
+	ItemInfoSubsystem = USHBlueprintFunctionLibrary::GetItemInfoSubsystem(GetWorld());
+
+	verify(IsValid(ItemInfoSubsystem));
+
+	TArray<TSubclassOf<USHItemInfo>> InfoClasses;
+	ItemInfoSubsystem->GetItemInfoClasses(InfoClasses);
+
+	SML::Logging::debug(*FString::Printf(TEXT("Initializing %d panels..."), InfoClasses.Num()));
+	UPanelWidget* PanelsContainer = GetPanelsContainer();
+
+	for (auto InfoClass : InfoClasses)
+	{
+		UCollapsableWidgetBase* CollapsableWidget = CreateWidget<UCollapsableWidgetBase, UWidget>(this, CollapsableWidgetClass);
+		USHItemInfo* InfoWidget = CreateWidget<USHItemInfo, UWidget>(CollapsableWidget, InfoClass);
+
+		CollapsableWidget->SetContent(InfoWidget);
+		CollapsableWidget->SetTitle(InfoWidget->GetTitle());
+		CollapsableWidget->SetVisibility(ESlateVisibility::Collapsed);
+		PanelsContainer->AddChild(CollapsableWidget);
+
+		TInfoPanelEntry Entry(CollapsableWidget, InfoWidget);
+		InfoPanels.Add(Entry);
+	}
+}
 
 void UItemsWindowWidgetBase::FilterItems(FString SearchText, const TArray<UDescriptorReference*>& InItemsArray, TArray<UDescriptorReference*>& OutItemsArray) const
 {
@@ -98,30 +133,51 @@ void UItemsWindowWidgetBase::FilterItems(FString SearchText, const TArray<UDescr
 	}
 }
 
-int32 UItemsWindowWidgetBase::FindItemIndexInList(TSubclassOf<class UFGItemDescriptor> searchClass, UListView* inListView)
+int32 UItemsWindowWidgetBase::FindItemIndexInList(TSubclassOf<class UFGItemDescriptor> SearchClass, UListView* InListView)
 {
 	// todo: implement
 	unimplemented();
 	return -1;
 }
 
-void UItemsWindowWidgetBase::UpdateItemView(TSubclassOf<UFGItemDescriptor> descriptorClass, UImage* imageWidget, UTextBlock* nameWidget, UTextBlock* descriptionWidget)
+void UItemsWindowWidgetBase::UpdateItemView(TSubclassOf<UFGItemDescriptor> DescriptorClass, UImage* ImageWidget, UTextBlock* NameWidget, UTextBlock* DescriptionWidget)
 {
-	if (!IsValid(descriptorClass))
+	if (!IsValid(DescriptorClass))
 		return;
 
-	nameWidget->SetText(UFGItemDescriptor::GetItemName(descriptorClass));
-	descriptionWidget->SetText(UFGItemDescriptor::GetItemDescription(descriptorClass));
+	// TODO: Use UItemTooltipHandler::GetItemName/Description instead
+	NameWidget->SetText(UFGItemDescriptor::GetItemName(DescriptorClass));
+	DescriptionWidget->SetText(UFGItemDescriptor::GetItemDescription(DescriptorClass));
 
-	UTexture2D* BigIcon = UFGItemDescriptor::GetBigIcon(descriptorClass);
+	UTexture2D* BigIcon = UFGItemDescriptor::GetBigIcon(DescriptorClass);
 
 	if (!IsValid(BigIcon))
 	{
 		BigIcon = MissingIconTexture;
 	}
 
-	imageWidget->Brush.SetResourceObject(BigIcon);
-	imageWidget->Brush.ImageSize = FVector2D(BigIcon->GetSizeX(), BigIcon->GetSizeY());
+	ImageWidget->Brush.SetResourceObject(BigIcon);
+	ImageWidget->Brush.ImageSize = FVector2D(BigIcon->GetSizeX(), BigIcon->GetSizeY());
+
+	UpdateInfoPanels(DescriptorClass);
+}
+
+void UItemsWindowWidgetBase::UpdateInfoPanels(TSubclassOf<UFGItemDescriptor> DescriptorClass)
+{
+	for (const TInfoPanelEntry& PanelEntry : InfoPanels)
+	{
+		auto CollapsableWidget = PanelEntry.Key;
+		auto ItemInfo = PanelEntry.Value;
+
+		if (ItemInfo->SetItemDescriptor(DescriptorClass))
+		{
+			CollapsableWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		}
+		else
+		{
+			CollapsableWidget->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
 }
 
 bool UItemsWindowWidgetBase::ShowWindow()

@@ -12,10 +12,6 @@ class UContentManager : public UObject
 	~UContentManager();
 
 public:
-	template<class TParentClass>
-	UFUNCTION(BlueprintCallable)
-	void SearchAssetsForChildClasses(UClass* InBaseClass, TArray<TSoftClassPtr<TParentClass>>& OutArray);
-
 	UFUNCTION(BlueprintCallable)
 	void FindAllDescriptors(TArray<TSubclassOf<class UFGItemDescriptor>>& OutArray, bool bSortByDisplayName);
 
@@ -26,4 +22,7 @@ public:
 
 private:
 	TArray<TSubclassOf<class UFGItemDescriptor>>* CachedDescriptors;
+
+	template<class TParentClass>
+	static void SearchAssetsForChildClasses(UClass* InBaseClass, TArray<TSoftClassPtr<TParentClass>>& OutArray);
 };
