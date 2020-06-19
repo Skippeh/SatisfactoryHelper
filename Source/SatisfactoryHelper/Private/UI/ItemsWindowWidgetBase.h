@@ -5,6 +5,8 @@
 #include "UI/FGInteractWidget.h"
 #include "ItemsWindowWidgetBase.generated.h"
 
+typedef TTuple<class UCollapsableWidgetBase*, class USHItemInfo*> TInfoPanelEntry;
+
 struct FSearchResult
 {
 	int32 Score;
@@ -41,12 +43,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool HideWindow();
 
-	void InitializeWindow();
+	void NativeOnInitialized() override;
 
 protected:
 	// Tries to find the index of the specified item descriptor in the given list. Returns -1 if it's not found or if the specified list's ItemList is not of type TArray<UDescriptorReference>.
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	int32 FindItemIndexInList(TSubclassOf<class UFGItemDescriptor> searchClass, class UListView* inListView);
+	int32 FindItemIndexInList(TSubclassOf<class UFGItemDescriptor> SearchClass, class UListView* ListView);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UWidgetAnimation* FadeInAnimation;
@@ -65,19 +67,40 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UTexture2D* MissingIconTexture;
-	
-private:
+
+	UPROPERTY(BlueprintReadOnly)
+	class ASHItemInfoSubsystem* ItemInfoSubsystem;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UCollapsableWidgetBase> CollapsableWidgetClass;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	UPanelWidget* GetPanelsContainer() const;
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void FilterItems(FString searchText, const TArray<class UDescriptorReference*>& inItemsArray, TArray<class UDescriptorReference*>& outItemsArray) const;
+	void FilterItems(FString SearchText, const TArray<class UDescriptorReference*>& InItemsArray, TArray<class UDescriptorReference*>& OutItemsArray) const;
 
 	UFUNCTION(BlueprintCallable)
-	void UpdateItemView(TSubclassOf<class UFGItemDescriptor> descriptorClass, class UImage* imageWidget, class UTextBlock* nameWidget, class UTextBlock* descriptionWidget);
+	void UpdateItemView(TSubclassOf<UFGItemDescriptor> DescriptorClass, UImage * ImageWidget, UTextBlock * NameWidget, UTextBlock * DescriptionWidget);
+	
+private:
+	UFUNCTION()
+	void UpdateInfoPanels(TSubclassOf<UFGItemDescriptor> DescriptorClass);
 
+	UPROPERTY()
 	FTimerHandle FadeTimerHandle;
 
+	UFUNCTION()
 	void OnFadeOutFinished();
+
+	UFUNCTION()
 	void OnFadeFinished();
 
+	UPROPERTY()
 	bool bIsFading = false;
+
+	UPROPERTY()
 	bool bIsVisible = false;
+
+	TArray<TInfoPanelEntry> InfoPanels;
 };

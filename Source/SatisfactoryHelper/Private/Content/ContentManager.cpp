@@ -4,6 +4,7 @@
 #include "FactoryGame/Public/Resources/FGItemDescriptor.h"
 #include "SML/util/Logging.h"
 #include "SHInit.h"
+#include "ItemInfos/SHItemInfo.h"
 #include "Resources/FGAnyUndefinedDescriptor.h"
 #include "Resources/FGNoneDescriptor.h"
 #include "Resources/FGWildCardDescriptor.h"
@@ -11,14 +12,13 @@
 
 using namespace SML;
 
-TArray<TAssetSubclassOf<class UFGItemDescriptor>>* CachedDescriptors = nullptr;
-
 template<class TParentClass>
 void UContentManager::SearchAssetsForChildClasses(UClass* InBaseClass, TArray<TSoftClassPtr<TParentClass>>& OutArray)
 {
 	// Search blueprint classes using the asset registry
 	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 	IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
+
 	FName BaseClassName = InBaseClass->GetFName();
 
 	// Get derived class names
@@ -50,9 +50,9 @@ void UContentManager::SearchAssetsForChildClasses(UClass* InBaseClass, TArray<TS
 
 		const FString ClassObjectPath = FPackageName::ExportTextPathToObjectPath(*GeneratedClassPathPtr);
 		const FString ClassName = FPackageName::ObjectPathToObjectName(ClassObjectPath);
-
+		
 		// Make sure the derived class names contains the current class
-		if (!DerivedNames.Contains(*ClassName))
+		if (!DerivedNames.Contains(FName(*ClassName)))
 			continue;
 
 		// Create soft class pointer reference and add to out array
@@ -73,7 +73,7 @@ void UContentManager::FindAllDescriptors(TArray<TSubclassOf<UFGItemDescriptor>>&
 {
 	if (!CachedDescriptors)
 	{
-		auto AllDescriptors = TArray<TSoftClassPtr<class UFGItemDescriptor>>();
+		TArray<TSoftClassPtr<UFGItemDescriptor>> AllDescriptors;
 		SearchAssetsForChildClasses<UFGItemDescriptor>(UFGItemDescriptor::StaticClass(), AllDescriptors);
 		CachedDescriptors = new TArray<TSubclassOf<UFGItemDescriptor>>();
 		auto InvalidItemClasses = GetInvalidItemDescriptorClasses();

@@ -1,4 +1,5 @@
 #include "CollapsableWidgetBase.h"
+#include "Components/PanelWidget.h"
 
 #pragma region Empty blueprint implementations
 bool UCollapsableWidgetBase::Collapse_Implementation() { return bool(); }
@@ -12,4 +13,11 @@ void UCollapsableWidgetBase::ToggleExpanded()
 		Collapse();
 	else
 		Expand();
+}
+
+void UCollapsableWidgetBase::SetContent(UWidget* ContentWidget)
+{
+	auto ContentContainer = GetContentContainer();
+	ContentContainer->ClearChildren();
+	ContentContainer->AddChild(ContentWidget);
 }

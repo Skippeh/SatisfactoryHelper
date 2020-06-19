@@ -17,8 +17,7 @@ void UItemDebugData::UpdateClassInheritancePath(TSubclassOf<UFGItemDescriptor> D
 		CurrentClass = CurrentClass->GetSuperClass();
 	} while (IsValid(CurrentClass));
 
-	ClassInheritancePath.Reset();
-	ClassInheritancePath.JoinBy(ParentClasses, TEXT(" <- "), [](UClass* Class)
+	ClassInheritancePath = FString::JoinBy(ParentClasses, TEXT(" <- "), [](UClass* Class)
 	{
 		return Class->GetName();
 	});

@@ -1,7 +1,14 @@
 #include "SHItemInfo.h"
 #include "Resources/FGItemDescriptor.h"
-#include "ItemInfoData/SHItemInfoManager.h"
+#include "ItemInfoData/SHItemInfoSubsystem.h"
 #include "SHInit.h"
+#include "SHBlueprintFunctionLibrary.h"
+
+void USHItemInfo::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+	verify(IsValid(DataClass)); // Fail early in case DataClass is not set.
+}
 
 bool USHItemInfo::SetItemDescriptor(TSubclassOf<UFGItemDescriptor> NewItemDescriptor)
 {
@@ -11,24 +18,27 @@ bool USHItemInfo::SetItemDescriptor(TSubclassOf<UFGItemDescriptor> NewItemDescri
 	if (NewItemDescriptor->HasAnyClassFlags(CLASS_Abstract))
 		return false;
 
+	if (!ShouldShowForItemDescriptor(NewItemDescriptor))
+		return false;
+
 	ItemDescriptor = NewItemDescriptor;
 
-	check(IsValid(DataClass));
-	auto ItemInfoManager = GetItemInfoManager();
+	auto ItemInfoManager = GetItemInfoSubsystem();
 	auto ItemData = ItemInfoManager->GetItemData(NewItemDescriptor, DataClass);
 
 	OnDescriptorSet(NewItemDescriptor, ItemData);
 	return true;
 }
 
+bool USHItemInfo::ShouldShowForItemDescriptor_Implementation(TSubclassOf<UFGItemDescriptor> ItemClass) const { return true; }
 void USHItemInfo::OnDescriptorSet_Implementation(TSubclassOf<UFGItemDescriptor> NewItemDescriptor, USHItemData* ItemData) { /* no default impl */ }
 
-ASHItemInfoManager* USHItemInfo::GetItemInfoManager()
+ASHItemInfoSubsystem* USHItemInfo::GetItemInfoSubsystem()
 {
-	if (!IsValid(CachedInfoManager))
+	if (!IsValid(CachedInfoSubsystem))
 	{
-		CachedInfoManager = ASHInit::GetSingleton(GetOuter()->GetWorld())->GetItemInfoManager();
+		CachedInfoSubsystem = USHBlueprintFunctionLibrary::GetItemInfoSubsystem(GetWorld());
 	}
 
-	return CachedInfoManager;
+	return CachedInfoSubsystem;
 }

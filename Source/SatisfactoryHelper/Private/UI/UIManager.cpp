@@ -11,9 +11,9 @@ void AUIManager::BeginPlay()
 	PlayerController = CastChecked<AFGPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
 	HUD = CastChecked<AFGHUD>(PlayerController->GetHUD());
 
-	check(IsValid(PlayerController));
-	check(IsValid(HUD));
-	check(IsValid(ItemsWindowClass));
+	verify(IsValid(PlayerController));
+	verify(IsValid(HUD));
+	verify(IsValid(ItemsWindowClass));
 
 	ItemsWindow = NewObject<UItemsWindowWidgetBase>(PlayerController, ItemsWindowClass);
 	ItemsWindow->SetOwningPlayer(PlayerController);

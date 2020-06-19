@@ -8,7 +8,7 @@
 class UFGItemDescriptor;
 
 UCLASS(Abstract)
-class USHItemInfo : public UUserWidget
+class SATISFACTORYHELPER_API USHItemInfo : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -19,9 +19,20 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE TSubclassOf<UFGItemDescriptor> GetItemDescriptor() const { return ItemDescriptor; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE FText GetTitle() const { return Title; }
+
+	/** Gets the main data class that this info widget gets its data from. */
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE TSubclassOf<USHItemData> GetDataClass() const { return DataClass; }
+
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE bool HasValidDescriptor() const { return IsValid(ItemDescriptor); }
+
+	/** Returns true if the specified item descriptor is valid for this widget. If false then this widget won't be shown for this item. Default is true. */
+	UFUNCTION(BlueprintNativeEvent)
+	bool ShouldShowForItemDescriptor(TSubclassOf<UFGItemDescriptor> ItemClass) const;
 
 	/** Called when a new item descriptor has been set. */
 	UFUNCTION(BlueprintNativeEvent)
@@ -31,7 +42,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Meta = (ExposeOnSpawn = "true"))
 	TSubclassOf<UFGItemDescriptor> ItemDescriptor;
 
-	/** The data class this ItemInfo reads from. */
+	/** REQUIRED! The data class this ItemInfo reads from. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<USHItemData> DataClass;
 
@@ -41,8 +52,11 @@ protected:
 
 	/** Gets the ItemInfoManager instance. */
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ASHItemInfoManager* GetItemInfoManager();
+	ASHItemInfoSubsystem* GetItemInfoSubsystem();
+
+	void NativeOnInitialized() override;
 
 private:
-	ASHItemInfoManager* CachedInfoManager = nullptr;
+	UPROPERTY()
+	ASHItemInfoSubsystem* CachedInfoSubsystem = nullptr;
 };

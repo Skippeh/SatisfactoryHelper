@@ -8,7 +8,8 @@
 #include "FGSubsystem.h"
 #include "SHSubsystemHolder.h"
 #include "Subsystems/SHCheatSubsystem.h"
-#include "ItemInfoData/SHItemInfoManager.h"
+#include "ItemInfoData/SHItemInfoSubsystem.h"
+#include "SatisfactoryModLoader.h"
 
 UContentManager* USHBlueprintFunctionLibrary::GetContentManager(UObject* InWorldContext)
 {
@@ -61,7 +62,17 @@ ASHCheatSubsystem* USHBlueprintFunctionLibrary::GetCheatSubsystem(UObject* World
 	return SubsystemHolder->GetCheatSubsystem();
 }
 
-USHItemData* USHBlueprintFunctionLibrary::GetItemData(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor, TSubclassOf<USHItemData> DataClass)
+ASHItemInfoSubsystem* USHBlueprintFunctionLibrary::GetItemInfoSubsystem(UObject* WorldContext)
 {
-	return GetInit(WorldContextObject)->GetItemInfoManager()->GetItemData(ItemDescriptor, DataClass);
+	auto SubsystemHolder = GetSHSubsystemHolder(WorldContext);
+
+	if (!IsValid(SubsystemHolder))
+		return nullptr;
+
+	return SubsystemHolder->GetItemInfoSubsystem();
+}
+
+bool USHBlueprintFunctionLibrary::IsDebugModeEnabled()
+{
+	return SML::getSMLConfig().debugLogOutput;
 }

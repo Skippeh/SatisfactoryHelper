@@ -36,7 +36,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Subsystem")
 	static class ASHCheatSubsystem* GetCheatSubsystem(UObject* WorldContext);
-	
-	UFUNCTION(BlueprintCallable, Category = "SatisfactoryHelper |")
-	static class USHItemData* GetItemData(UObject* WorldContextObject, TSubclassOf<class UFGItemDescriptor> ItemDescriptor, TSubclassOf<class USHItemData> DataClass);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Subsystem")
+	static class ASHItemInfoSubsystem* GetItemInfoSubsystem(UObject* WorldContext);
+
+	/** Returns true if SML debug mode is enabled. */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | SML")
+	static bool IsDebugModeEnabled();
 };
