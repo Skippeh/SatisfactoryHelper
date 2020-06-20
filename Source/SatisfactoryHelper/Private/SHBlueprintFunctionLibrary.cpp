@@ -33,19 +33,6 @@ USHRCO* USHBlueprintFunctionLibrary::GetRCOFromPlayer(AFGPlayerController* Playe
 	return RCO;
 }
 
-bool USHBlueprintFunctionLibrary::IsItemDescriptorAnInvalidClass(TSubclassOf<UFGItemDescriptor> InDescriptorClass)
-{
-	auto InvalidClasses = UContentManager::GetInvalidItemDescriptorClasses();
-
-	for (auto InvalidClass : InvalidClasses)
-	{
-		if (InDescriptorClass->IsChildOf(InvalidClass))
-			return true;
-	}
-
-	return false;
-}
-
 USHSubsystemHolder* USHBlueprintFunctionLibrary::GetSHSubsystemHolder(UObject* WorldContext)
 {
 	USHSubsystemHolder* SubsystemHolder = GetSubsystemHolder<USHSubsystemHolder>(WorldContext);
@@ -75,4 +62,24 @@ ASHItemInfoSubsystem* USHBlueprintFunctionLibrary::GetItemInfoSubsystem(UObject*
 bool USHBlueprintFunctionLibrary::IsDebugModeEnabled()
 {
 	return SML::getSMLConfig().debugLogOutput;
+}
+
+FString USHBlueprintFunctionLibrary::GetClassInheritancePathString(UClass* Class)
+{
+	if (!IsValid(Class))
+		return FString(TEXT("INVALID_PTR"));
+
+	TArray<UClass*> ParentClasses;
+	UClass* CurrentClass = Class;
+
+	do
+	{
+		ParentClasses.Add(CurrentClass);
+		CurrentClass = CurrentClass->GetSuperClass();
+	} while (IsValid(CurrentClass));
+
+	return FString::JoinBy(ParentClasses, TEXT(" <- "), [](UClass* Class)
+	{
+		return Class->GetName();
+	});
 }

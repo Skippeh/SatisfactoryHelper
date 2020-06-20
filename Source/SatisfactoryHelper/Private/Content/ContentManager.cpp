@@ -9,6 +9,9 @@
 #include "Resources/FGNoneDescriptor.h"
 #include "Resources/FGWildCardDescriptor.h"
 #include "Resources/FGResourceDescriptor.h"
+#include "Resources/FGOverflowDescriptor.h"
+#include "FGSchematicManager.h"
+#include "FGUnlockRecipe.h"
 
 using namespace SML;
 
@@ -73,32 +76,25 @@ void UContentManager::FindAllDescriptors(TArray<TSubclassOf<UFGItemDescriptor>>&
 {
 	if (!CachedDescriptors)
 	{
-		TArray<TSoftClassPtr<UFGItemDescriptor>> AllDescriptors;
-		SearchAssetsForChildClasses<UFGItemDescriptor>(UFGItemDescriptor::StaticClass(), AllDescriptors);
 		CachedDescriptors = new TArray<TSubclassOf<UFGItemDescriptor>>();
-		auto InvalidItemClasses = GetInvalidItemDescriptorClasses();
+		TSet<TSubclassOf<UFGItemDescriptor>> ItemDescriptorSet;
+		TArray<TSubclassOf<UFGRecipe>> AllRecipes;
+		GetAllRecipes(AllRecipes);
 
-		// Exclude invalid descriptor types
-		for (auto DescriptorClassRef : AllDescriptors)
+		for (TSubclassOf<UFGRecipe> Recipe : AllRecipes)
 		{
-			auto DescriptorClass = DescriptorClassRef.Get();
-			bool bShouldSkipDescriptor = false;
-
-			// Check if class inherits from a non valid item type
-			for (TSubclassOf<UFGItemDescriptor> InvalidClass : InvalidItemClasses)
+			for (FItemAmount Ingredient : UFGRecipe::GetIngredients(Recipe))
 			{
-				if (DescriptorClass->IsChildOf(InvalidClass))
-				{
-					bShouldSkipDescriptor = true;
-					break;
-				}
+				ItemDescriptorSet.Add(Ingredient.ItemClass);
 			}
 
-			if (bShouldSkipDescriptor)
-				continue;
-
-			CachedDescriptors->Add(DescriptorClass);
+			for (FItemAmount Product : UFGRecipe::GetProducts(Recipe))
+			{
+				ItemDescriptorSet.Add(Product.ItemClass);
+			}
 		}
+
+		CachedDescriptors->Append(ItemDescriptorSet.Array());
 	}
 
 	OutArray.Append(*CachedDescriptors);
@@ -115,21 +111,41 @@ void UContentManager::FindAllDescriptors(TArray<TSubclassOf<UFGItemDescriptor>>&
 	}
 }
 
-TArray<TSubclassOf<UFGItemDescriptor>> UContentManager::GetInvalidItemDescriptorClasses()
+void UContentManager::GetAllRecipes(TArray<TSubclassOf<UFGRecipe>>& OutArray)
 {
-	TArray<TSubclassOf<UFGItemDescriptor>> Classes;
+	if (!CachedRecipes)
+	{
+		CachedRecipes = new TArray<TSubclassOf<UFGRecipe>>();
+		AFGSchematicManager* SchematicManager = AFGSchematicManager::Get(GetOuter());
+		TArray<TSubclassOf<UFGSchematic>> AllSchematics;
+		SchematicManager->GetAllSchematics(AllSchematics);
 
-	Classes.Add(UFGAnyUndefinedDescriptor::StaticClass());
-	Classes.Add(UFGNoneDescriptor::StaticClass());
-	Classes.Add(UFGWildCardDescriptor::StaticClass());
+		for (TSubclassOf<UFGSchematic> Schematic : AllSchematics)
+		{
+			TArray<UFGUnlock*> Unlocks = UFGSchematic::GetUnlocks(Schematic);
 
-	return Classes;
+			for (UFGUnlock* Unlock : Unlocks)
+			{
+				auto RecipeUnlock = Cast<UFGUnlockRecipe>(Unlock);
+
+				if (!IsValid(RecipeUnlock))
+					continue;
+
+				CachedRecipes->Append(RecipeUnlock->GetRecipesToUnlock());
+			}
+		}
+	}
+
+	OutArray.Append(*CachedRecipes);
 }
 
 UContentManager::~UContentManager()
 {
 	if (CachedDescriptors)
 		delete CachedDescriptors;
+
+	if (CachedRecipes)
+		delete CachedRecipes;
 }
 
 #pragma region Singleton implementation
