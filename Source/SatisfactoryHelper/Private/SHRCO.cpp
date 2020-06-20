@@ -42,9 +42,6 @@ bool USHRCO::GiveItem_Validate(TSubclassOf<UFGItemDescriptor> ItemClass, int32 N
 	if (ItemClass->IsChildOf(UFGBuildDescriptor::StaticClass()))
 		return false;
 
-	if (USHBlueprintFunctionLibrary::IsItemDescriptorAnInvalidClass(ItemClass))
-		return false;
-
 	return true;
 }
 
