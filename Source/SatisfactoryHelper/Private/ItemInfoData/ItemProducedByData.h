@@ -12,7 +12,7 @@ struct FRecipes
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	TArray<TSubclassOf<UFGRecipe>> Recipes;
 };
 
@@ -21,10 +21,10 @@ struct FManufacturerRecipes
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	TSubclassOf<UObject> Manufacturer;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	TArray<TSubclassOf<UFGRecipe>> Recipes;
 
 	FManufacturerRecipes(TSubclassOf<UObject> Manufacturer, TArray<TSubclassOf<UFGRecipe>> InRecipes)

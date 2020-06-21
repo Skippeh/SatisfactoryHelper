@@ -185,7 +185,7 @@ bool UItemsWindowWidgetBase::ShowWindow()
 	if (bIsFading || bIsVisible)
 		return false;
 
-	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	SetVisibility(ESlateVisibility::Visible);
 
 	if (IsValid(FadeInAnimation))
 		PlayAnimation(FadeInAnimation);

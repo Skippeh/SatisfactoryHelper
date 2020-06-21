@@ -22,4 +22,15 @@ public:
 	/** Returns all recipes that uses the given item as an input/ingredient. */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Recipes")
 	static TArray<TSubclassOf<UFGRecipe>> FindRecipesByIngredient(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor);
+
+	/** Gets the manufacturer's name. Input types can be of type TSubclassOf<AFGBuildGun or UFGItemDescriptor or UFGWorkBench> */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Recipes")
+	static FText GetManufacturerName(TSubclassOf<UObject> ManufacturerClass);
+
+	/**
+	* Gets the manufacturer's icon. Input types can be of type TSubclassOf<AFGBuildGun or UFGItemDescriptor or UFGWorkBench>.
+	* Return value may be null.
+	*/
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Recipes")
+	static UTexture2D* GetManufacturerIcon(TSubclassOf<UObject> ManufacturerClass);
 };

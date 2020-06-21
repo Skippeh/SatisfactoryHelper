@@ -18,7 +18,7 @@ void UItemProducedByData::SetPropertiesFromItemDescriptor_Implementation(TSubcla
 
 		for (TSubclassOf<UObject> Manufacturer : RecipeManufacturers)
 		{
-			FRecipes ManufacturerRecipes = MapOfManufacturers.FindOrAdd(Manufacturer);
+			FRecipes& ManufacturerRecipes = MapOfManufacturers.FindOrAdd(Manufacturer);
 			ManufacturerRecipes.Recipes.Add(Recipe);
 		}
 	}
