@@ -12,6 +12,12 @@ void UItemSlotGridBase::AddDescriptor(TSubclassOf<UFGItemDescriptor> ItemDescrip
 	AddChild(ConstructSlotWidget(InventoryStack));
 }
 
+void UItemSlotGridBase::AddItemAmount(const FItemAmount& InItemAmount)
+{
+	FInventoryStack InventoryStack(InItemAmount.Amount, InItemAmount.ItemClass);
+	AddChild(ConstructSlotWidget(InventoryStack));
+}
+
 void UItemSlotGridBase::AddStacks(const TArray<FInventoryStack>& InInventoryStacks)
 {
 	for (const FInventoryStack& InventoryStack : InInventoryStacks)
@@ -32,6 +38,18 @@ void UItemSlotGridBase::AddDescriptors(const TArray<TSubclassOf<UFGItemDescripto
 	AddStacks(InventoryStacks);
 }
 
+void UItemSlotGridBase::AddItemAmounts(const TArray<FItemAmount>& InItemAmounts)
+{
+	TArray<FInventoryStack> InventoryStacks;
+
+	for (auto ItemAmount : InItemAmounts)
+	{
+		InventoryStacks.Add(FInventoryStack(ItemAmount.Amount, ItemAmount.ItemClass));
+	}
+
+	AddStacks(InventoryStacks);
+}
+
 void UItemSlotGridBase::ClearAndAddStacks(const TArray<FInventoryStack>& InInventoryStacks)	
 {
 	ClearChildren();
@@ -42,4 +60,10 @@ void UItemSlotGridBase::ClearAndAddDescriptors(const TArray<TSubclassOf<UFGItemD
 {
 	ClearChildren();
 	AddDescriptors(InItemDescriptors);
+}
+
+void UItemSlotGridBase::ClearAndAddItemAmounts(const TArray<FItemAmount>& InItemAmounts)
+{
+	ClearChildren();
+	AddItemAmounts(InItemAmounts);
 }
