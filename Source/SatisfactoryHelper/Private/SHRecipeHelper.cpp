@@ -4,7 +4,7 @@
 #include "Content/ContentManager.h"
 #include "util/Logging.h"
 
-TArray<TSubclassOf<UFGRecipe>> SHRecipeHelper::FindRecipesByProduct(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor)
+TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByProduct(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor)
 {
 	TArray<TSubclassOf<UFGRecipe>> ResultArray;
 	TArray<TSubclassOf<UFGRecipe>> AllRecipes;

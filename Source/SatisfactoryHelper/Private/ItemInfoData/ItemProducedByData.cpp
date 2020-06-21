@@ -6,7 +6,7 @@
 
 void UItemProducedByData::SetPropertiesFromItemDescriptor_Implementation(TSubclassOf<UFGItemDescriptor> ItemDescriptor)
 {
-	TArray<TSubclassOf<UFGRecipe>> ProducedByArray = SHRecipeHelper::FindRecipesByProduct(GetOuter(), ItemDescriptor);
+	TArray<TSubclassOf<UFGRecipe>> ProducedByArray = USHRecipeHelper::FindRecipesByProduct(GetOuter(), ItemDescriptor);
 
 	SML::Logging::debug(*FString::Printf(TEXT("Found %d recipes producing %s"), ProducedByArray.Num(), *(UFGItemDescriptor::GetItemName(ItemDescriptor).ToString())));
 
