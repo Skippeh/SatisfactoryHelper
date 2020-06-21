@@ -23,3 +23,23 @@ TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByProduct(UObject* Wo
 
 	return ResultArray;
 }
+
+TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByIngredient(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor)
+{
+	TArray<TSubclassOf<UFGRecipe>> ResultArray;
+	TArray<TSubclassOf<UFGRecipe>> AllRecipes;
+	UContentManager::GetSingleton(WorldContextObject)->GetAllRecipes(ResultArray);
+
+	for (auto Recipe : AllRecipes)
+	{
+		if (UFGRecipe::GetIngredients(Recipe).ContainsByPredicate([ItemDescriptor](const FItemAmount& ItemAmount)
+		{
+			return ItemAmount.ItemClass == ItemDescriptor;
+		}))
+		{
+			ResultArray.Add(Recipe);
+		}
+	}
+
+	return ResultArray;
+}

@@ -16,6 +16,10 @@ class SATISFACTORYHELPER_API USHRecipeHelper : public UObject
 
 public:
 	/** Returns all recipes that output the given item. */
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Recipes")
 	static TArray<TSubclassOf<UFGRecipe>> FindRecipesByProduct(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor);
+
+	/** Returns all recipes that uses the given item as an input/ingredient. */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Recipes")
+	static TArray<TSubclassOf<UFGRecipe>> FindRecipesByIngredient(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor);
 };
