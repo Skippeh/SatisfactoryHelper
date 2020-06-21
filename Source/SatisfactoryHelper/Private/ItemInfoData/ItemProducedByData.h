@@ -14,6 +14,8 @@ struct FRecipes
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<TSubclassOf<UFGRecipe>> Recipes;
+
+	bool bContainsDefaultRecipe;
 };
 
 USTRUCT(BlueprintType)
