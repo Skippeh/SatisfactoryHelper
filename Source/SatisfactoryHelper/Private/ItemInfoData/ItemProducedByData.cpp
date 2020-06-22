@@ -9,7 +9,7 @@ static FString AlternateString = FString(TEXT("Alternate"));
 void UItemProducedByData::SetPropertiesFromItemDescriptor_Implementation(TSubclassOf<UFGItemDescriptor> ItemDescriptor)
 {
 	TArray<TSubclassOf<UFGRecipe>> ProducedByArray = USHRecipeHelper::FindRecipesByProduct(GetOuter(), ItemDescriptor);
-	TMap<TSubclassOf<UObject>, FRecipes> MapOfManufacturers;
+	TMap<TSubclassOf<UObject>, FTempRecipes> MapOfManufacturers;
 
 	// Sort by name
 	ProducedByArray.Sort([](const TSubclassOf<UFGRecipe>& A, const TSubclassOf<UFGRecipe>& B)
@@ -35,7 +35,7 @@ void UItemProducedByData::SetPropertiesFromItemDescriptor_Implementation(TSubcla
 
 		for (TSubclassOf<UObject> Manufacturer : RecipeManufacturers)
 		{
-			FRecipes& ManufacturerRecipes = MapOfManufacturers.FindOrAdd(Manufacturer);
+			FTempRecipes& ManufacturerRecipes = MapOfManufacturers.FindOrAdd(Manufacturer);
 			ManufacturerRecipes.Recipes.Add(Recipe);
 
 			if (!UFGRecipe::GetRecipeName(Recipe).ToString().StartsWith(AlternateString))
@@ -43,7 +43,7 @@ void UItemProducedByData::SetPropertiesFromItemDescriptor_Implementation(TSubcla
 		}
 	}
 
-	MapOfManufacturers.ValueSort([](const FRecipes& A, const FRecipes& B)
+	MapOfManufacturers.ValueSort([](const FTempRecipes& A, const FTempRecipes& B)
 	{
 		return A.bContainsDefaultRecipe > B.bContainsDefaultRecipe;
 	});

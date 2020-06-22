@@ -7,14 +7,9 @@
 class UFGBuildDescriptor;
 class UFGRecipe;
 
-USTRUCT(BlueprintType)
-struct FRecipes
+struct FTempRecipes
 {
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(BlueprintReadWrite)
 	TArray<TSubclassOf<UFGRecipe>> Recipes;
-
 	bool bContainsDefaultRecipe;
 };
 
