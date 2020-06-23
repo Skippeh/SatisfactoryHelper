@@ -7,12 +7,17 @@
 #include "FGBuildGun.h"
 #include "FGWorkBench.h"
 #include "SHBlueprintFunctionLibrary.h"
+#include "FGRecipeManager.h"
 
-TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByProduct(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor)
+TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByProduct(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor, bool bIncludeLockedRecipes)
 {
 	TArray<TSubclassOf<UFGRecipe>> ResultArray;
 	TArray<TSubclassOf<UFGRecipe>> AllRecipes;
-	UContentManager::GetSingleton(WorldContextObject)->GetAllRecipes(AllRecipes);
+
+	if (bIncludeLockedRecipes)
+		UContentManager::GetSingleton(WorldContextObject)->GetAllRecipes(AllRecipes);
+	else
+		GetRecipeManager(WorldContextObject)->GetAllAvailableRecipes(AllRecipes);
 	
 	for (auto Recipe : AllRecipes)
 	{
@@ -28,11 +33,15 @@ TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByProduct(UObject* Wo
 	return ResultArray;
 }
 
-TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByIngredient(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor)
+TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByIngredient(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor, bool bIncludeLockedRecipes)
 {
 	TArray<TSubclassOf<UFGRecipe>> ResultArray;
 	TArray<TSubclassOf<UFGRecipe>> AllRecipes;
-	UContentManager::GetSingleton(WorldContextObject)->GetAllRecipes(ResultArray);
+
+	if (bIncludeLockedRecipes)
+		UContentManager::GetSingleton(WorldContextObject)->GetAllRecipes(AllRecipes);
+	else
+		GetRecipeManager(WorldContextObject)->GetAllAvailableRecipes(AllRecipes);
 
 	for (auto Recipe : AllRecipes)
 	{
@@ -97,4 +106,45 @@ UTexture2D* USHRecipeHelper::GetManufacturerIcon(TSubclassOf<UObject> Manufactur
 	}
 
 	return InvalidClassSpecified<UTexture2D*>(ManufacturerClass, nullptr);
+}
+
+AFGRecipeManager* USHRecipeHelper::RecipeManager = nullptr;
+AFGRecipeManager* USHRecipeHelper::GetRecipeManager(UObject* WorldContextObject)
+{
+	if (!IsValid(RecipeManager))
+	{
+		RecipeManager = AFGRecipeManager::Get(WorldContextObject);
+	}
+
+	return RecipeManager;
+}
+
+bool USHRecipeHelper::IsItemUnlocked(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor)
+{
+	AFGRecipeManager* RecipeManager = GetRecipeManager(WorldContextObject);
+	TArray<TSubclassOf<UFGRecipe>> UnlockedRecipes;
+	RecipeManager->GetAllAvailableRecipes(UnlockedRecipes);
+
+	auto ContainsCheck = [ItemDescriptor](const FItemAmount& A)
+	{
+		return A.ItemClass == ItemDescriptor;
+	};
+
+	for (TSubclassOf<UFGRecipe> Recipe : UnlockedRecipes)
+	{
+		if (UFGRecipe::GetIngredients(Recipe).ContainsByPredicate(ContainsCheck) || UFGRecipe::GetProducts(Recipe).ContainsByPredicate(ContainsCheck))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool USHRecipeHelper::IsRecipeUnlocked(UObject* WorldContextObject, TSubclassOf<UFGRecipe> Recipe)
+{
+	AFGRecipeManager* RecipeManager = GetRecipeManager(WorldContextObject);
+	TArray<TSubclassOf<UFGRecipe>> UnlockedRecipes;
+	RecipeManager->GetAllAvailableRecipes(UnlockedRecipes);
+	return UnlockedRecipes.Contains(Recipe);
 }

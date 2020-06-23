@@ -12,6 +12,8 @@
 #include "UI/ItemInfos/SHItemInfo.h"
 #include "UI/Partials/CollapsableWidgetBase.h"
 #include "SHBlueprintFunctionLibrary.h"
+#include "FGRecipeManager.h"
+#include "SHRecipeHelper.h"
 
 #pragma region Empty blueprint implementations
 void UItemsWindowWidgetBase::ClearItemSelection_Implementation() { unimplemented(); }
@@ -51,72 +53,92 @@ void UItemsWindowWidgetBase::NativeOnInitialized()
 	}
 }
 
-void UItemsWindowWidgetBase::FilterItems(FString SearchText, const TArray<UDescriptorReference*>& InItemsArray, TArray<UDescriptorReference*>& OutItemsArray) const
+void UItemsWindowWidgetBase::FilterItems(FString SearchText, bool bShowLockedItems, const TArray<UDescriptorReference*>& InItemsArray, TArray<UDescriptorReference*>& OutItemsArray) const
 {
 	SearchText.TrimStartAndEndInline();
+	TArray<FSearchResult> SearchArray;
 
 	if (SearchText.IsEmpty())
 	{
-		OutItemsArray.Append(InItemsArray);
-		return;
+		for (UDescriptorReference* DescriptorReference : InItemsArray)
+		{
+			SearchArray.Add(FSearchResult(1, DescriptorReference));
+		}
 	}
-
-	TArray<FSearchResult> SearchArray;
-
-	for (UDescriptorReference* DescriptorReference : InItemsArray)
+	else
 	{
-		FString ItemName = UFGItemDescriptor::GetItemName(DescriptorReference->ItemDescriptorClass).ToString();
-		FString ItemDescription = UFGItemDescriptor::GetItemDescription(DescriptorReference->ItemDescriptorClass).ToString();
-		int32 Score = 0;
-		int32 ItemNameIndex = 0;
-		int32 ConsecutiveChars = 0;
-
-		for (int32 SearchTextIndex = 0; SearchTextIndex < SearchText.Len(); /* increment i conditionally in loop */ )
+		for (UDescriptorReference* DescriptorReference : InItemsArray)
 		{
-			// If search text is longer than item name skip this item
-			if (SearchTextIndex >= ItemName.Len())
-			{
-				Score = 0;
-				break;
-			}
+			FString ItemName = UFGItemDescriptor::GetItemName(DescriptorReference->ItemDescriptorClass).ToString();
+			FString ItemDescription = UFGItemDescriptor::GetItemDescription(DescriptorReference->ItemDescriptorClass).ToString();
+			int32 Score = 0;
+			int32 ItemNameIndex = 0;
+			int32 ConsecutiveChars = 0;
 
-			// Create FStrings from TCHAR to support unicode comparison
-			FString NameChar;
-			NameChar.AppendChar(ItemName[ItemNameIndex]);
-			FString SearchChar;
-			SearchChar.AppendChar(SearchText[SearchTextIndex]);
-
-			if (NameChar.Equals(SearchChar, ESearchCase::IgnoreCase))
+			for (int32 SearchTextIndex = 0; SearchTextIndex < SearchText.Len(); /* increment i conditionally in loop */)
 			{
-				if (ItemNameIndex == SearchTextIndex)
+				// If search text is longer than item name skip this item
+				if (SearchTextIndex >= ItemName.Len())
+				{
+					Score = 0;
+					break;
+				}
+
+				// Create FStrings from TCHAR to support unicode comparison
+				FString NameChar;
+				NameChar.AppendChar(ItemName[ItemNameIndex]);
+				FString SearchChar;
+				SearchChar.AppendChar(SearchText[SearchTextIndex]);
+
+				if (NameChar.Equals(SearchChar, ESearchCase::IgnoreCase))
+				{
+					if (ItemNameIndex == SearchTextIndex)
+						++Score;
+
+					++SearchTextIndex;
 					++Score;
+					++ConsecutiveChars;
 
-				++SearchTextIndex;
-				++Score;
-				++ConsecutiveChars;
+					if (ConsecutiveChars >= 2)
+						++Score;
+				}
+				else
+				{
+					ConsecutiveChars = 0;
+				}
 
-				if (ConsecutiveChars >= 2)
-					++Score;
+				++ItemNameIndex;
+
+				// Break out of loop if the current item char index is >= item name length
+				if (ItemNameIndex >= ItemName.Len())
+					break;
 			}
-			else
+
+			if (Score > 0)
 			{
-				ConsecutiveChars = 0;
+				SearchArray.Add(FSearchResult(Score, DescriptorReference));
 			}
-
-			++ItemNameIndex;
-
-			// Break out of loop if the current item char index is >= item name length
-			if (ItemNameIndex >= ItemName.Len())
-				break;
-		}
-
-		if (Score > 0)
-		{
-			SearchArray.Add(FSearchResult(Score, DescriptorReference));
 		}
 	}
 
-	SearchArray.Sort([](const FSearchResult& a, const FSearchResult& b)
+	TArray<FSearchResult> AvailableItems;
+
+	if (!bShowLockedItems)
+	{
+		for (const FSearchResult& SearchResult : SearchArray)
+		{
+			if (USHRecipeHelper::IsItemUnlocked(GetOuter(), SearchResult.DescriptorReference->ItemDescriptorClass))
+			{
+				AvailableItems.Add(SearchResult);
+			}
+		}
+	}
+	else
+	{
+		AvailableItems = SearchArray;
+	}
+
+	AvailableItems.Sort([](const FSearchResult& a, const FSearchResult& b)
 	{
 		if (a.Score != b.Score)
 			return a.Score > b.Score;
@@ -127,7 +149,7 @@ void UItemsWindowWidgetBase::FilterItems(FString SearchText, const TArray<UDescr
 		return ItemAName < ItemBName;
 	});
 
-	for (FSearchResult& SearchResult : SearchArray)
+	for (FSearchResult& SearchResult : AvailableItems)
 	{
 		OutItemsArray.Add(SearchResult.DescriptorReference);
 	}
@@ -164,6 +186,9 @@ void UItemsWindowWidgetBase::UpdateItemView(TSubclassOf<UFGItemDescriptor> Descr
 
 void UItemsWindowWidgetBase::UpdateInfoPanels(TSubclassOf<UFGItemDescriptor> DescriptorClass)
 {
+	if (!IsValid(DescriptorClass))
+		return;
+
 	for (const TInfoPanelEntry& PanelEntry : InfoPanels)
 	{
 		auto CollapsableWidget = PanelEntry.Key;
@@ -180,7 +205,7 @@ void UItemsWindowWidgetBase::UpdateInfoPanels(TSubclassOf<UFGItemDescriptor> Des
 	}
 }
 
-bool UItemsWindowWidgetBase::ShowWindow()
+bool UItemsWindowWidgetBase::ShowWindow_Implementation()
 {
 	if (bIsFading || bIsVisible)
 		return false;
@@ -198,7 +223,7 @@ bool UItemsWindowWidgetBase::ShowWindow()
 	return true;
 }
 
-bool UItemsWindowWidgetBase::HideWindow()
+bool UItemsWindowWidgetBase::HideWindow_Implementation()
 {
 	if (bIsFading || !bIsVisible)
 		return false;
@@ -234,4 +259,21 @@ void UItemsWindowWidgetBase::OnFadeOutFinished()
 {
 	OnFadeFinished();
 	SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UItemsWindowWidgetBase::SetShowAllRecipes(bool bShowAllRecipes)
+{
+	if (!IsValid(CachedInit))
+		CachedInit = ASHInit::GetSingleton(this);
+
+	CachedInit->Config.UserConfig.bShowAllRecipes = bShowAllRecipes;
+	CachedInit->SaveConfig();
+}
+
+bool UItemsWindowWidgetBase::GetShowAllRecipes()
+{
+	if (!IsValid(CachedInit))
+		CachedInit = ASHInit::GetSingleton(this);
+
+	return CachedInit->Config.UserConfig.bShowAllRecipes;
 }

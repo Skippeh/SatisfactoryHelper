@@ -11,12 +11,29 @@ class UContentManager;
 class ASHItemInfoSubsystem;
 
 USTRUCT(BlueprintType)
+struct FSHUserConfig
+{
+	GENERATED_USTRUCT_BODY()
+
+	FSHUserConfig()
+		: bShowAllRecipes(false)
+	{
+	}
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bShowAllRecipes;
+};
+
+USTRUCT(BlueprintType)
 struct FSHConfig
 {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(BlueprintReadOnly)
 	FEnabledCheats Cheats;
+
+	UPROPERTY(BlueprintReadOnly)
+	FSHUserConfig UserConfig;
 
 	FSHConfig()
 		: Cheats(false)
@@ -41,6 +58,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	FSHConfig Config;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void SaveConfig();
 
 protected:
 	void BeginPlay() override;
