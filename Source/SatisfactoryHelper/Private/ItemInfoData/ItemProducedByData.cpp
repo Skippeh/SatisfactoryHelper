@@ -3,12 +3,13 @@
 #include "FGRecipe.h"
 #include "util/Logging.h"
 #include "SHRecipeHelper.h"
+#include "SHInit.h"
 
 static FString AlternateString = FString(TEXT("Alternate"));
 
 void UItemProducedByData::SetPropertiesFromItemDescriptor_Implementation(TSubclassOf<UFGItemDescriptor> ItemDescriptor)
 {
-	TArray<TSubclassOf<UFGRecipe>> ProducedByArray = USHRecipeHelper::FindRecipesByProduct(GetOuter(), ItemDescriptor);
+	TArray<TSubclassOf<UFGRecipe>> ProducedByArray = USHRecipeHelper::FindRecipesByProduct(GetOuter(), ItemDescriptor, true);
 	TMap<TSubclassOf<UObject>, FTempRecipes> MapOfManufacturers;
 
 	// Sort by name

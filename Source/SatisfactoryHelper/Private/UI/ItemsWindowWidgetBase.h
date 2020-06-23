@@ -37,10 +37,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool ToggleWindowVisibility();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	bool ShowWindow();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	bool HideWindow();
 
 	void NativeOnInitialized() override;
@@ -78,15 +78,21 @@ protected:
 	UPanelWidget* GetPanelsContainer() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void FilterItems(FString SearchText, const TArray<class UDescriptorReference*>& InItemsArray, TArray<class UDescriptorReference*>& OutItemsArray) const;
+	void FilterItems(FString SearchText, bool bShowLockedItems, const TArray<class UDescriptorReference*>& InItemsArray, TArray<class UDescriptorReference*>& OutItemsArray) const;
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateItemView(TSubclassOf<UFGItemDescriptor> DescriptorClass, UImage * ImageWidget, UTextBlock * NameWidget, UTextBlock * DescriptionWidget);
-	
-private:
-	UFUNCTION()
+
+	UFUNCTION(BlueprintCallable)
 	void UpdateInfoPanels(TSubclassOf<UFGItemDescriptor> DescriptorClass);
 
+	UFUNCTION(BlueprintCallable)
+	void SetShowAllRecipes(bool bShowAllRecipes);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetShowAllRecipes();
+	
+private:
 	UPROPERTY()
 	FTimerHandle FadeTimerHandle;
 
@@ -103,4 +109,7 @@ private:
 	bool bIsVisible = false;
 
 	TArray<TInfoPanelEntry> InfoPanels;
+
+	UPROPERTY()
+	class ASHInit* CachedInit;
 };

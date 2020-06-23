@@ -9,7 +9,7 @@ USHItemData* ASHItemInfoSubsystem::GetItemData(TSubclassOf<UFGItemDescriptor> De
 {
 	verify(!ItemDataClass->HasAnyClassFlags(CLASS_Abstract));
 
-	auto CachedData = CachedItemDataMap.FindOrAdd(DescriptorClass);
+	FCachedItemData& CachedData = CachedItemDataMap.FindOrAdd(DescriptorClass);
 	USHItemData* ItemData = nullptr;
 	USHItemData** ExistingDataPtr = CachedData.Map.Find(ItemDataClass);
 
