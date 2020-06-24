@@ -108,15 +108,9 @@ UTexture2D* USHRecipeHelper::GetManufacturerIcon(TSubclassOf<UObject> Manufactur
 	return InvalidClassSpecified<UTexture2D*>(ManufacturerClass, nullptr);
 }
 
-AFGRecipeManager* USHRecipeHelper::RecipeManager = nullptr;
 AFGRecipeManager* USHRecipeHelper::GetRecipeManager(UObject* WorldContextObject)
 {
-	if (!IsValid(RecipeManager))
-	{
-		RecipeManager = AFGRecipeManager::Get(WorldContextObject);
-	}
-
-	return RecipeManager;
+	return AFGRecipeManager::Get(WorldContextObject);
 }
 
 bool USHRecipeHelper::IsItemUnlocked(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor)

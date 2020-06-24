@@ -266,8 +266,9 @@ void UItemsWindowWidgetBase::SetShowAllRecipes(bool bShowAllRecipes)
 	if (!IsValid(CachedInit))
 		CachedInit = ASHInit::GetSingleton(this);
 
-	CachedInit->Config.UserConfig.bShowAllRecipes = bShowAllRecipes;
-	CachedInit->SaveConfig();
+	FSHUserConfig UserConfig = CachedInit->GetUserConfig();
+	UserConfig.bShowAllRecipes = bShowAllRecipes;
+	CachedInit->SetUserConfig(UserConfig);
 }
 
 bool UItemsWindowWidgetBase::GetShowAllRecipes()
@@ -275,5 +276,5 @@ bool UItemsWindowWidgetBase::GetShowAllRecipes()
 	if (!IsValid(CachedInit))
 		CachedInit = ASHInit::GetSingleton(this);
 
-	return CachedInit->Config.UserConfig.bShowAllRecipes;
+	return CachedInit->GetUserConfig().bShowAllRecipes;
 }

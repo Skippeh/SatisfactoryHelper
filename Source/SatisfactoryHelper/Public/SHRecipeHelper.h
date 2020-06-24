@@ -44,6 +44,5 @@ public:
 	static bool IsRecipeUnlocked(UObject* WorldContextObject, TSubclassOf<UFGRecipe> Recipe);
 
 private:
-	static AFGRecipeManager* RecipeManager;
 	static AFGRecipeManager* GetRecipeManager(UObject* WorldContextObject);
 };

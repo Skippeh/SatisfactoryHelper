@@ -18,6 +18,7 @@ void ASHInit::BeginPlay()
 {
 	verify(IsValid(UIManagerClass));
 	verify(IsValid(InputManagerClass));
+	Config = LoadConfig();
 	ContentManager = NewObject<UContentManager>(this);
 
 	auto ItemInfoSubsystem = USHBlueprintFunctionLibrary::GetItemInfoSubsystem(GetWorld());
@@ -25,15 +26,13 @@ void ASHInit::BeginPlay()
 
 	UIManager = GetWorld()->SpawnActor<AUIManager>(UIManagerClass);
 	InputManager = GetWorld()->SpawnActor<ASHInputManager>(InputManagerClass);
-
-	Config = LoadConfig();
-
+	
 	if (HasAuthority())
 	{
 		AFGGameMode* GameMode = CastChecked<AFGGameMode>(GetWorld()->GetAuthGameMode());
 		GameMode->RegisterRemoteCallObjectClass(USHRCO::StaticClass());
 		USHBlueprintFunctionLibrary::GetRCO(GetWorld())->Init();
-		USHBlueprintFunctionLibrary::GetCheatSubsystem(GetWorld())->SetEnabledCheats(Config.Cheats);
+		USHBlueprintFunctionLibrary::GetCheatSubsystem(GetWorld())->SetEnabledCheats(&Config.Cheats);
 	}
 
 	// Cache all item descriptors (subsequent calls returns from cache instead of searching assets again)
@@ -52,4 +51,17 @@ ASHInit* ASHInit::GetSingleton(const UObject* InWorldContext)
 		return nullptr;
 
 	return Cast<ASHInit>(FoundActors[0]);
+}
+
+FSHUserConfig ASHInit::GetUserConfig() const
+{
+	return Config.UserConfig;
+}
+
+void ASHInit::SetUserConfig(const FSHUserConfig& InUserConfig, bool bSaveToDisk)
+{
+	Config.UserConfig = InUserConfig;
+
+	if (bSaveToDisk)
+		SaveConfig(Config);
 }
