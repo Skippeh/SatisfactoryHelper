@@ -6,7 +6,6 @@
 
 void USHItemInfo::NativeOnInitialized()
 {
-	Super::NativeOnInitialized();
 	verify(IsValid(DataClass)); // Fail early in case DataClass is not set.
 }
 
@@ -31,7 +30,7 @@ bool USHItemInfo::SetItemDescriptor(TSubclassOf<UFGItemDescriptor> NewItemDescri
 }
 
 bool USHItemInfo::ShouldShowForItemDescriptor_Implementation(TSubclassOf<UFGItemDescriptor> ItemClass) const { return true; }
-void USHItemInfo::OnDescriptorSet_Implementation(TSubclassOf<UFGItemDescriptor> NewItemDescriptor, USHItemData* ItemData) { /* no default impl */ }
+void USHItemInfo::OnDescriptorSet_Implementation(TSubclassOf<UFGItemDescriptor> NewItemDescriptor, USHItemData* ItemData) { unimplemented(); /* no default impl */ }
 
 ASHItemInfoSubsystem* USHItemInfo::GetItemInfoSubsystem()
 {
@@ -41,4 +40,9 @@ ASHItemInfoSubsystem* USHItemInfo::GetItemInfoSubsystem()
 	}
 
 	return CachedInfoSubsystem;
+}
+
+bool USHItemInfo::GetShowAllItems() const
+{
+	return ASHInit::GetSingleton(GetOuter())->GetUserConfig().bShowAllRecipes;
 }

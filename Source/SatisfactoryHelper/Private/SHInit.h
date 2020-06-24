@@ -56,11 +56,14 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UContentManager* GetContentManager() const;
 
-	UPROPERTY(BlueprintReadOnly)
-	FSHConfig Config;
-
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void SaveConfig();
+	void SaveConfig(const FSHConfig& InUserConfig);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FSHUserConfig GetUserConfig() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetUserConfig(const FSHUserConfig& InUserConfig, bool bSaveToDisk = true);
 
 protected:
 	void BeginPlay() override;
@@ -86,6 +89,9 @@ private:
 
 	UPROPERTY()
 	UContentManager* ContentManager;
+
+	UPROPERTY()
+	FSHConfig Config;
 
 #pragma region Singleton
 public:

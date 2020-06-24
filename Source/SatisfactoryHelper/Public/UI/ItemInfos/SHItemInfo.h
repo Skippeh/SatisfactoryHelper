@@ -54,6 +54,10 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ASHItemInfoSubsystem* GetItemInfoSubsystem();
 
+	/** Returns true if we should show all items or just unlocked ones. */
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetShowAllItems() const;
+
 	void NativeOnInitialized() override;
 
 private:
