@@ -45,6 +45,9 @@ public:
 
 	void NativeOnInitialized() override;
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void RefreshWidgets();
+
 protected:
 	// Tries to find the index of the specified item descriptor in the given list. Returns -1 if it's not found or if the specified list's ItemList is not of type TArray<UDescriptorReference>.
 	UFUNCTION(BlueprintCallable, BlueprintPure)

@@ -9,6 +9,7 @@
 #include "SHBlueprintFunctionLibrary.h"
 #include "Subsystems/SHCheatSubsystem.h"
 #include "ItemInfoData/SHItemInfoSubsystem.h"
+#include "FGSchematicManager.h"
 
 AUIManager* ASHInit::GetUIManager() const { return UIManager; }
 ASHInputManager* ASHInit::GetInputManager() const { return InputManager; }
@@ -40,6 +41,9 @@ void ASHInit::BeginPlay()
 	ContentManager->FindAllDescriptors(Descriptors, false);
 
 	SML::Logging::debug(*FString::Printf(TEXT("Found %d descriptor(s)"), Descriptors.Num()));
+
+	auto SchematicManager = AFGSchematicManager::Get(GetWorld());
+	SchematicManager->PurchasedSchematicDelegate.AddDynamic(this, &ASHInit::OnPurchasedSchematic);
 }
 
 ASHInit* ASHInit::GetSingleton(const UObject* InWorldContext)
@@ -64,4 +68,8 @@ void ASHInit::SetUserConfig(const FSHUserConfig& InUserConfig, bool bSaveToDisk)
 
 	if (bSaveToDisk)
 		SaveConfig(Config);
+}
+
+void ASHInit::OnPurchasedSchematic_Implementation(TSubclassOf<UFGSchematic> SchematicClass)
+{
 }

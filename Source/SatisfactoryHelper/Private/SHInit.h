@@ -80,6 +80,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<class USHItemInfo>> ItemInfoClasses;
 
+	UFUNCTION(BlueprintNativeEvent)
+	void OnPurchasedSchematic(TSubclassOf<UFGSchematic> SchematicClass);
+
 private:
 	UPROPERTY()
 	AUIManager* UIManager;
