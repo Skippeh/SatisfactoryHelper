@@ -4,6 +4,7 @@
 #include "util/Logging.h"
 #include "SHRecipeHelper.h"
 #include "SHInit.h"
+#include "FGBuildableAutomatedWorkBench.h"
 
 static FString AlternateString = FString(TEXT("Alternate"));
 
@@ -36,6 +37,9 @@ void UItemProducedByData::SetPropertiesFromItemDescriptor_Implementation(TSubcla
 
 		for (TSubclassOf<UObject> Manufacturer : RecipeManufacturers)
 		{
+			if (Manufacturer->IsChildOf(AFGBuildableAutomatedWorkBench::StaticClass())) // Same as normal workbench
+				continue;
+
 			FTempRecipes& ManufacturerRecipes = MapOfManufacturers.FindOrAdd(Manufacturer);
 			ManufacturerRecipes.Recipes.Add(Recipe);
 
