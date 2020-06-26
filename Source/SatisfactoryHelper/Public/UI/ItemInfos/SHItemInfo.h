@@ -22,6 +22,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE FText GetTitle() const { return Title; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE int32 GetListPriority() const { return ListPriority; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE bool GetCollapsedByDefault() const { return bCollapsedByDefault; }
+
 	/** Gets the main data class that this info widget gets its data from. */
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE TSubclassOf<USHItemData> GetDataClass() const { return DataClass; }
@@ -49,6 +55,14 @@ protected:
 	/** The title to set on the container collapsible widget. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText Title;
+
+	/** The order of appearance in the info panels view. Higher value means appearing further up the list. Default value is 0. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 ListPriority;
+
+	/** If true then this panel will be collapsed by default. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bCollapsedByDefault;
 
 	/** Gets the ItemInfoManager instance. */
 	UFUNCTION(BlueprintCallable, BlueprintPure)

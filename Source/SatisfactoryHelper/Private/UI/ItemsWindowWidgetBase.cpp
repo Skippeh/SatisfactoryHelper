@@ -33,19 +33,27 @@ void UItemsWindowWidgetBase::NativeOnInitialized()
 	verify(IsValid(ItemInfoSubsystem));
 
 	TArray<TSubclassOf<USHItemInfo>> InfoClasses;
-	ItemInfoSubsystem->GetItemInfoClasses(InfoClasses);
+	ItemInfoSubsystem->GetItemInfoClasses(InfoClasses, true);
 
 	SML::Logging::debug(*FString::Printf(TEXT("Initializing %d panels..."), InfoClasses.Num()));
 	UPanelWidget* PanelsContainer = GetPanelsContainer();
 
 	for (auto InfoClass : InfoClasses)
 	{
+		SML::Logging::debug(*FString::Printf(TEXT("Initializing: %s"), *InfoClass.Get()->GetName()));
+
 		UCollapsableWidgetBase* CollapsableWidget = CreateWidget<UCollapsableWidgetBase, UWidget>(this, CollapsableWidgetClass);
 		USHItemInfo* InfoWidget = CreateWidget<USHItemInfo, UWidget>(CollapsableWidget, InfoClass);
 
 		CollapsableWidget->SetContent(InfoWidget);
 		CollapsableWidget->SetTitle(InfoWidget->GetTitle());
 		CollapsableWidget->SetVisibility(ESlateVisibility::Collapsed);
+
+		if (InfoClass.GetDefaultObject()->GetCollapsedByDefault())
+		{
+			CollapsableWidget->Collapse();
+		}
+
 		PanelsContainer->AddChild(CollapsableWidget);
 
 		TInfoPanelEntry Entry(CollapsableWidget, InfoWidget);

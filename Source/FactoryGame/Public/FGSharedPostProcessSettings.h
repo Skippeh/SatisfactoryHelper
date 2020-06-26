@@ -22,7 +22,7 @@ public:
 	FORCEINLINE const FPostProcessSettings& GetPostProcessSettings() const{ return mPostProcessSettings; }
 	FORCEINLINE float GetBlendRadius() const{ return mBlendRadius; }
 	FORCEINLINE float GetBlendWeight() const{ return mBlendWeight; }
-	FORCEINLINE float GetPriority() const{ return mPriority; }
+	FORCEINLINE float GetListPriority() const{ return mPriority; }
 protected:
 	/** Normal settings for post process  */
 	UPROPERTY( EditDefaultsOnly, Category = "PostProcess" )
