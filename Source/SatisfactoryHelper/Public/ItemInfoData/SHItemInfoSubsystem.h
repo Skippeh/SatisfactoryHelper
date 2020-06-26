@@ -24,9 +24,9 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Item Data"))
 	USHItemData* GetItemData(TSubclassOf<class UFGItemDescriptor> DescriptorClass, TSubclassOf<USHItemData> ItemDataClass);
 
-	/** Gets all registered classes that inherit the USHItemInfo widget base class. */
+	/** Gets all registered classes that inherit the USHItemInfo widget base class. Optionally sort array by priority and title. */
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void GetItemInfoClasses(TArray<TSubclassOf<class USHItemInfo>>& OutArray);
+	void GetItemInfoClasses(TArray<TSubclassOf<class USHItemInfo>>& OutArray, bool bSortByPriorityAndTitle = false);
 
 	/** Register an item info class. This needs to be called in order for an item info to show up on an item. Returns false if the class is already registered, or if it's abstract. */
 	UFUNCTION(BlueprintCallable)

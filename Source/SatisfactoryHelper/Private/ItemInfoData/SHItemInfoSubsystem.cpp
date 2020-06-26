@@ -30,9 +30,28 @@ USHItemData* ASHItemInfoSubsystem::GetItemData(TSubclassOf<UFGItemDescriptor> De
 	return ItemData;
 }
 
-void ASHItemInfoSubsystem::GetItemInfoClasses(TArray<TSubclassOf<USHItemInfo>>& OutArray)
+void ASHItemInfoSubsystem::GetItemInfoClasses(TArray<TSubclassOf<USHItemInfo>>& OutArray, bool bSortByPriorityAndTitle)
 {
 	OutArray.Append(ItemInfoClasses);
+
+	if (bSortByPriorityAndTitle)
+	{
+		OutArray.Sort([](const TSubclassOf<USHItemInfo>& A, const TSubclassOf<USHItemInfo>& B)
+		{
+			auto DefaultObjectA = Cast<USHItemInfo>(A->GetDefaultObject());
+			auto DefaultObjectB = Cast<USHItemInfo>(B->GetDefaultObject());
+			int32 Delta = DefaultObjectA->GetListPriority() - DefaultObjectB->GetListPriority();
+
+			if (Delta == 0)
+			{
+				return DefaultObjectA->GetTitle().ToString() < DefaultObjectB->GetTitle().ToString();
+			}
+			else
+			{
+				return Delta < 0;
+			}
+		});
+	}
 }
 
 bool ASHItemInfoSubsystem::RegisterItemInfoClass(TSubclassOf<class USHItemInfo> ItemInfoClass)
