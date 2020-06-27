@@ -48,7 +48,7 @@ void ASHItemInfoSubsystem::GetItemInfoClasses(TArray<TSubclassOf<USHItemInfo>>& 
 			}
 			else
 			{
-				return Delta < 0;
+				return Delta > 0;
 			}
 		});
 	}
