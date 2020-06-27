@@ -1,4 +1,4 @@
-#include "ItemProducedByData.h"
+#include "ItemRecipeData.h"
 #include "Resources/FGBuildDescriptor.h"
 #include "FGRecipe.h"
 #include "util/Logging.h"
@@ -8,9 +8,11 @@
 
 static FString AlternateString = FString(TEXT("Alternate"));
 
-void UItemProducedByData::SetPropertiesFromItemDescriptor_Implementation(TSubclassOf<UFGItemDescriptor> ItemDescriptor)
+void UItemRecipeData::SetPropertiesFromItemDescriptor_Implementation(TSubclassOf<UFGItemDescriptor> ItemDescriptor)
 {
-	TArray<TSubclassOf<UFGRecipe>> ProducedByArray = USHRecipeHelper::FindRecipesByProduct(GetOuter(), ItemDescriptor, true);
+	TArray<TSubclassOf<UFGRecipe>> ProducedByArray = bShowByIngredients
+		? USHRecipeHelper::FindRecipesByIngredient(GetOuter(), ItemDescriptor, true)
+		: USHRecipeHelper::FindRecipesByProduct(GetOuter(), ItemDescriptor, true);
 	TMap<TSubclassOf<UObject>, FTempRecipes> MapOfManufacturers;
 
 	// Sort by name
@@ -54,7 +56,7 @@ void UItemProducedByData::SetPropertiesFromItemDescriptor_Implementation(TSubcla
 	});
 	
 	Manufacturers.Empty();
-		
+
 	for (auto KV : MapOfManufacturers)
 	{
 		FManufacturerRecipes ManufacturerRecipes(KV.Key, KV.Value.Recipes);
