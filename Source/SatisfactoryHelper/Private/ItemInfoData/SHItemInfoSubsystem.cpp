@@ -4,9 +4,12 @@
 #include "Content/ContentManager.h"
 #include "Resources/FGItemDescriptor.h"
 #include "util/Logging.h"
+#include "SHBlueprintFunctionLibrary.h"
 
 USHItemData* ASHItemInfoSubsystem::GetItemData(TSubclassOf<UFGItemDescriptor> DescriptorClass, TSubclassOf<USHItemData> ItemDataClass)
 {
+	verify(IsValid(DescriptorClass));
+	verify(IsValid(ItemDataClass));
 	verify(!ItemDataClass->HasAnyClassFlags(CLASS_Abstract));
 
 	FCachedItemData& CachedData = CachedItemDataMap.FindOrAdd(DescriptorClass);
@@ -21,7 +24,10 @@ USHItemData* ASHItemInfoSubsystem::GetItemData(TSubclassOf<UFGItemDescriptor> De
 		ItemData = NewObject<USHItemData>(this, ItemDataClass);
 
 		if (!ItemData->SupportsItemDescriptor(DescriptorClass))
+		{
+			SML::Logging::debug(*FString::Printf(TEXT("%s does not support item descriptor %s"), *ItemDataClass->GetName(), *USHBlueprintFunctionLibrary::GetClassInheritancePathString(DescriptorClass)));
 			return nullptr;
+		}
 
 		ItemData->SetPropertiesFromItemDescriptor(DescriptorClass);
 		CachedData.Map.Add(ItemDataClass, ItemData);
