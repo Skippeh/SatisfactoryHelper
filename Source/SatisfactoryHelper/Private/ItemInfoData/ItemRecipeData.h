@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "ItemInfoData/SHItemData.h"
-#include "ItemProducedByData.generated.h"
+#include "ItemRecipeData.generated.h"
 
 class UFGBuildDescriptor;
 class UFGRecipe;
@@ -33,8 +33,8 @@ struct FManufacturerRecipes
 	FManufacturerRecipes() { }
 };
 
-UCLASS()
-class UItemProducedByData : public USHItemData
+UCLASS(Abstract)
+class UItemRecipeData : public USHItemData
 {
 	GENERATED_BODY()
 	
@@ -43,4 +43,30 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FManufacturerRecipes> Manufacturers;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bShowByIngredients;
+};
+
+UCLASS()
+class UItemProducedByData : public UItemRecipeData
+{
+	GENERATED_BODY()
+
+	UItemProducedByData()
+	{
+		bShowByIngredients = false;
+	}
+};
+
+UCLASS()
+class UItemUsedByData : public UItemRecipeData
+{
+	GENERATED_BODY()
+
+	UItemUsedByData()
+	{
+		bShowByIngredients = true;
+	}
 };
