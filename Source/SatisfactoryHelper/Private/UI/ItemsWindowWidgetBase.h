@@ -25,14 +25,11 @@ class UItemsWindowWidgetBase : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void ClearItemSelection();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	bool SelectItem(TSubclassOf<class UFGItemDescriptor> searchClass);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	bool SelectIndex(int32 listIndex);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	bool SelectIndex(int32 listIndex, bool bFromPinnedItems);
 
 	UFUNCTION(BlueprintCallable)
 	bool ToggleWindowVisibility();
@@ -80,8 +77,11 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	UPanelWidget* GetPanelsContainer() const;
 
+	/**
+	 * Filters the input array based on the search text and bShowLockedItems. Returns the max search score achieved.
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void FilterItems(FString SearchText, bool bShowLockedItems, const TArray<class UDescriptorReference*>& InItemsArray, TArray<class UDescriptorReference*>& OutItemsArray) const;
+	UPARAM(DisplayName = "Max Score") int32 FilterItems(FString SearchText, bool bShowLockedItems, const TArray<class UDescriptorReference*>& InItemsArray, TArray<class UDescriptorReference*>& OutItemsArray) const;
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateItemView(TSubclassOf<UFGItemDescriptor> DescriptorClass, UImage * ImageWidget, UTextBlock * NameWidget, UTextBlock * DescriptionWidget);

@@ -16,9 +16,6 @@
 #include "SHRecipeHelper.h"
 
 #pragma region Empty blueprint implementations
-void UItemsWindowWidgetBase::ClearItemSelection_Implementation() { unimplemented(); }
-bool UItemsWindowWidgetBase::SelectItem_Implementation(TSubclassOf<UFGItemDescriptor> searchClass) { unimplemented(); return bool(); }
-bool UItemsWindowWidgetBase::SelectIndex_Implementation(int32 listIndex) { unimplemented(); return bool(); }
 void UItemsWindowWidgetBase::OnToggleWindowVisibility_Implementation(bool bIsVisible) { }
 #pragma endregion
 
@@ -61,10 +58,11 @@ void UItemsWindowWidgetBase::NativeOnInitialized()
 	}
 }
 
-void UItemsWindowWidgetBase::FilterItems(FString SearchText, bool bShowLockedItems, const TArray<UDescriptorReference*>& InItemsArray, TArray<UDescriptorReference*>& OutItemsArray) const
+int32 UItemsWindowWidgetBase::FilterItems(FString SearchText, bool bShowLockedItems, const TArray<UDescriptorReference*>& InItemsArray, TArray<UDescriptorReference*>& OutItemsArray) const
 {
 	SearchText.TrimStartAndEndInline();
 	TArray<FSearchResult> SearchArray;
+	int32 MaxScore = 0;
 
 	if (SearchText.IsEmpty())
 	{
@@ -125,6 +123,9 @@ void UItemsWindowWidgetBase::FilterItems(FString SearchText, bool bShowLockedIte
 			if (Score > 0)
 			{
 				SearchArray.Add(FSearchResult(Score, DescriptorReference));
+
+				if (Score > MaxScore)
+					MaxScore = Score;
 			}
 		}
 	}
@@ -161,6 +162,8 @@ void UItemsWindowWidgetBase::FilterItems(FString SearchText, bool bShowLockedIte
 	{
 		OutItemsArray.Add(SearchResult.DescriptorReference);
 	}
+
+	return MaxScore;
 }
 
 int32 UItemsWindowWidgetBase::FindItemIndexInList(TSubclassOf<class UFGItemDescriptor> SearchClass, UListView* InListView)
