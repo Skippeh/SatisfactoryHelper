@@ -14,4 +14,7 @@ class UDescriptorReference : public UObject
 public:
 	UPROPERTY(BlueprintReadWrite)
 	TSubclassOf<class UFGItemDescriptor> ItemDescriptorClass;
+	
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsPinned;
 };
