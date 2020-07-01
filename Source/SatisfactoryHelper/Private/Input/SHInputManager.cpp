@@ -16,11 +16,6 @@ void ASHInputManager::Tick(float DeltaTime)
 {
 	if (PlayerController->WasInputKeyJustPressed(ToggleItemsMenuKey))
 	{
-		const bool bToggledWindow = ASHInit::GetSingleton(GetWorld())->GetUIManager()->GetItemsWindow()->ToggleWindowVisibility();
-	}
-
-	if (PlayerController->WasInputKeyJustPressed(EKeys::Escape))
-	{
-		ASHInit::GetSingleton(GetWorld())->GetUIManager()->GetItemsWindow()->HideWindow();
+		ASHInit::GetSingleton(GetWorld())->GetUIManager()->GetItemsWindow()->ToggleWindowVisibility();
 	}
 }

@@ -14,6 +14,7 @@
 #include "SHBlueprintFunctionLibrary.h"
 #include "FGRecipeManager.h"
 #include "SHRecipeHelper.h"
+#include "DescriptorReference.h"
 
 #pragma region Empty blueprint implementations
 void UItemsWindowWidgetBase::OnToggleWindowVisibility_Implementation(bool bIsVisible) { }
@@ -173,10 +174,12 @@ int32 UItemsWindowWidgetBase::FindItemIndexInList(TSubclassOf<class UFGItemDescr
 	return -1;
 }
 
-void UItemsWindowWidgetBase::UpdateItemView(TSubclassOf<UFGItemDescriptor> DescriptorClass, UImage* ImageWidget, UTextBlock* NameWidget, UTextBlock* DescriptionWidget)
+void UItemsWindowWidgetBase::UpdateItemView(UDescriptorReference* DescriptorReference, UImage* ImageWidget, UTextBlock* NameWidget, UTextBlock* DescriptionWidget, UWidgetSwitcher* PinnedItemSwitcher)
 {
-	if (!IsValid(DescriptorClass))
+	if (!IsValid(DescriptorReference))
 		return;
+
+	auto DescriptorClass = DescriptorReference->ItemDescriptorClass;
 
 	// TODO: Use UItemTooltipHandler::GetItemName/Description instead
 	NameWidget->SetText(UFGItemDescriptor::GetItemName(DescriptorClass));
@@ -191,6 +194,8 @@ void UItemsWindowWidgetBase::UpdateItemView(TSubclassOf<UFGItemDescriptor> Descr
 
 	ImageWidget->Brush.SetResourceObject(BigIcon);
 	ImageWidget->Brush.ImageSize = FVector2D(BigIcon->GetSizeX(), BigIcon->GetSizeY());
+
+	PinnedItemSwitcher->SetActiveWidgetIndex(DescriptorReference->bIsPinned ? 1 : 0);
 
 	UpdateInfoPanels(DescriptorClass);
 }
