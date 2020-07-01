@@ -120,6 +120,14 @@ void UContentManager::GetAllRecipes(TArray<TSubclassOf<UFGRecipe>>& OutArray)
 		TArray<TSubclassOf<UFGSchematic>> AllSchematics;
 		SchematicManager->GetAllSchematics(AllSchematics);
 
+		TArray<TSubclassOf<UFGSchematic>> AvailableSchematics;
+		SchematicManager->GetAvailableSchematics(AvailableSchematics);
+		
+		for (auto Schematic : AvailableSchematics)
+		{
+			AllSchematics.AddUnique(Schematic);
+		}
+
 		for (TSubclassOf<UFGSchematic> Schematic : AllSchematics)
 		{
 			TArray<UFGUnlock*> Unlocks = UFGSchematic::GetUnlocks(Schematic);
