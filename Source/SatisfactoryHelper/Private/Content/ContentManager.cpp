@@ -120,11 +120,13 @@ void UContentManager::GetAllRecipes(TArray<TSubclassOf<UFGRecipe>>& OutArray)
 		TArray<TSubclassOf<UFGSchematic>> AllSchematics;
 		SchematicManager->GetAllSchematics(AllSchematics);
 
+		// Modded schematics are only added to available schematics.
 		TArray<TSubclassOf<UFGSchematic>> AvailableSchematics;
 		SchematicManager->GetAvailableSchematics(AvailableSchematics);
 		
 		for (auto Schematic : AvailableSchematics)
 		{
+			// Add unique because it also contains vanilla items which are already in the array.
 			AllSchematics.AddUnique(Schematic);
 		}
 
