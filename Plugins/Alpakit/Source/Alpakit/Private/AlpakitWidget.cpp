@@ -311,7 +311,7 @@ void SAlpakaWidget::CookDone(FString result, double runtime,UAlpakitSettings* Se
 		if (Settings->StartGame)
 		{
 			FString gamePath = *FPaths::ConvertRelativePathToFull(Settings->SatisfactoryGamePath.Path / TEXT("FactoryGame/Binaries/Win64/FactoryGame-Win64-Shipping.exe")).Replace(TEXT("/"), TEXT("\\"));
-			system(TCHAR_TO_ANSI(*FString::Printf(TEXT("start \"\" \"%s\""), *gamePath)));
+			system(TCHAR_TO_ANSI(*FString::Printf(TEXT("start \"\" \"%s\" %s"), *gamePath, *Settings->LaunchArguments)));
 		}
 	}
 	else

@@ -59,4 +59,6 @@ public:
 	UPROPERTY(EditAnywhere, config, Category = Config)
 	bool CopyModsToGame;
 
+	UPROPERTY(EditAnywhere, config, Category = Config)
+	FString LaunchArguments;
 };
