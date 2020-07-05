@@ -38,8 +38,7 @@ struct FACTORYGAME_API FDisabledInputGate
 	GENERATED_USTRUCT_BODY()
 
 public:
-	FORCEINLINE FDisabledInputGate() : FDisabledInputGate( false )
-	{}
+	FDisabledInputGate();
 
 	FORCEINLINE FDisabledInputGate( bool disabled ) :
 		mBuildGun( disabled ),
