@@ -61,7 +61,7 @@ ASHItemInfoSubsystem* USHBlueprintFunctionLibrary::GetItemInfoSubsystem(UObject*
 
 bool USHBlueprintFunctionLibrary::IsDebugModeEnabled()
 {
-	return SML::getSMLConfig().debugLogOutput;
+	return SML::GetSmlConfig().bDebugLogOutput;
 }
 
 FString USHBlueprintFunctionLibrary::GetClassInheritancePathString(UClass* Class)
