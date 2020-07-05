@@ -188,7 +188,7 @@ public:
 	void GetAtmosphereSettings( float atTime, FSkyAtmosphereSettings& out_settings ) const;
 
 	// Get the blend priority, higher number is higher priority.
-	FORCEINLINE float GetListPriority() const { return mPriority; }
+	FORCEINLINE float GetPriority() const { return mPriority; }
 	// Get the blend distance of this volume
 	FORCEINLINE float GetBlendDistance() const { return mBlendDistance; }
 
