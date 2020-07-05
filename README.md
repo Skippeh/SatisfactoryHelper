@@ -21,20 +21,19 @@ A Quality of Life mod for Satisfactory that adds:
 2. Make sure you've launched the custom version of Unreal Engine that you installed above. It can most likely be found in the start menu as ```Unreal Engine - CSS``` (CSS stands for Coffee Stain Studios).
 3. Right click FactoryGame.uproject and click ```Switch Unreal Engine Version...```, select ```4.22.3-CSS``` in the dropdown list. If you can't find it you can add it manually using the ```...``` button. Browse to the CSS version of Unreal Engine that you installed earlier.
 4. Right click the FactoryGame.uproject in the root of the repository and click ```Generate Visual Studio project files```.
-5. Open the generated .sln file with Visual Studio and compile both ```Development Editor``` and ```Shipping``` configurations selected. You can do a batch build (found under ```Build > Batch Build...``` in the window toolbar) to do both of them after eachother automatically. This will take some time.
-6. Open FactoryGame.uproject. Make sure the selected unreal engine is still ```4.22.3-CSS```.
+5. Create a file in the root directory called GamePath.txt and type in the filepath to Satisfactory installation.
+6. Open the generated .sln file with Visual Studio and compile both ```Development Editor``` and ```Shipping``` configurations selected. You can do a batch build (found under ```Build > Batch Build...``` in the window toolbar) to do both of them after eachother automatically. This will take some time.
+7. Open FactoryGame.uproject. Make sure the selected unreal engine is still ```4.22.3-CSS```.
 7. Compile the modules if the question appears.
 8. Now you're ready to start developing.
 
 ### Playtesting/cooking mod
-1. In the unreal editor click the Alpakit button in the top middle.
-2. Configure the path to the game and check the ```Copy Mods to Game``` checkbox. Check the ```Start Game``` checkbox if you want to launch the game after it's done cooking the mod.
-3. Add an array element to the Mods array.
-4. Set the name of the mod to ```SatisfactoryHelper``` and fill the rest of the fields with appropriate values (nothing is enforced except the Name field as it needs to match the folder name of the mod under ```Content/```).
-5. Open the ```Binaries/Win64``` folder and copy ```UE4-SatisfactoryHelper-Win64-Shipping.dll``` to the game's ```mods``` folder. Optionally also copy the symbols (.pdb) file if you need debugging symbols for troubleshooting crashes.
-   - NOTE: Make sure the shipping build is up to date in Visual Studio.
-     - Tip: If you're doing changes to code that's only executed in-game you don't need to compile the ```Development Editor``` configuration as well to save time. This does not include changes to headers however (that the engine is aware of by the use of UCLASS/UPROPERTY etc). Just build the ```Shipping``` configuration in Visual Studio and copy the .dll to the game's ```mods``` folder and launch the game normally.
-6. Click the ```Alpakit!``` button when you're ready to build.
+1. Build the visual studio solution with the ```Shipping``` configuration if it's out of date. This will also copy the dll and pdb to the game's mods folder automatically.
+2. In the unreal editor click the Alpakit button in the top middle.
+3. Configure the path to the game and check the ```Copy Mods to Game``` checkbox. Check the ```Start Game``` checkbox if you want to launch the game after it's done cooking the mod.
+4. Add an array element to the Mods array.
+5.  Set the name of the mod to ```SatisfactoryHelper``` and fill the rest of the fields with appropriate values (nothing is enforced except the Name field as it needs to match the folder name of the mod under ```Content/```).
+6.  Click the ```Alpakit!``` button when you're ready to build.
 
 ### Common errors
 Here are some common errors and solutions/workarounds i've come across:
@@ -46,3 +45,4 @@ Here are some common errors and solutions/workarounds i've come across:
 - Sometimes the game will take around a minute to launch then crash, and Epic Games Launcher will come up saying the game is already running.
   - Open the task manager and check if CrashReporter.exe from the game is running and terminate it. Relaunch the game using ```FactoryGame.exe```.
     - Most of the time it won't be running and EGS is just being weird (or it terminated already). Relaunching the game works in this case.
+  - Launching the game with -Epicportal commandline argument seems to bypass the issue entirely but online sessions won't work.
