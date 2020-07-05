@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Info.h"
 #include "UIManager.generated.h"
 
 UCLASS(Blueprintable, Abstract)
-class AUIManager : public AActor
+class AUIManager : public AInfo
 {
 	GENERATED_BODY()
 
