@@ -84,3 +84,6 @@ Plugins/*
 !Plugins/ExampleMod/
 !Plugins/Alpakit/
 !Plugins/SatisfactoryHelper/
+
+# Automation variables
+GamePath.txt
