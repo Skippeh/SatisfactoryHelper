@@ -2,14 +2,20 @@
 const fs = require("fs");
 const path = require("path");
 
-if (process.argv.length < 4) {
-    console.error("Usage: node automation.js <SatisfactoryPath> <ModLoaderRootPath> [...ModList]");
+if (process.argv.length < 3) {
+    console.error("Usage: node automation.js <ModLoaderRootPath> [...ModList]");
     process.exit(1);
 }
 
-const SatisfactoryPath = process.argv[2];
-const ModLoaderRootPath = process.argv[3];
-const ModList = process.argv.slice(4);
+const ModLoaderRootPath = process.argv[2];
+const ModList = process.argv.slice(3);
+
+if (!fs.existsSync(`${ModLoaderRootPath}/GamePath.txt`)) {
+    console.error(`GamePath.txt does not exist in ${ModLoaderRootPath}.`);
+    process.exit(1);
+}
+
+const SatisfactoryPath = fs.readFileSync(`${ModLoaderRootPath}/GamePath.txt`);
 
 console.log(`SF Root: ${SatisfactoryPath} ModLoader Root: ${ModLoaderRootPath} Mod List: ${ModList.join(", ")}`);
 

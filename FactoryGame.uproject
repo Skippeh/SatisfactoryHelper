@@ -59,7 +59,7 @@
 	],
 	"PostBuildSteps": {
 		"Win64": [
-			"node $(ProjectDir)\\automation.js \"F:\\Games\\SatisfactoryEarlyAccess\" $(ProjectDir) SatisfactoryHelper"
+			"node $(ProjectDir)\\automation.js $(ProjectDir) SatisfactoryHelper"
 		]
 	}
 }
