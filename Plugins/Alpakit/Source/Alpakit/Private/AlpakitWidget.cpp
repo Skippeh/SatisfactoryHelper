@@ -310,8 +310,15 @@ void SAlpakaWidget::CookDone(FString result, double runtime,UAlpakitSettings* Se
 		}
 		if (Settings->StartGame)
 		{
+			UE_LOG(LogTemp, Display, TEXT("Launching game..."));
 			FString gamePath = *FPaths::ConvertRelativePathToFull(Settings->SatisfactoryGamePath.Path / TEXT("FactoryGame/Binaries/Win64/FactoryGame-Win64-Shipping.exe")).Replace(TEXT("/"), TEXT("\\"));
 			system(TCHAR_TO_ANSI(*FString::Printf(TEXT("start \"\" \"%s\" %s"), *gamePath, *Settings->LaunchArguments)));
+
+			if (Settings->LaunchSecondaryClient)
+			{
+				UE_LOG(LogTemp, Display, TEXT("Launching secondary game..."));
+				system(TCHAR_TO_ANSI(*FString::Printf(TEXT("start \"\" \"%s\" %s"), *gamePath, TEXT("-Exec=\"open 127.0.0.1\" -Epicportal"))));
+			}
 		}
 	}
 	else

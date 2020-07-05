@@ -54,11 +54,16 @@ public:
 	TArray<FAlpakitMod> Mods;
 
 	UPROPERTY(EditAnywhere, config, Category = Config)
-	bool StartGame;
-
-	UPROPERTY(EditAnywhere, config, Category = Config)
 	bool CopyModsToGame;
 
 	UPROPERTY(EditAnywhere, config, Category = Config)
+	bool StartGame;
+
+	/** The commandline arguments for the main (host/server) game. */
+	UPROPERTY(EditAnywhere, config, Category = Config, meta = (EditCondition = "StartGame"))
 	FString LaunchArguments;
+
+	/** If true a secondary game will launch in offline mode and connect to 127.0.0.1 on startup (requires ExecOnStartup mod). */
+	UPROPERTY(EditAnywhere, config, Category = Config, meta = (EditCondition = "StartGame"))
+	bool LaunchSecondaryClient;
 };
