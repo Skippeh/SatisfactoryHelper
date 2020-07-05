@@ -56,5 +56,10 @@
 			"Name": "SteamVR",
 			"Enabled": false
 		}
-	]
+	],
+	"PostBuildSteps": {
+		"Win64": [
+			"node $(ProjectDir)\\automation.js \"F:\\Games\\SatisfactoryEarlyAccess\" $(ProjectDir) SatisfactoryHelper"
+		]
+	}
 }
