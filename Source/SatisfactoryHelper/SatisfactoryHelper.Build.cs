@@ -25,23 +25,12 @@ public class SatisfactoryHelper : ModuleRules
             "AssetRegistry",
             "GameplayTasks",
             "AnimGraphRuntime",
-            "Slate", "SlateCore",
-            "Json", "PropertyPath" });
+            "Slate", "SlateCore"});
 			
 		if (Target.Type == TargetRules.TargetType.Editor) {
 			PublicDependencyModuleNames.AddRange(new string[] {"OnlineBlueprintSupport", "AnimGraph", "UnrealEd", "BlueprintGraph", "Kismet", "UMGEditor", "MovieScene"});
 		}
 
         PublicDependencyModuleNames.AddRange(new string[] {"FactoryGame", "SML"});
-        string platformName = Enum.GetName(typeof(UnrealTargetPlatform), Target.Platform);
-        string projectFilePath = Target.ProjectFile.ToString();
-        string projectRootPath = projectFilePath.Substring(0, projectFilePath.LastIndexOf(Path.DirectorySeparatorChar));
-        string fullLibPath = Path.Combine(projectRootPath, "Library", platformName);
-        Console.WriteLine("Full Library Path: " + fullLibPath);
-        PublicAdditionalLibraries.AddRange(new string[] {
-            Path.Combine(fullLibPath, "ttvfs.lib"),
-            Path.Combine(fullLibPath, "ttvfs_zip.lib"),
-			Path.Combine(fullLibPath, "funchook.lib") });
-        bEnableExceptions = true;
     }
 }
