@@ -82,3 +82,5 @@ Plugins/*
 !Plugins/SML/
 !Plugins/SMLEditor/
 !Plugins/ExampleMod/
+!Plugins/Alpakit/
+!Plugins/SatisfactoryHelper/
