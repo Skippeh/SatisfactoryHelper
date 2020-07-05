@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Info.h"
 #include "SHInputManager.generated.h"
 
 UCLASS(Blueprintable, Abstract)
-class ASHInputManager : public AActor
+class ASHInputManager : public AInfo
 {
 	GENERATED_BODY()
 

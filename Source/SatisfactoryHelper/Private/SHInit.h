@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/Info.h"
 #include "Subsystems/LocalPlayerSubsystem.h"
 #include "Subsystems/SHCheatSubsystem.h"
 #include "SHInit.generated.h"
@@ -42,7 +43,7 @@ struct FSHConfig
 };
 
 UCLASS(Blueprintable, Abstract)
-class ASHInit : public AActor
+class ASHInit : public AInfo
 {
 	GENERATED_BODY()
 	
