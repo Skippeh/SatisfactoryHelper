@@ -42,7 +42,7 @@ void ASHInit::BeginPlay()
 
 	SML::Logging::debug(*FString::Printf(TEXT("Found %d descriptor(s)"), Descriptors.Num()));
 
-	auto SchematicManager = AFGSchematicManager::Get(GetWorld());
+	auto SchematicManager = USHBlueprintFunctionLibrary::GetSchematicManager(GetWorld());
 	SchematicManager->PurchasedSchematicDelegate.AddDynamic(this, &ASHInit::OnPurchasedSchematic);
 }
 

@@ -10,6 +10,20 @@
 #include "Subsystems/SHCheatSubsystem.h"
 #include "ItemInfoData/SHItemInfoSubsystem.h"
 #include "SatisfactoryModLoader.h"
+#include "FGSchematicManager.h"
+#include "FGRecipeManager.h"
+
+template<class T>
+T* GetManagerClass(UObject* WorldContext)
+{
+	TArray<AActor*> OutActors;
+	UGameplayStatics::GetAllActorsOfClass(WorldContext, T::StaticClass(), OutActors);
+
+	if (OutActors.Num() <= 0)
+		return nullptr;
+
+	return CastChecked<T>(OutActors[0]);
+}
 
 UContentManager* USHBlueprintFunctionLibrary::GetContentManager(UObject* InWorldContext)
 {
@@ -41,22 +55,22 @@ USHSubsystemHolder* USHBlueprintFunctionLibrary::GetSHSubsystemHolder(UObject* W
 
 ASHCheatSubsystem* USHBlueprintFunctionLibrary::GetCheatSubsystem(UObject* WorldContext)
 {
-	auto SubsystemHolder = GetSHSubsystemHolder(WorldContext);
-
-	if (!IsValid(SubsystemHolder))
-		return nullptr;
-
-	return SubsystemHolder->GetCheatSubsystem();
+	return GetManagerClass<ASHCheatSubsystem>(WorldContext);
 }
 
 ASHItemInfoSubsystem* USHBlueprintFunctionLibrary::GetItemInfoSubsystem(UObject* WorldContext)
 {
-	auto SubsystemHolder = GetSHSubsystemHolder(WorldContext);
+	return GetManagerClass<ASHItemInfoSubsystem>(WorldContext);
+}
 
-	if (!IsValid(SubsystemHolder))
-		return nullptr;
+AFGRecipeManager* USHBlueprintFunctionLibrary::GetRecipeManager(UObject* WorldContext)
+{
+	return GetManagerClass<AFGRecipeManager>(WorldContext);
+}
 
-	return SubsystemHolder->GetItemInfoSubsystem();
+AFGSchematicManager* USHBlueprintFunctionLibrary::GetSchematicManager(UObject* WorldContext)
+{
+	return GetManagerClass<AFGSchematicManager>(WorldContext);
 }
 
 bool USHBlueprintFunctionLibrary::IsDebugModeEnabled()

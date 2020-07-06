@@ -37,6 +37,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Subsystem")
 	static class ASHItemInfoSubsystem* GetItemInfoSubsystem(UObject* WorldContext);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Recipe")
+	static class AFGRecipeManager* GetRecipeManager(UObject* WorldContext);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Schematics")
+	static AFGSchematicManager* GetSchematicManager(UObject* WorldContext);
+
 	/** Returns true if SML debug mode is enabled. */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | SML")
 	static bool IsDebugModeEnabled();

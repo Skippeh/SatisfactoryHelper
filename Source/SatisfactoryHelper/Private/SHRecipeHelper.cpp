@@ -17,7 +17,7 @@ TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByProduct(UObject* Wo
 	if (bIncludeLockedRecipes)
 		UContentManager::GetSingleton(WorldContextObject)->GetAllRecipes(AllRecipes);
 	else
-		GetRecipeManager(WorldContextObject)->GetAllAvailableRecipes(AllRecipes);
+		USHBlueprintFunctionLibrary::GetRecipeManager(WorldContextObject)->GetAllAvailableRecipes(AllRecipes);
 	
 	for (auto Recipe : AllRecipes)
 	{
@@ -41,7 +41,7 @@ TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByIngredient(UObject*
 	if (bIncludeLockedRecipes)
 		UContentManager::GetSingleton(WorldContextObject)->GetAllRecipes(AllRecipes);
 	else
-		GetRecipeManager(WorldContextObject)->GetAllAvailableRecipes(AllRecipes);
+		USHBlueprintFunctionLibrary::GetRecipeManager(WorldContextObject)->GetAllAvailableRecipes(AllRecipes);
 
 	for (auto Recipe : AllRecipes)
 	{
@@ -108,14 +108,9 @@ UTexture2D* USHRecipeHelper::GetManufacturerIcon(TSubclassOf<UObject> Manufactur
 	return InvalidClassSpecified<UTexture2D*>(ManufacturerClass, nullptr);
 }
 
-AFGRecipeManager* USHRecipeHelper::GetRecipeManager(UObject* WorldContextObject)
-{
-	return AFGRecipeManager::Get(WorldContextObject);
-}
-
 bool USHRecipeHelper::IsItemUnlocked(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor)
 {
-	AFGRecipeManager* RecipeManager = GetRecipeManager(WorldContextObject);
+	AFGRecipeManager* RecipeManager = USHBlueprintFunctionLibrary::GetRecipeManager(WorldContextObject);
 	TArray<TSubclassOf<UFGRecipe>> UnlockedRecipes;
 	RecipeManager->GetAllAvailableRecipes(UnlockedRecipes);
 
@@ -137,7 +132,7 @@ bool USHRecipeHelper::IsItemUnlocked(UObject* WorldContextObject, TSubclassOf<UF
 
 bool USHRecipeHelper::IsRecipeUnlocked(UObject* WorldContextObject, TSubclassOf<UFGRecipe> Recipe)
 {
-	AFGRecipeManager* RecipeManager = GetRecipeManager(WorldContextObject);
+	AFGRecipeManager* RecipeManager = USHBlueprintFunctionLibrary::GetRecipeManager(WorldContextObject);
 	TArray<TSubclassOf<UFGRecipe>> UnlockedRecipes;
 	RecipeManager->GetAllAvailableRecipes(UnlockedRecipes);
 	return UnlockedRecipes.Contains(Recipe);

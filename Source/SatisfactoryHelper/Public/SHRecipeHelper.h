@@ -42,7 +42,4 @@ public:
 	/** Returns true if the given recipe can be crafted. */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Recipes")
 	static bool IsRecipeUnlocked(UObject* WorldContextObject, TSubclassOf<UFGRecipe> Recipe);
-
-private:
-	static AFGRecipeManager* GetRecipeManager(UObject* WorldContextObject);
 };
