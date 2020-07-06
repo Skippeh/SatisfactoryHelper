@@ -12,6 +12,7 @@
 #include "Resources/FGOverflowDescriptor.h"
 #include "FGSchematicManager.h"
 #include "FGUnlockRecipe.h"
+#include "SHBlueprintFunctionLibrary.h"
 
 using namespace SML;
 
@@ -116,7 +117,7 @@ void UContentManager::GetAllRecipes(TArray<TSubclassOf<UFGRecipe>>& OutArray)
 	if (!CachedRecipes)
 	{
 		CachedRecipes = new TArray<TSubclassOf<UFGRecipe>>();
-		AFGSchematicManager* SchematicManager = AFGSchematicManager::Get(GetOuter());
+		AFGSchematicManager* SchematicManager = USHBlueprintFunctionLibrary::GetSchematicManager(GetOuter());
 		TArray<TSubclassOf<UFGSchematic>> AllSchematics;
 		SchematicManager->GetAllSchematics(AllSchematics);
 
