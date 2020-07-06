@@ -28,7 +28,7 @@ void ASHInit::BeginPlay()
 	UIManager = GetWorld()->SpawnActor<AUIManager>(UIManagerClass);
 	InputManager = GetWorld()->SpawnActor<ASHInputManager>(InputManagerClass);
 	
-	if (HasAuthority())
+	if (GetNetMode() != ENetMode::NM_Client)
 	{
 		AFGGameMode* GameMode = CastChecked<AFGGameMode>(GetWorld()->GetAuthGameMode());
 		GameMode->RegisterRemoteCallObjectClass(USHRCO::StaticClass());
