@@ -39,6 +39,21 @@ public:
 	TArray<FString> OverwritePaths;
 };
 
+USTRUCT()
+struct FGamePath
+{
+	GENERATED_BODY();
+public:
+	UPROPERTY(EditAnywhere, config)
+	bool Enabled = true;
+
+	UPROPERTY(EditAnywhere, config)
+	FDirectoryPath Directory;
+
+	UPROPERTY(EditAnywhere, config)
+	FString LaunchArguments;
+};
+
 UCLASS(config = Game)
 class UAlpakitSettings : public UObject
 {
@@ -48,7 +63,7 @@ public:
 	UAlpakitSettings(const FObjectInitializer& ObjectInitializer);
 
 	UPROPERTY(EditAnywhere, config, Category = Config)
-	FDirectoryPath SatisfactoryGamePath;
+	TArray<FGamePath> SatisfactoryGamePaths;
 	
 	UPROPERTY(EditAnywhere, config, Category = Mods)
 	TArray<FAlpakitMod> Mods;
@@ -59,11 +74,7 @@ public:
 	UPROPERTY(EditAnywhere, config, Category = Config)
 	bool StartGame;
 
-	/** The commandline arguments for the main (host/server) game. */
+	/** If enabled all games will be started. Otherwise only the first game will be. */
 	UPROPERTY(EditAnywhere, config, Category = Config, meta = (EditCondition = "StartGame"))
-	FString LaunchArguments;
-
-	/** If true a secondary game will launch in offline mode and connect to 127.0.0.1 on startup (requires ExecOnStartup mod). */
-	UPROPERTY(EditAnywhere, config, Category = Config, meta = (EditCondition = "StartGame"))
-	bool LaunchSecondaryClient;
+	bool StartAllGames;
 };

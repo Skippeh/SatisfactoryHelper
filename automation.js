@@ -15,9 +15,9 @@ if (!fs.existsSync(`${ModLoaderRootPath}/GamePath.txt`)) {
     process.exit(1);
 }
 
-const SatisfactoryPath = fs.readFileSync(`${ModLoaderRootPath}/GamePath.txt`);
+const SatisfactoryPaths = fs.readFileSync(`${ModLoaderRootPath}/GamePath.txt`, "utf-8").replace("\r", "").split("\n");
 
-console.log(`SF Root: ${SatisfactoryPath} ModLoader Root: ${ModLoaderRootPath} Mod List: ${ModList.join(", ")}`);
+console.log(`SF Root: ${SatisfactoryPaths.join(", ")} ModLoader Root: ${ModLoaderRootPath} Mod List: ${ModList.join(", ")}`);
 
 function CopyFileAndLog(SourceFilePath, DestinationFolder) {
     if (fs.existsSync(SourceFilePath)) {
@@ -38,11 +38,16 @@ let ModsCopied = 0;
 for (let ModId of ModList) {
     let FolderName = ModId === "SML" ? "loaders" : "mods";
     let SourceFilePathBase = `${ModLoaderRootPath}/Binaries/Win64/UE4-${ModId}-Win64-Shipping`;
-    let DestinationFolder = `${SatisfactoryPath}/${FolderName}`;
-    if (CopyFileAndLog(`${SourceFilePathBase}.dll`, DestinationFolder)) {
-        CopyFileAndLog(`${SourceFilePathBase}.pdb`, DestinationFolder);
-        ModsCopied++;
+
+    for (const SatisfactoryPath of SatisfactoryPaths) {
+        let DestinationFolder = `${SatisfactoryPath}/${FolderName}`;
+
+        if (CopyFileAndLog(`${SourceFilePathBase}.dll`, DestinationFolder)) {
+            CopyFileAndLog(`${SourceFilePathBase}.pdb`, DestinationFolder);
+        }
     }
+
+    ModsCopied++;
 }
 console.log(`Done. Copied ${ModsCopied} mod(s).`);
 

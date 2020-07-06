@@ -271,53 +271,37 @@ void SAlpakaWidget::CookDone(FString result, double runtime,UAlpakitSettings* Se
 
 			if (Settings->CopyModsToGame) {
 				modsCopied++;
-				FString gameModsDir = FPaths::ConvertRelativePathToFull(Settings->SatisfactoryGamePath.Path / TEXT("mods"));
-				if (!FPaths::DirectoryExists(gameModsDir)) {
-					PlatformFile.CreateDirectoryTree(*gameModsDir);
+
+				for (const FGamePath& SatisfactoryGamePath : Settings->SatisfactoryGamePaths) {
+					if (!SatisfactoryGamePath.Enabled)
+						continue;
+
+					FString gameModsDir = FPaths::ConvertRelativePathToFull(SatisfactoryGamePath.Directory.Path / TEXT("mods"));
+
+					if (!FPaths::DirectoryExists(gameModsDir)) {
+						PlatformFile.CreateDirectoryTree(*gameModsDir);
+					}
+
+					// Copy to Satisfactory mods folder
+					PlatformFile.CopyFile(*(gameModsDir / FString::Printf(TEXT("%s.pak"), *pakName)), *pakFilePath);
+					UE_LOG(LogTemp, Log, TEXT("Copied %s to game dir %s"), *mod.Name, *SatisfactoryGamePath.Directory.Path);
 				}
-				// Copy to Satisfactory mods folder
-				PlatformFile.CopyFile(*(gameModsDir / FString::Printf(TEXT("%s.pak"), *pakName)), *pakFilePath);
-				UE_LOG(LogTemp, Log, TEXT("Copied %s to game dir"), *mod.Name);
 			}
 		}
-		if (Settings->CopyModsToGame && modsCopied > 0) {
-			// Enable SML developmentMode
-			FString gameConfigDir = FPaths::ConvertRelativePathToFull(Settings->SatisfactoryGamePath.Path / TEXT("configs"));
-			FString smlConfigFile = gameConfigDir / TEXT("SML.cfg");
-			if (!FPaths::DirectoryExists(*gameConfigDir)) {
-				PlatformFile.CreateDirectoryTree(*gameConfigDir);
-			}
-			
-			TSharedPtr<FJsonObject> smlCfg = MakeShared<FJsonObject>(FJsonObject());
-			if (FPaths::FileExists(smlConfigFile)) {
-				FString contents;
-				FFileHelper::LoadFileToString(contents, *smlConfigFile);
 
-				TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(*contents);
-				FJsonSerializer Serializer;
-				Serializer.Deserialize(reader, smlCfg);
-
-			}
-			if (!smlCfg->HasField(TEXT("developmentMode")) || !smlCfg->GetBoolField(TEXT("developmentMode"))) {
-				smlCfg->SetBoolField(TEXT("developmentMode"), true);
-				
-				FString resultString;
-				TSharedRef<TJsonWriter<>> writer = TJsonWriterFactory<>::Create(&resultString);
-				FJsonSerializer Serializer;
-				Serializer.Serialize(smlCfg.ToSharedRef(), writer);
-				FFileHelper::SaveStringToFile(resultString, *smlConfigFile);
-			}
-		}
 		if (Settings->StartGame)
 		{
 			UE_LOG(LogTemp, Display, TEXT("Launching game..."));
-			FString gamePath = *FPaths::ConvertRelativePathToFull(Settings->SatisfactoryGamePath.Path / TEXT("FactoryGame/Binaries/Win64/FactoryGame-Win64-Shipping.exe")).Replace(TEXT("/"), TEXT("\\"));
-			system(TCHAR_TO_ANSI(*FString::Printf(TEXT("start \"\" \"%s\" %s"), *gamePath, *Settings->LaunchArguments)));
 
-			if (Settings->LaunchSecondaryClient)
-			{
-				UE_LOG(LogTemp, Display, TEXT("Launching secondary game..."));
-				system(TCHAR_TO_ANSI(*FString::Printf(TEXT("start \"\" \"%s\" %s"), *gamePath, TEXT("-Exec=\"open 127.0.0.1\" -Epicportal"))));
+			for (const FGamePath& SatisfactoryGamePath : Settings->SatisfactoryGamePaths) {
+				if (!SatisfactoryGamePath.Enabled)
+					continue;
+
+				FString gamePath = *FPaths::ConvertRelativePathToFull(SatisfactoryGamePath.Directory.Path / TEXT("FactoryGame/Binaries/Win64/FactoryGame-Win64-Shipping.exe")).Replace(TEXT("/"), TEXT("\\"));
+				system(TCHAR_TO_ANSI(*FString::Printf(TEXT("start \"\" \"%s\" %s"), *gamePath, *SatisfactoryGamePath.LaunchArguments)));
+
+				if (!Settings->StartAllGames)
+					break;
 			}
 		}
 	}
