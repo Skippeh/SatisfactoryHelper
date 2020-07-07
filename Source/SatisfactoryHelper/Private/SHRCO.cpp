@@ -11,10 +11,17 @@
 #include "SHBlueprintFunctionLibrary.h"
 #include "mod/ModSubsystems.h"
 #include "Subsystems/SHCheatSubsystem.h"
+#include "SHSaveManager.h"
 
-void USHRCO::Init()
+bool ItemClassIsValid(TSubclassOf<UFGItemDescriptor> ItemClass)
 {
-	CheatsSubsystem = USHBlueprintFunctionLibrary::GetCheatSubsystem(GetOuter());
+	if (!IsValid(ItemClass))
+		return false;
+
+	if (ItemClass->HasAnyClassFlags(CLASS_Deprecated | CLASS_Abstract))
+		return false;
+
+	return true;
 }
 
 void USHRCO::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -25,12 +32,10 @@ void USHRCO::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 
 bool USHRCO::GiveItem_Validate(TSubclassOf<UFGItemDescriptor> ItemClass, int32 NumItems)
 {
-	// Todo: Check is cheats are enabled
-
-	if (!IsValid(ItemClass))
+	if (!USHBlueprintFunctionLibrary::GetCheatSubsystem(GetOuter())->GetEnabledCheats().bSpawnItemsAllowed)
 		return false;
 
-	if (ItemClass->HasAnyClassFlags(CLASS_Deprecated | CLASS_Abstract))
+	if (!ItemClassIsValid(ItemClass))
 		return false;
 
 	if (NumItems <= 0 || NumItems > UFGItemDescriptor::GetStackSize(ItemClass))
@@ -55,4 +60,22 @@ void USHRCO::GiveItem_Implementation(TSubclassOf<UFGItemDescriptor> ItemClass, i
 
 	FInventoryStack ItemStack(NumItems, ItemClass);
 	int32 AddedAmount = Inventory->AddStack(ItemStack, true);
+}
+
+bool USHRCO::TogglePinItem_Validate(TSubclassOf<UFGItemDescriptor> ItemClass, bool bPinItem)
+{
+	if (!ItemClassIsValid(ItemClass))
+		return false;
+
+	return true;
+}
+
+void USHRCO::TogglePinItem_Implementation(TSubclassOf<UFGItemDescriptor> ItemClass, bool bPinItem)
+{
+	ASHSaveManager* SaveManager = USHBlueprintFunctionLibrary::GetSaveManager(GetOuter());
+	
+	if (bPinItem)
+		SaveManager->AddPinnedItem(ItemClass);
+	else
+		SaveManager->RemovePinnedItem(ItemClass);
 }

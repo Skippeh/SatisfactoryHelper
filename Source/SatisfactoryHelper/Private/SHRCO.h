@@ -13,12 +13,10 @@ public:
 	UFUNCTION(Server, WithValidation, Reliable, BlueprintCallable)
 	void GiveItem(TSubclassOf<class UFGItemDescriptor> ItemClass, int32 NumItems);
 
-	/** Initialize members (server only) */
-	void Init();
+	UFUNCTION(Server, WithValidation, Reliable, BlueprintCallable)
+	void TogglePinItem(TSubclassOf<class UFGItemDescriptor> ItemClass, bool bPinItem);
 
 private:
 	UPROPERTY(Replicated)
 	bool bDummy = true;
-
-	class ASHCheatSubsystem* CheatsSubsystem;
 };

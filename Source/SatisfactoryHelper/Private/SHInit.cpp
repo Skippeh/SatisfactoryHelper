@@ -10,6 +10,7 @@
 #include "Subsystems/SHCheatSubsystem.h"
 #include "ItemInfoData/SHItemInfoSubsystem.h"
 #include "FGSchematicManager.h"
+#include "SHSaveManager.h"
 
 AUIManager* ASHInit::GetUIManager() const { return UIManager; }
 ASHInputManager* ASHInit::GetInputManager() const { return InputManager; }
@@ -25,6 +26,21 @@ void ASHInit::BeginPlay()
 	auto ItemInfoSubsystem = USHBlueprintFunctionLibrary::GetItemInfoSubsystem(GetWorld());
 	ItemInfoSubsystem->RegisterItemInfoClasses(ItemInfoClasses);
 
+	if (GetNetMode() != ENetMode::NM_Client)
+	{
+		SaveManager = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld());
+
+		SML::Logging::debug(*FString::Printf(TEXT("Loaded SaveManager is valid: %d"), IsValid(SaveManager)));
+
+		if (SaveManager == nullptr) // Will be null if new world or loading a save that didn't have this mod beforehand
+			SaveManager = GetWorld()->SpawnActor<ASHSaveManager>(ASHSaveManager::StaticClass());
+	}
+	else
+	{
+		SaveManager = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld()); // gets replicated host actor
+		SML::Logging::debug(*FString::Printf(TEXT("SaveManager is valid: %d"), IsValid(SaveManager)));
+	}
+
 	UIManager = GetWorld()->SpawnActor<AUIManager>(UIManagerClass);
 	InputManager = GetWorld()->SpawnActor<ASHInputManager>(InputManagerClass);
 	
@@ -32,7 +48,6 @@ void ASHInit::BeginPlay()
 	{
 		AFGGameMode* GameMode = CastChecked<AFGGameMode>(GetWorld()->GetAuthGameMode());
 		GameMode->RegisterRemoteCallObjectClass(USHRCO::StaticClass());
-		USHBlueprintFunctionLibrary::GetRCO(GetWorld())->Init();
 		USHBlueprintFunctionLibrary::GetCheatSubsystem(GetWorld())->SetEnabledCheats(&Config.Cheats);
 	}
 

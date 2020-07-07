@@ -10,6 +10,7 @@ class AUIManager;
 class ASHInputManager;
 class UContentManager;
 class ASHItemInfoSubsystem;
+class ASHSaveManager;
 
 USTRUCT(BlueprintType)
 struct FSHUserConfig
@@ -93,6 +94,9 @@ private:
 
 	UPROPERTY()
 	UContentManager* ContentManager;
+
+	UPROPERTY()
+	ASHSaveManager* SaveManager;
 
 	UPROPERTY()
 	FSHConfig Config;
