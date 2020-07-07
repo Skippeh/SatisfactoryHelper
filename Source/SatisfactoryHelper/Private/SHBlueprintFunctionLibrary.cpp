@@ -7,6 +7,7 @@
 #include "mod/ModSubsystems.h"
 #include "FGSubsystem.h"
 #include "SHSubsystemHolder.h"
+#include "SHSaveManager.h"
 #include "Subsystems/SHCheatSubsystem.h"
 #include "ItemInfoData/SHItemInfoSubsystem.h"
 #include "SatisfactoryModLoader.h"
@@ -71,6 +72,11 @@ AFGRecipeManager* USHBlueprintFunctionLibrary::GetRecipeManager(UObject* WorldCo
 AFGSchematicManager* USHBlueprintFunctionLibrary::GetSchematicManager(UObject* WorldContext)
 {
 	return GetManagerClass<AFGSchematicManager>(WorldContext);
+}
+
+ASHSaveManager* USHBlueprintFunctionLibrary::GetSaveManager(UObject* WorldContext)
+{
+	return GetManagerClass<ASHSaveManager>(WorldContext);
 }
 
 bool USHBlueprintFunctionLibrary::IsDebugModeEnabled()

@@ -6,6 +6,7 @@
 class UContentManager;
 class ASHInit;
 class USHRCO;
+class ASHSaveManager;
 
 UCLASS()
 class USHBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
@@ -42,6 +43,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Schematics")
 	static AFGSchematicManager* GetSchematicManager(UObject* WorldContext);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Save")
+	static ASHSaveManager* GetSaveManager(UObject* WorldContext);
 
 	/** Returns true if SML debug mode is enabled. */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | SML")
