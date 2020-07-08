@@ -29,16 +29,13 @@ void ASHInit::BeginPlay()
 	if (GetNetMode() != ENetMode::NM_Client)
 	{
 		SaveManager = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld());
-
-		SML::Logging::debug(*FString::Printf(TEXT("Loaded SaveManager is valid: %d"), IsValid(SaveManager)));
-
+		
 		if (SaveManager == nullptr) // Will be null if new world or loading a save that didn't have this mod beforehand
 			SaveManager = GetWorld()->SpawnActor<ASHSaveManager>(ASHSaveManager::StaticClass());
 	}
 	else
 	{
 		SaveManager = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld()); // gets replicated host actor
-		SML::Logging::debug(*FString::Printf(TEXT("SaveManager is valid: %d"), IsValid(SaveManager)));
 	}
 
 	UIManager = GetWorld()->SpawnActor<AUIManager>(UIManagerClass);
