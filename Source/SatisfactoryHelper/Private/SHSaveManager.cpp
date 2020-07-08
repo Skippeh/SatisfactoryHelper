@@ -5,6 +5,18 @@
 #pragma region IFGSaveInterface implementation
 void ASHSaveManager::PostLoadGame_Implementation(int32 saveVersion, int32 gameVersion)
 {
+	TArray<TSubclassOf<UFGItemDescriptor>> PendingRemoval;
+
+	for (const auto& ItemDescriptor : PinnedItems)
+	{
+		if (!IsValid(ItemDescriptor) || ItemDescriptor->HasAnyClassFlags(CLASS_Deprecated))
+			PendingRemoval.Add(ItemDescriptor);
+	}
+
+	for (const auto& ItemDescriptor : PendingRemoval)
+	{
+		PinnedItems.Remove(ItemDescriptor);
+	}
 }
 
 void ASHSaveManager::PreLoadGame_Implementation(int32 saveVersion, int32 gameVersion)
