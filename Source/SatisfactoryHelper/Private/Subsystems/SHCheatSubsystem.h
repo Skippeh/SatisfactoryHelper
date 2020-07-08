@@ -9,7 +9,7 @@ struct FEnabledCheats
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, SaveGame)
 	bool bSpawnItemsAllowed;
 
 	FEnabledCheats(bool bCheatsEnabled)

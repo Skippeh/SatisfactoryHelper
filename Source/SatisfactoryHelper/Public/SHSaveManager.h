@@ -5,6 +5,7 @@
 #include "FGSaveInterface.h"
 #include "DelegateCombinations.h"
 #include "Resources/FGItemDescriptor.h"
+#include "Subsystems/SHCheatSubsystem.h"
 #include "SHSaveManager.generated.h"
 
 class UFGItemDescriptor;
@@ -47,6 +48,9 @@ public:
 private:
 	UPROPERTY(SaveGame, Replicated)
 	TArray<TSubclassOf<UFGItemDescriptor>> PinnedItems;
+
+	UPROPERTY(SaveGame)
+	FEnabledCheats EnabledCheats;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void RPC_OnToggledPinnedItem(TSubclassOf<UFGItemDescriptor> ItemDescriptor, bool bIsPinned);
