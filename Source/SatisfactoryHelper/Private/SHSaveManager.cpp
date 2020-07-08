@@ -5,22 +5,18 @@
 #pragma region IFGSaveInterface implementation
 void ASHSaveManager::PostLoadGame_Implementation(int32 saveVersion, int32 gameVersion)
 {
-	SML::Logging::debug(TEXT("PostLoadGame"));
 }
 
 void ASHSaveManager::PreLoadGame_Implementation(int32 saveVersion, int32 gameVersion)
 {
-	SML::Logging::debug(TEXT("PreLoadGame"));
 }
 
 void ASHSaveManager::PostSaveGame_Implementation(int32 saveVersion, int32 gameVersion)
 {
-	SML::Logging::debug(TEXT("PostSaveGame"));
 }
 
 void ASHSaveManager::PreSaveGame_Implementation(int32 saveVersion, int32 gameVersion)
 {
-	SML::Logging::debug(TEXT("PreSaveGame"));
 }
 #pragma endregion
 
