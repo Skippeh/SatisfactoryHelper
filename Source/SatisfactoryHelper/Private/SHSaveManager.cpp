@@ -9,7 +9,7 @@ void ASHSaveManager::PostLoadGame_Implementation(int32 saveVersion, int32 gameVe
 
 	for (const auto& ItemDescriptor : PinnedItems)
 	{
-		if (!IsValid(ItemDescriptor) || ItemDescriptor->HasAnyClassFlags(CLASS_Deprecated))
+		if (!IsValid(ItemDescriptor) || !IsValid(ItemDescriptor.Get()) || ItemDescriptor->HasAnyClassFlags(CLASS_Deprecated))
 			PendingRemoval.Add(ItemDescriptor);
 	}
 
