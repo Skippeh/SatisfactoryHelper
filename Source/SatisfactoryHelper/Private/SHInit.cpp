@@ -48,7 +48,6 @@ void ASHInit::BeginPlay()
 	{
 		AFGGameMode* GameMode = CastChecked<AFGGameMode>(GetWorld()->GetAuthGameMode());
 		GameMode->RegisterRemoteCallObjectClass(USHRCO::StaticClass());
-		USHBlueprintFunctionLibrary::GetCheatSubsystem(GetWorld())->SetEnabledCheats(&Config.Cheats);
 	}
 
 	// Cache all item descriptors (subsequent calls returns from cache instead of searching assets again)

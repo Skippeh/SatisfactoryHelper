@@ -32,13 +32,9 @@ struct FSHConfig
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(BlueprintReadOnly)
-	FEnabledCheats Cheats;
-
-	UPROPERTY(BlueprintReadOnly)
 	FSHUserConfig UserConfig;
 
 	FSHConfig()
-		: Cheats(false)
 	{
 	}
 };

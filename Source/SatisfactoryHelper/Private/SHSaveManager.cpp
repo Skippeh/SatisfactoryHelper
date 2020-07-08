@@ -1,10 +1,16 @@
 #include "SHSaveManager.h"
 #include "UnrealNetwork.h"
 #include "util/Logging.h"
+#include "SHBlueprintFunctionLibrary.h"
 
 #pragma region IFGSaveInterface implementation
+void ASHSaveManager::PreLoadGame_Implementation(int32 saveVersion, int32 gameVersion)
+{
+}
+
 void ASHSaveManager::PostLoadGame_Implementation(int32 saveVersion, int32 gameVersion)
 {
+	// Remove item descriptors from mods that have been deleted or have been deprecated.
 	TArray<TSubclassOf<UFGItemDescriptor>> PendingRemoval;
 
 	for (const auto& ItemDescriptor : PinnedItems)
@@ -17,17 +23,19 @@ void ASHSaveManager::PostLoadGame_Implementation(int32 saveVersion, int32 gameVe
 	{
 		PinnedItems.Remove(ItemDescriptor);
 	}
-}
 
-void ASHSaveManager::PreLoadGame_Implementation(int32 saveVersion, int32 gameVersion)
-{
-}
-
-void ASHSaveManager::PostSaveGame_Implementation(int32 saveVersion, int32 gameVersion)
-{
+	// Set enabled cheats
+	USHBlueprintFunctionLibrary::GetCheatSubsystem(this)->SetEnabledCheats(EnabledCheats);
+	SML::Logging::debug(*FString::Printf(TEXT("loading, spawn items allowed: %d"), EnabledCheats.bSpawnItemsAllowed));
 }
 
 void ASHSaveManager::PreSaveGame_Implementation(int32 saveVersion, int32 gameVersion)
+{
+	EnabledCheats = USHBlueprintFunctionLibrary::GetCheatSubsystem(this)->GetEnabledCheats();
+	SML::Logging::debug(*FString::Printf(TEXT("saving, spawn items allowed: %d"), EnabledCheats.bSpawnItemsAllowed));
+}
+
+void ASHSaveManager::PostSaveGame_Implementation(int32 saveVersion, int32 gameVersion)
 {
 }
 #pragma endregion
