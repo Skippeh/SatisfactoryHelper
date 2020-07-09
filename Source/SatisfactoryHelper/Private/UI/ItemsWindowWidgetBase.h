@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	bool SelectIndex(int32 listIndex, bool bFromPinnedItems);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	bool SelectDescriptorReference(UDescriptorReference* DescriptorReference, bool bFromPinnedItems);
+
 	UFUNCTION(BlueprintCallable)
 	bool ToggleWindowVisibility();
 
