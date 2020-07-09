@@ -24,6 +24,9 @@ struct FSHUserConfig
 
 	UPROPERTY(BlueprintReadWrite)
 	bool bShowAllRecipes;
+
+	UPROPERTY(BlueprintReadWrite)
+	FString ItemsMenuKey = EKeys::F2.ToString();
 };
 
 USTRUCT(BlueprintType)
