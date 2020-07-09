@@ -87,7 +87,7 @@ protected:
 	UPARAM(DisplayName = "Max Score") int32 FilterItems(FString SearchText, bool bShowLockedItems, const TArray<class UDescriptorReference*>& InItemsArray, TArray<class UDescriptorReference*>& OutItemsArray) const;
 
 	UFUNCTION(BlueprintCallable)
-	void UpdateItemView(class UDescriptorReference* DescriptorReference, UImage* ImageWidget, UTextBlock* NameWidget, UTextBlock* DescriptionWidget, UWidgetSwitcher* PinnedItemSwitcher);
+	void UpdateItemView(class UDescriptorReference* DescriptorReference, UImage* ImageWidget, UTextBlock* NameWidget, UTextBlock* DescriptionWidget, UWidgetSwitcher* PinnedItemSwitcher, bool bUpdateInfoPanels = true);
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateInfoPanels(TSubclassOf<UFGItemDescriptor> DescriptorClass);

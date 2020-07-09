@@ -15,6 +15,7 @@
 #include "FGRecipeManager.h"
 #include "SHRecipeHelper.h"
 #include "DescriptorReference.h"
+#include "tooltip/ItemTooltipHandler.h"
 
 #pragma region Empty blueprint implementations
 void UItemsWindowWidgetBase::OnToggleWindowVisibility_Implementation(bool bIsVisible) { }
@@ -174,16 +175,17 @@ int32 UItemsWindowWidgetBase::FindItemIndexInList(TSubclassOf<class UFGItemDescr
 	return -1;
 }
 
-void UItemsWindowWidgetBase::UpdateItemView(UDescriptorReference* DescriptorReference, UImage* ImageWidget, UTextBlock* NameWidget, UTextBlock* DescriptionWidget, UWidgetSwitcher* PinnedItemSwitcher)
+void UItemsWindowWidgetBase::UpdateItemView(UDescriptorReference* DescriptorReference, UImage* ImageWidget, UTextBlock* NameWidget, UTextBlock* DescriptionWidget, UWidgetSwitcher* PinnedItemSwitcher, bool bUpdateInfoPanels)
 {
 	if (!IsValid(DescriptorReference))
 		return;
 
 	auto DescriptorClass = DescriptorReference->ItemDescriptorClass;
 
-	// TODO: Use UItemTooltipHandler::GetItemName/Description instead
-	NameWidget->SetText(UFGItemDescriptor::GetItemName(DescriptorClass));
-	DescriptionWidget->SetText(UFGItemDescriptor::GetItemDescription(DescriptorClass));
+	FText ItemName = UItemTooltipHandler::GetItemName(GetOwningPlayer(), FInventoryStack(1, DescriptorClass));
+	FText ItemDescription = UItemTooltipHandler::GetItemDescription(GetOwningPlayer(), FInventoryStack(1, DescriptorClass));
+	NameWidget->SetText(ItemName);
+	DescriptionWidget->SetText(ItemDescription);
 
 	UTexture2D* BigIcon = UFGItemDescriptor::GetBigIcon(DescriptorClass);
 
@@ -197,7 +199,8 @@ void UItemsWindowWidgetBase::UpdateItemView(UDescriptorReference* DescriptorRefe
 
 	PinnedItemSwitcher->SetActiveWidgetIndex(DescriptorReference->bIsPinned ? 1 : 0);
 
-	UpdateInfoPanels(DescriptorClass);
+	if (bUpdateInfoPanels)
+		UpdateInfoPanels(DescriptorClass);
 }
 
 void UItemsWindowWidgetBase::UpdateInfoPanels(TSubclassOf<UFGItemDescriptor> DescriptorClass)
