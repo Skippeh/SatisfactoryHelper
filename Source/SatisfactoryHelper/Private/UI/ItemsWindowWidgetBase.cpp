@@ -269,12 +269,12 @@ bool UItemsWindowWidgetBase::ToggleWindowVisibility()
 		return ShowWindow();
 }
 
-void UItemsWindowWidgetBase::OnFadeFinished()
+void UItemsWindowWidgetBase::OnFadeFinished_Implementation()
 {
 	bIsFading = false;
 }
 
-void UItemsWindowWidgetBase::OnFadeOutFinished()
+void UItemsWindowWidgetBase::OnFadeOutFinished_Implementation()
 {
 	OnFadeFinished();
 	SetVisibility(ESlateVisibility::Hidden);

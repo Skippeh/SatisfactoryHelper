@@ -38,8 +38,8 @@ void ASHInit::BeginPlay()
 		SaveManager = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld()); // gets replicated host actor
 	}
 
-	UIManager = GetWorld()->SpawnActor<AUIManager>(UIManagerClass);
 	InputManager = GetWorld()->SpawnActor<ASHInputManager>(InputManagerClass);
+	UIManager = GetWorld()->SpawnActor<AUIManager>(UIManagerClass);
 	
 	if (GetNetMode() != ENetMode::NM_Client)
 	{

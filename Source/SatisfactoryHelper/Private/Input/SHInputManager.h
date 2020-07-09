@@ -14,8 +14,11 @@ class ASHInputManager : public AInfo
 	ASHInputManager() { PrimaryActorTick.bCanEverTick = true; }
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FKey ToggleItemsMenuKey = EKeys::F2;
+	UFUNCTION(BlueprintCallable)
+	void SetToggleItemsMenuKey(FKey NewKey) { ToggleItemsMenuKey = NewKey; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FKey GetToggleItemsMenuKey() const { return ToggleItemsMenuKey; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -25,4 +28,13 @@ protected:
 private:
 	UPROPERTY()
 	class AFGPlayerController* PlayerController;
+
+	UPROPERTY()
+	FKey ToggleItemsMenuKey;
+
+	UPROPERTY()
+	class ASHInit* Init;
+
+	UFUNCTION()
+	bool AlternateKeyJustPressed() const;
 };

@@ -97,16 +97,16 @@ protected:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool GetShowAllRecipes();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnFadeOutFinished();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnFadeFinished();
 	
 private:
 	UPROPERTY()
 	FTimerHandle FadeTimerHandle;
-
-	UFUNCTION()
-	void OnFadeOutFinished();
-
-	UFUNCTION()
-	void OnFadeFinished();
 
 	UPROPERTY()
 	bool bIsFading = false;
