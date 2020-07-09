@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FGInventoryComponent.h"
 #include "SHBlueprintFunctionLibrary.generated.h"
 
 class UContentManager;
@@ -53,4 +54,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Debugging")
 	static FString GetClassInheritancePathString(UClass* Class);
+
+	/** Creates an inventory stack with the given values. This method exists to be able to create FInventoryStack in BP. FInventoryStack members do not have BlueprintReadWrite. */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper |")
+	static FInventoryStack MakeInventoryStack(TSubclassOf<UFGItemDescriptor> ItemDescriptor, int32 NumItems)
+	{
+		return FInventoryStack(NumItems, ItemDescriptor);
+	}
 };
