@@ -14,6 +14,9 @@ public:
 	void GiveItem(TSubclassOf<class UFGItemDescriptor> ItemClass, int32 NumItems);
 
 	UFUNCTION(Server, WithValidation, Reliable, BlueprintCallable)
+	void SpawnVehicle(TSubclassOf<class UFGVehicleDescriptor> VehicleClass);
+
+	UFUNCTION(Server, WithValidation, Reliable, BlueprintCallable)
 	void TogglePinItem(TSubclassOf<class UFGItemDescriptor> ItemClass, bool bPinItem);
 
 private:

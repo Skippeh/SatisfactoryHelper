@@ -12,8 +12,12 @@ struct FEnabledCheats
 	UPROPERTY(BlueprintReadWrite, SaveGame)
 	bool bSpawnItemsAllowed;
 
+	UPROPERTY(BlueprintReadWrite, SaveGame)
+	bool bSpawnVehiclesWithFuel;
+
 	FEnabledCheats(bool bCheatsEnabled)
-		: bSpawnItemsAllowed(bCheatsEnabled)
+		: bSpawnItemsAllowed(bCheatsEnabled),
+		  bSpawnVehiclesWithFuel(bCheatsEnabled)
 	{
 	}
 

@@ -66,6 +66,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetUserConfig(const FSHUserConfig& InUserConfig, bool bSaveToDisk = true);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	TSubclassOf<UFGItemDescriptor> GetVehicleFuelItemClass() const { return VehicleFuelItemClass; }
+
 protected:
 	void BeginPlay() override;
 
@@ -83,6 +86,9 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnPurchasedSchematic(TSubclassOf<UFGSchematic> SchematicClass);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UFGItemDescriptor> VehicleFuelItemClass;
 
 private:
 	UPROPERTY()
