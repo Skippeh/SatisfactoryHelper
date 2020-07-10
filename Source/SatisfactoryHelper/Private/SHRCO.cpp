@@ -91,8 +91,6 @@ void USHRCO::SpawnVehicle_Implementation(TSubclassOf<UFGVehicleDescriptor> Vehic
 	FVector ForwardVector = Camera->GetForwardVector();
 	if (GetWorld()->LineTraceSingleByChannel(HitResult, Location, Location + (ForwardVector * 10000), ECC_Visibility))
 	{
-		SML::Logging::debug(*FString::Printf(TEXT("Hit: %s"), *HitResult.ImpactPoint.ToString()));
-
 		TSubclassOf<AFGVehicle> VehicleActorClass = UFGVehicleDescriptor::GetVehicleClass(VehicleClass);
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
