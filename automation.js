@@ -3,12 +3,13 @@ const fs = require("fs");
 const path = require("path");
 
 if (process.argv.length < 3) {
-    console.error("Usage: node automation.js <ModLoaderRootPath> [...ModList]");
+    console.error("Usage: node automation.js <ModLoaderRootPath> <Build Configuration> [...ModList]");
     process.exit(1);
 }
 
 const ModLoaderRootPath = process.argv[2];
-const ModList = process.argv.slice(3);
+const BuildConfiguration = process.argv[3];
+const ModList = process.argv.slice(4);
 
 if (!fs.existsSync(`${ModLoaderRootPath}/GamePath.txt`)) {
     console.error(`GamePath.txt does not exist in ${ModLoaderRootPath}.`);
@@ -17,7 +18,12 @@ if (!fs.existsSync(`${ModLoaderRootPath}/GamePath.txt`)) {
 
 const SatisfactoryPaths = fs.readFileSync(`${ModLoaderRootPath}/GamePath.txt`, "utf-8").replace("\r", "").split("\n");
 
-console.log(`SF Root: ${SatisfactoryPaths.join(", ")} ModLoader Root: ${ModLoaderRootPath} Mod List: ${ModList.join(", ")}`);
+console.log(`Build Configuration: ${BuildConfiguration} SF Root: ${SatisfactoryPaths.join(", ")} ModLoader Root: ${ModLoaderRootPath} Mod List: ${ModList.join(", ")}`);
+
+if (BuildConfiguration != "Shipping") {
+    console.info("Skipping copying mod DLLs, build configuration != Shipping");
+    process.exit(0);
+}
 
 function CopyFileAndLog(SourceFilePath, DestinationFolder) {
     if (fs.existsSync(SourceFilePath)) {
