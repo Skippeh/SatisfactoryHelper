@@ -55,6 +55,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Debugging")
 	static FString GetClassInheritancePathString(UClass* Class);
 
+	/** Gets the number of classes this class inherits. */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Debugging")
+	static int32 GetClassInheritanceLength(UClass* Class);
+
 	/** Creates an inventory stack with the given values. This method exists to be able to create FInventoryStack in BP. FInventoryStack members do not have BlueprintReadWrite. */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper |")
 	static FInventoryStack MakeInventoryStack(TSubclassOf<UFGItemDescriptor> ItemDescriptor, int32 NumItems)

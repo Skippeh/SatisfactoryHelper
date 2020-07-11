@@ -29,7 +29,7 @@ public:
 	void ClearItemSelection();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	bool SelectIndex(int32 listIndex, bool bFromPinnedItems);
+	bool SelectIndex(int32 listIndex, bool bFromPinnedItems, UDescriptorReference*& DescriptorReference);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	bool SelectDescriptorReference(UDescriptorReference* DescriptorReference, bool bFromPinnedItems);
