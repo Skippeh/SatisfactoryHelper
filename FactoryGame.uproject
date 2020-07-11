@@ -58,7 +58,7 @@
 	],
 	"PostBuildSteps": {
 		"Win64": [
-			"node $(ProjectDir)\\automation.js $(ProjectDir) SatisfactoryHelper SML"
+			"node \"$(ProjectDir)\\automation.js\" \"$(ProjectDir)\" \"$(TargetConfiguration)\" SatisfactoryHelper SML"
 		]
 	}
 }
