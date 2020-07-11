@@ -103,3 +103,22 @@ FString USHBlueprintFunctionLibrary::GetClassInheritancePathString(UClass* Class
 		return Class->GetName();
 	});
 }
+
+int32 USHBlueprintFunctionLibrary::GetClassInheritanceLength(UClass* Class)
+{
+	if (!IsValid(Class))
+		return 0;
+
+	int32 NumClasses;
+	UClass* CurrentClass = Class;
+
+	while (IsValid(CurrentClass))
+	{
+		CurrentClass = CurrentClass->GetSuperClass();
+
+		if (IsValid(CurrentClass))
+			++NumClasses;
+	}
+
+	return NumClasses;
+}
