@@ -109,7 +109,7 @@ int32 USHBlueprintFunctionLibrary::GetClassInheritanceLength(UClass* Class)
 	if (!IsValid(Class))
 		return 0;
 
-	int32 NumClasses;
+	int32 NumClasses = 0;
 	UClass* CurrentClass = Class;
 
 	while (IsValid(CurrentClass))
