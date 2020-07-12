@@ -168,13 +168,6 @@ int32 UItemsWindowWidgetBase::FilterItems(FString SearchText, bool bShowLockedIt
 	return MaxScore;
 }
 
-int32 UItemsWindowWidgetBase::FindItemIndexInList(TSubclassOf<class UFGItemDescriptor> SearchClass, UListView* InListView)
-{
-	// todo: implement
-	unimplemented();
-	return -1;
-}
-
 void UItemsWindowWidgetBase::UpdateItemView(UDescriptorReference* DescriptorReference, UImage* ImageWidget, UTextBlock* NameWidget, UTextBlock* DescriptionWidget, UWidgetSwitcher* PinnedItemSwitcher, bool bUpdateInfoPanels)
 {
 	if (!IsValid(DescriptorReference))
