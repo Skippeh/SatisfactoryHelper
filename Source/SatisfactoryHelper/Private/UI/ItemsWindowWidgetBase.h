@@ -5,7 +5,13 @@
 #include "UI/FGInteractWidget.h"
 #include "ItemsWindowWidgetBase.generated.h"
 
-typedef TTuple<class UCollapsableWidgetBase*, class USHItemInfo*> TInfoPanelEntry;
+class UDescriptorReference;
+class UFGItemDescriptor;
+class UCollapsableWidgetBase;
+class USHItemInfo;
+class ASHItemInfoSubsystem;
+class ASHInit;
+typedef TTuple<UCollapsableWidgetBase*, USHItemInfo*> TInfoPanelEntry;
 
 struct FSearchResult
 {
@@ -68,7 +74,7 @@ protected:
 	UTexture2D* MissingIconTexture;
 
 	UPROPERTY(BlueprintReadOnly)
-	class ASHItemInfoSubsystem* ItemInfoSubsystem;
+	ASHItemInfoSubsystem* ItemInfoSubsystem;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UCollapsableWidgetBase> CollapsableWidgetClass;
@@ -80,10 +86,10 @@ protected:
 	 * Filters the input array based on the search text and bShowLockedItems. Returns the max search score achieved.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UPARAM(DisplayName = "Max Score") int32 FilterItems(FString SearchText, bool bShowLockedItems, const TArray<class UDescriptorReference*>& InItemsArray, TArray<class UDescriptorReference*>& OutItemsArray) const;
+	UPARAM(DisplayName = "Max Score") int32 FilterItems(FString SearchText, bool bShowLockedItems, const TArray<UDescriptorReference*>& InItemsArray, TArray<UDescriptorReference*>& OutItemsArray) const;
 
 	UFUNCTION(BlueprintCallable)
-	void UpdateItemView(class UDescriptorReference* DescriptorReference, UImage* ImageWidget, UTextBlock* NameWidget, UTextBlock* DescriptionWidget, UWidgetSwitcher* PinnedItemSwitcher, bool bUpdateInfoPanels = true);
+	void UpdateItemView(UDescriptorReference* DescriptorReference, UImage* ImageWidget, UTextBlock* NameWidget, UTextBlock* DescriptionWidget, UWidgetSwitcher* PinnedItemSwitcher, bool bUpdateInfoPanels = true);
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateInfoPanels(TSubclassOf<UFGItemDescriptor> DescriptorClass);
@@ -113,5 +119,5 @@ private:
 	TArray<TInfoPanelEntry> InfoPanels;
 
 	UPROPERTY()
-	class ASHInit* CachedInit;
+	ASHInit* CachedInit;
 };
