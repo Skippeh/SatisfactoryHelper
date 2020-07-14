@@ -6,6 +6,12 @@
 #include "util/Logging.h"
 #include "SHBlueprintFunctionLibrary.h"
 
+ASHItemInfoSubsystem::ASHItemInfoSubsystem()
+{
+	bReplicates = true;
+	bAlwaysRelevant = true;
+}
+
 USHItemData* ASHItemInfoSubsystem::GetItemData(TSubclassOf<UFGItemDescriptor> DescriptorClass, TSubclassOf<USHItemData> ItemDataClass)
 {
 	verify(IsValid(DescriptorClass));
