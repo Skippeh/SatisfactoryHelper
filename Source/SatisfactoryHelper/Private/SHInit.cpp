@@ -52,8 +52,6 @@ void ASHInit::BeginPlay()
 	TArray<TSubclassOf<UFGItemDescriptor>> Descriptors;
 	ContentManager->FindAllDescriptors(Descriptors, false);
 
-	SML::Logging::debug(*FString::Printf(TEXT("Found %d descriptor(s)"), Descriptors.Num()));
-
 	auto SchematicManager = USHBlueprintFunctionLibrary::GetSchematicManager(GetWorld());
 	SchematicManager->PurchasedSchematicDelegate.AddDynamic(this, &ASHInit::OnPurchasedSchematic);
 }
