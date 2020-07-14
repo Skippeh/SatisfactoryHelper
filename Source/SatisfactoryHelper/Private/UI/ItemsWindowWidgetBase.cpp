@@ -34,12 +34,12 @@ void UItemsWindowWidgetBase::NativeOnInitialized()
 	TArray<TSubclassOf<USHItemInfo>> InfoClasses;
 	ItemInfoSubsystem->GetItemInfoClasses(InfoClasses, true);
 
-	SML::Logging::debug(*FString::Printf(TEXT("Initializing %d panels..."), InfoClasses.Num()));
+	SML::Logging::debug(*FString::Printf(TEXT("[SatisfactoryHelper] Initializing %d panels..."), InfoClasses.Num()));
 	UPanelWidget* PanelsContainer = GetPanelsContainer();
 
 	for (auto InfoClass : InfoClasses)
 	{
-		SML::Logging::debug(*FString::Printf(TEXT("Initializing: %s"), *InfoClass.Get()->GetName()));
+		SML::Logging::debug(*FString::Printf(TEXT("[SatisfactoryHelper] Initializing: %s"), *InfoClass.Get()->GetName()));
 
 		UCollapsableWidgetBase* CollapsableWidget = CreateWidget<UCollapsableWidgetBase, UWidget>(this, CollapsableWidgetClass);
 		USHItemInfo* InfoWidget = CreateWidget<USHItemInfo, UWidget>(CollapsableWidget, InfoClass);
