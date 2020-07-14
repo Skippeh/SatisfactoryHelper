@@ -15,7 +15,7 @@ void AUIManager::BeginPlay()
 	verify(IsValid(HUD));
 	verify(IsValid(ItemsWindowClass));
 
-	ItemsWindow = NewObject<UItemsWindowWidgetBase>(PlayerController, ItemsWindowClass);
+	ItemsWindow = CreateWidget<UItemsWindowWidgetBase>(PlayerController, ItemsWindowClass);
 	ItemsWindow->SetOwningPlayer(PlayerController);
 	ItemsWindow->AddToViewport();
 }
