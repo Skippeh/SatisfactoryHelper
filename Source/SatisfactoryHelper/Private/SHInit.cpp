@@ -23,7 +23,8 @@ void ASHInit::BeginPlay()
 	Config = LoadConfig();
 	ContentManager = NewObject<UContentManager>(this);
 
-	auto ItemInfoSubsystem = USHBlueprintFunctionLibrary::GetItemInfoSubsystem(GetWorld());
+	ASHItemInfoSubsystem* ItemInfoSubsystem = USHBlueprintFunctionLibrary::GetItemInfoSubsystem(GetWorld());
+	SML::Logging::debug(TEXT("[SatisfactoryHelper] ItemInfoSubsystem is valid: "), IsValid(ItemInfoSubsystem));
 	ItemInfoSubsystem->RegisterItemInfoClasses(ItemInfoClasses);
 
 	if (GetNetMode() != ENetMode::NM_Client)

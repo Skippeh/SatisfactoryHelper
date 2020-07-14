@@ -118,6 +118,7 @@ void UContentManager::GetAllRecipes(TArray<TSubclassOf<UFGRecipe>>& OutArray)
 	{
 		CachedRecipes = new TArray<TSubclassOf<UFGRecipe>>();
 		AFGSchematicManager* SchematicManager = USHBlueprintFunctionLibrary::GetSchematicManager(GetOuter());
+		Logging::debug(TEXT("[SatisfactoryHelper] SchematicManager IsValid: "), IsValid(SchematicManager));
 		TArray<TSubclassOf<UFGSchematic>> AllSchematics;
 		SchematicManager->GetAllSchematics(AllSchematics);
 
