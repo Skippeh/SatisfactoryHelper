@@ -270,7 +270,7 @@ void UItemsWindowWidgetBase::OnFadeFinished_Implementation()
 void UItemsWindowWidgetBase::OnFadeOutFinished_Implementation()
 {
 	OnFadeFinished();
-	SetVisibility(ESlateVisibility::Hidden);
+	SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void UItemsWindowWidgetBase::SetShowAllRecipes(bool bShowAllRecipes)
