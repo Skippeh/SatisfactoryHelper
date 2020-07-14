@@ -18,8 +18,10 @@ UCLASS()
 class SATISFACTORYHELPER_API ASHItemInfoSubsystem : public AFGSubsystem
 {
 	GENERATED_BODY()
-	
+
 public:
+	ASHItemInfoSubsystem();
+	
 	/** Gets the item data for the specific item descriptor. If the item data doesn't support the given DescriptorClass null will be returned. */
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Item Data"))
 	USHItemData* GetItemData(TSubclassOf<class UFGItemDescriptor> DescriptorClass, TSubclassOf<USHItemData> ItemDataClass);
