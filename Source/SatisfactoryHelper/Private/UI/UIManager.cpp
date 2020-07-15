@@ -32,14 +32,11 @@ void AUIManager::ToggleCursor(bool bShowCursor)
 	if (CursorShowAmount > 0)
 	{
 		PlayerController->SetIgnoreLookInput(true);
-		SetInputEnabled(false);
 		UFGVirtualCursorFunctionLibrary::EnableVirtualCursor(PlayerController);
 		PlayerController->bShowMouseCursor = true;
 	}
 	else
 	{
-		SetInputEnabled(true);
-
 		bool bIsGamePaused = false; // todo: find out if the game is paused
 
 		if (!bIsGamePaused)
@@ -49,10 +46,4 @@ void AUIManager::ToggleCursor(bool bShowCursor)
 			PlayerController->bShowMouseCursor = false;
 		}
 	}
-}
-
-void AUIManager::SetInputEnabled(bool bInputEnabled)
-{
-	FDisabledInputGate DisabledInput(!bInputEnabled);
-	PlayerController->SetDisabledInputGate(DisabledInput);
 }
