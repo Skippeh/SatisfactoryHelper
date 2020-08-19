@@ -49,7 +49,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	bool HideWindow();
 
-	void NativeOnInitialized() override;
+	virtual void NativeOnInitialized() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void RefreshWidgets();
