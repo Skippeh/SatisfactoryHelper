@@ -32,6 +32,23 @@ struct FACTORYGAME_API TrackedJumpPadPlayer
 	float LastJumpTimeStamp;
 };
 
+struct FACTORYGAME_API TrackedJumpPadPlayer
+{
+	TrackedJumpPadPlayer( class AFGCharacterPlayer* PlayerToTrack, float InitialTimeStamp )
+		: pPlayer( PlayerToTrack )
+		, NumChainedJumps( 0 )
+		, LastJumpTimeStamp( InitialTimeStamp )
+	{}
+	
+	class AFGCharacterPlayer* pPlayer;
+	
+	int32 NumChainedJumps;
+	float LastJumpTimeStamp;
+
+public:
+	FORCEINLINE ~TrackedJumpPadPlayer() = default;
+};
+
 DECLARE_LOG_CATEGORY_EXTERN( LogJumpPad, Log, All );
 
 /**
