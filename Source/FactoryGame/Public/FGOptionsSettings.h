@@ -35,6 +35,14 @@ enum class ENetmodeAvailability : uint8
 	NA_OnlyClient				UMETA( DisplayName = "Only Client" )
 };
 
+UENUM( BlueprintType )
+enum class EGamemodeAvailability : uint8
+{
+	GA_Always					UMETA( DisplayName = "Always" ),
+    GA_OnlyInMainMenu			UMETA( DisplayName = "Only In Main Menu" ),
+    GA_OnlyInGame				UMETA( DisplayName = "Only In Game" )
+};
+
 
 USTRUCT( BlueprintType )
 struct FACTORYGAME_API FOptionRowData
@@ -53,7 +61,9 @@ public:
 		ShowZeroAsOff(false),
 		DefaultSliderValue(0),
 		UpdateInstantly(false),
-		RequireRestart(false)
+		RequireRestart(false),
+		NetmodeAvailability( ENetmodeAvailability::NA_ServerAndClient ),
+		GamemodeAvailability( EGamemodeAvailability::GA_Always )
 	{
 	}
 
@@ -111,6 +121,9 @@ public:
 	UPROPERTY( BlueprintReadWrite, EditAnywhere )
 	ENetmodeAvailability NetmodeAvailability;
 
+	UPROPERTY( BlueprintReadWrite, EditAnywhere )
+	EGamemodeAvailability GamemodeAvailability;
+
 public:
 	FORCEINLINE ~FOptionRowData() = default;
 };
@@ -120,9 +133,9 @@ struct FACTORYGAME_API FActionMappingDisplayName
 {
 	GENERATED_BODY()
 	
-	FActionMappingDisplayName(){}
+	MODDING_SHIPPING_FORCEINLINE FActionMappingDisplayName(){}
 
-	FActionMappingDisplayName( FName keyBidningName ) :
+	MODDING_SHIPPING_FORCEINLINE FActionMappingDisplayName( FName keyBidningName ) :
 		ActionMappingName( keyBidningName )
 	{}
 
@@ -134,6 +147,7 @@ struct FACTORYGAME_API FActionMappingDisplayName
 
 public:
 	FORCEINLINE ~FActionMappingDisplayName() = default;
+	MODDING_SHIPPING_FORCEINLINE FActionMappingDisplayName(const FActionMappingDisplayName&) = default;
 };
 
 USTRUCT( BlueprintType, meta = ( ShowOnlyInnerProperties ) )
@@ -141,9 +155,9 @@ struct FACTORYGAME_API FAxisMappingDisplayName
 {
 	GENERATED_BODY()
 
-	FAxisMappingDisplayName(){}
+	MODDING_SHIPPING_FORCEINLINE FAxisMappingDisplayName(){}
 
-	FAxisMappingDisplayName( FName axisMappingName ) :
+	MODDING_SHIPPING_FORCEINLINE FAxisMappingDisplayName( FName axisMappingName ) :
 		AxisMappingName( axisMappingName )
 	{}
 
@@ -158,6 +172,7 @@ struct FACTORYGAME_API FAxisMappingDisplayName
 
 public:
 	FORCEINLINE ~FAxisMappingDisplayName() = default;
+	MODDING_SHIPPING_FORCEINLINE FAxisMappingDisplayName(const FAxisMappingDisplayName&) = default;
 };
 
 UCLASS( config = Game, defaultconfig, meta = ( DisplayName = "Satisfactory User Options" ) )

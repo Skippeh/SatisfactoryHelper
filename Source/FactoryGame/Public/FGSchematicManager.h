@@ -83,9 +83,13 @@ public:
 	virtual bool ShouldSave_Implementation() const override;
 	// End IFSaveInterface
 
-	/** Returns the available schematics in the game. */
+	/** Returns the available schematics in the game that have meet their dependencies. */
 	UFUNCTION( BlueprintCallable, BlueprintPure = false, Category = "Schematic" )
 	void GetAvailableSchematics( TArray< TSubclassOf< UFGSchematic > >& out_schematics ) const;
+
+	/** Returns the available schematics in the game of the given types that have meet their dependencies. */
+	UFUNCTION( BlueprintCallable, BlueprintPure = false, Category = "Schematic" )
+	void GetAvailableSchematicsOfTypes( TArray<ESchematicType> types, TArray< TSubclassOf< UFGSchematic > >& out_schematics ) const;
 
 	/** Returns the schematics the players have purchased of the given types. */
 	UFUNCTION( BlueprintCallable, BlueprintPure = false, Category = "Schematic" )
@@ -114,11 +118,11 @@ public:
 	/** Give the player access to a schematic */
 	UFUNCTION( BlueprintCallable, Category = "Schematic" )
 	void GiveAccessToSchematic( TSubclassOf< UFGSchematic > schematicClass, bool accessedViaCheats = false );
-
-	/** adds a schematic to available schematics */
-	UFUNCTION( BlueprintCallable, Category = "Schematic" )
-	void AddAvailableSchematic( TSubclassOf< UFGSchematic > schematicClassToAdd );
 	
+	/** adds a schematic to available schematics */
+	UFUNCTION(BlueprintCallable, Category = "Schematic", BlueprintInternalUseOnly)
+	void AddAvailableSchematic( TSubclassOf< UFGSchematic > schematicClassToAdd );
+
 	/** Gives you the base cost, after random, for a schematic */
 	UFUNCTION( BlueprintPure, DisplayName = "GetCostFor_Deprecated", Category = "Schematic", meta = ( DeprecatedFunction, DeprecationMessage = "Get the cost from the Schematic directly" ) )
 	TArray< FItemAmount > GetCostFor( TSubclassOf< UFGSchematic > schematic );
@@ -182,6 +186,9 @@ public:
 	void Debug_DumpStateToLog() const;
 	TArray< TSubclassOf< class UFGRecipe > > Debug_GetAllRecipes() const;
 
+	/** Checks if it's valid to give access to the given schematic */
+	bool CanGiveAccessToSchematic( TSubclassOf< UFGSchematic > schematic ) const;
+
 private:
 	/** Populate list with all schematics */
 	void PopulateSchematicsLists();
@@ -204,17 +211,19 @@ private:
 	void AddSchematicPayOff( TSubclassOf< class UFGSchematic > schematic, const TArray< FItemAmount >& amount );
 	void RemoveSchematicPayOff( TSubclassOf< class UFGSchematic > schematic );
 
-protected:	
+protected:
 	/** All schematic assets that have been sucked up in the PopulateSchematicsList function. Contains cheats and all sort of schematic. */
 	UPROPERTY()
 	TArray< TSubclassOf< UFGSchematic > > mAllSchematics;
 
 	/** All schematics that are available to the player */
-	UPROPERTY( SaveGame, Replicated )
+	// MODDING EDIT BlueprintReadOnly
+	UPROPERTY( SaveGame, Replicated , BlueprintReadOnly)
 	TArray< TSubclassOf< UFGSchematic > > mAvailableSchematics;
 
 	/** Once schematic is purchased it ends up here */
-	UPROPERTY( EditDefaultsOnly, SaveGame, ReplicatedUsing = OnRep_PurchasedSchematic, Category = "Schematic" )
+	// MODDING EDIT BlueprintReadOnly
+	UPROPERTY( EditDefaultsOnly, SaveGame, ReplicatedUsing = OnRep_PurchasedSchematic, Category = "Schematic" , BlueprintReadOnly)
 	TArray< TSubclassOf< UFGSchematic > > mPurchasedSchematics;
 
 	/* This keeps track of what players have paid off on different schematics */
@@ -222,7 +231,8 @@ protected:
 	TArray< FSchematicCost > mPaidOffSchematic;
 	
 	/** The active schematic the resources is being sold towards. */
-	UPROPERTY( SaveGame, ReplicatedUsing = OnRep_ActiveSchematic )
+	// MODDING EDIT BlueprintReadOnly
+	UPROPERTY( SaveGame, ReplicatedUsing = OnRep_ActiveSchematic, BlueprintReadOnly)
 	TSubclassOf< UFGSchematic > mActiveSchematic;
 
 	/** Called when we the schematic has been changed . */

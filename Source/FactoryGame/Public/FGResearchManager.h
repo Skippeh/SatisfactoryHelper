@@ -261,15 +261,21 @@ protected:
 	/** Called when the local player builds anything */
 	UFUNCTION()
 	void OnBuildingBuiltGlobal( class AFGBuildable* buildable );
+	
+	/** Checks if a research tree is valid for addition to the available research trees list. */
+	bool CanAddToAvailableResearchTrees( TSubclassOf< UFGResearchTree > researchTree ) const;
 
 	/** Whether multiple concurrent research can be conducted, or only one at a time. */
 	UPROPERTY( EditDefaultsOnly, Category = "Research" )
 	bool mCanConductMultipleResearch;
 
 public: // MODDING EDIT
+	UPROPERTY( Transient, Replicated )
+	TArray<TSubclassOf<class UFGResearchTree>> mAvailableResearchTrees;
+	
 	UPROPERTY( Transient )
 	TArray<TSubclassOf<class UFGResearchTree>> mAllResearchTrees;
-protected:
+	
 	UPROPERTY( SaveGame, Replicated )
 	TArray<TSubclassOf<class UFGResearchTree>> mUnlockedResearchTrees;
 
@@ -285,6 +291,8 @@ protected:
 	UPROPERTY( SaveGame )
 	TArray<FResearchTime> mSavedOngoingResearch;
 
+public: // MODDING EDIT Accessor
+	FORCEINLINE void OnResearchTimerCompleteAccessor(TSubclassOf<class UFGSchematic> schematic) { OnResearchTimerComplete(schematic); };
 private:
 	UFUNCTION()
 	void OnResearchTimerComplete( TSubclassOf<class UFGSchematic> schematic );

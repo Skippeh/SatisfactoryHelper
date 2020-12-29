@@ -51,6 +51,9 @@ protected:
 	/** Try to produce nuclear waste and put it in the output inventory */
 	void TryProduceWaste();
 
+public: // MODDING EDIT accessor
+	FORCEINLINE class UFGInventoryComponent* GetWasteInventoryAccessor() const { return GetWasteInventory(); };
+private:
 	/** Returns the inventory for waste in the nuclear generator */
 	UFUNCTION( BlueprintPure, Category = "Nuclear" )
 	FORCEINLINE class UFGInventoryComponent* GetWasteInventory() const { return mOutputInventoryHandler->GetActiveInventoryComponent(); }
@@ -60,14 +63,14 @@ private:
 	virtual void OnRep_ReplicationDetailActor() override;
 
 	class AFGReplicationDetailActor_GeneratorNuclear* GetCastRepDetailsActor() const;
-public://MODDING EDIT
+public: //MODDING EDIT
 	/** Spent fuel rods goes here. */
 	UPROPERTY( SaveGame )
 	class UFGInventoryComponent* mOutputInventory;
 
 	UPROPERTY()
 	UFGReplicationDetailInventoryComponent* mOutputInventoryHandler;
-private://MODDING EDIT
+private: //MODDING EDIT
 	/** Waste left to produce from the current fuel rod*/
 	UPROPERTY( SaveGame )
 	int32 mWasteLeftFromCurrentFuel;

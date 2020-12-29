@@ -7,6 +7,7 @@
 
 #include "ItemAmount.h"
 #include "Hologram/HologramSplinePathMode.h"
+#include "FGEventSubsystem.h"
 #include "FGRecipe.generated.h"
 
 
@@ -44,6 +45,10 @@ public:
 	UFUNCTION( BlueprintPure, Category = "FactoryGame|Recipe" )
 	static TArray< TSubclassOf< UObject > > GetProducedIn( TSubclassOf< UFGRecipe > inClass );
 
+	/** True if this recipe can be produced in the game. */
+	UFUNCTION( BlueprintPure, Category = "FactoryGame|Recipe" )
+    static bool HasAnyProducers( TSubclassOf< UFGRecipe > inClass );
+
 	/** Can the given player afford the recipe. */
 	UFUNCTION( BlueprintCallable, Category = "FactoryGame|Recipe" )
 	static bool IsRecipeAffordable( class AFGCharacterPlayer* player, TSubclassOf< class UFGRecipe > recipe );
@@ -52,9 +57,15 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "FactoryGame|Recipe" )
 	static void SortByName( UPARAM(ref) TArray< TSubclassOf< UFGRecipe > >& recipes );
 
-	/** Get descriptor for recipe specified */
+	/** Get descriptor for recipe specified 
+	* @note - This will only return the first product so recipes that produce more than one will only return the first in the array.
+	*/
 	UFUNCTION( BlueprintCallable, Category = "FactoryGame|Recipe" )
 	static TSubclassOf< class UFGItemDescriptor > GetDescriptorForRecipe( TSubclassOf< class UFGRecipe > recipe );
+
+	/** Returns the relevant events this recipe is present in. */
+	UFUNCTION( BlueprintPure, Category = "FactoryGame|Recipe" )
+    static TArray< EEvents > GetRelevantEvents( TSubclassOf< UFGRecipe > inClass );
 
 	/** Native accessors. */
 	virtual FText GetDisplayName() const;
@@ -106,6 +117,9 @@ public: // MODDING EDIT: protected -> public
 	UPROPERTY( EditDefaultsOnly, Meta = ( MustImplement = "FGRecipeProducerInterface", Category = "Recipe" ) )
 	TArray< TSoftClassPtr< UObject > > mProducedIn;
 
+	/** The events this recipe are present in */
+	UPROPERTY( EditDefaultsOnly, Category = "Events" )
+	TArray< EEvents > mRelevantEvents;
 public:
 	FORCEINLINE ~UFGRecipe() = default;
 };
