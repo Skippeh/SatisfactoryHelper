@@ -6,6 +6,8 @@
 #include "Subsystems/SHCheatSubsystem.h"
 #include "SHInit.generated.h"
 
+class UFGSchematic;
+class UFGItemDescriptor;
 class AUIManager;
 class ASHInputManager;
 class UContentManager;
