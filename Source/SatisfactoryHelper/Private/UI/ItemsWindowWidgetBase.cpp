@@ -231,7 +231,7 @@ bool UItemsWindowWidgetBase::ShowWindow_Implementation()
 	GetOuter()->GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, this, &UItemsWindowWidgetBase::OnFadeFinished, IsValid(FadeInAnimation) ? FadeInAnimationLength : 0);
 	bIsFading = true;
 	bIsVisible = true;
-	OnToggleWindowVisibility(false);
+	OnToggleWindowVisibility(true);
 	return true;
 }
 
