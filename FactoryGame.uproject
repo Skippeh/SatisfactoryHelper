@@ -58,6 +58,10 @@
 		{
 			"Name": "RiderLink",
 			"Enabled": true
+		},
+		{
+			"Name": "SMLEditor",
+			"Enabled": true
 		}
 	],
 	"PostBuildSteps":
