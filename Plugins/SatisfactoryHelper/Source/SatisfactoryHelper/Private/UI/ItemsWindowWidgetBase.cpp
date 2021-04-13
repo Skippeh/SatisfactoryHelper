@@ -4,18 +4,18 @@
 #include "Components/ListView.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-#include "util/Logging.h"
+//#include "util/Logging.h"
 #include "SHInit.h"
 #include "UI/UIManager.h"
 #include "FGHUD.h"
-#include "ItemInfoData/SHItemInfoSubsystem.h"
+#include "SHItemInfoSubsystem.h"
 #include "UI/ItemInfos/SHItemInfo.h"
 #include "UI/Partials/CollapsableWidgetBase.h"
 #include "SHBlueprintFunctionLibrary.h"
 #include "FGRecipeManager.h"
 #include "SHRecipeHelper.h"
 #include "DescriptorReference.h"
-#include "tooltip/ItemTooltipHandler.h"
+#include "Tooltip/ItemTooltipSubsystem.h"
 
 #pragma region Empty blueprint implementations
 void UItemsWindowWidgetBase::OnToggleWindowVisibility_Implementation(bool bIsVisible) { }
@@ -34,12 +34,12 @@ void UItemsWindowWidgetBase::NativeOnInitialized()
 	TArray<TSubclassOf<USHItemInfo>> InfoClasses;
 	ItemInfoSubsystem->GetItemInfoClasses(InfoClasses, true);
 
-	SML::Logging::debug(*FString::Printf(TEXT("[SatisfactoryHelper] Initializing %d panels..."), InfoClasses.Num()));
+	//SML::Logging::debug(*FString::Printf(TEXT("[SatisfactoryHelper] Initializing %d panels..."), InfoClasses.Num()));
 	UPanelWidget* PanelsContainer = GetPanelsContainer();
 
 	for (auto InfoClass : InfoClasses)
 	{
-		SML::Logging::debug(*FString::Printf(TEXT("[SatisfactoryHelper] Initializing: %s"), *InfoClass.Get()->GetName()));
+		//SML::Logging::debug(*FString::Printf(TEXT("[SatisfactoryHelper] Initializing: %s"), *InfoClass.Get()->GetName()));
 
 		UCollapsableWidgetBase* CollapsableWidget = CreateWidget<UCollapsableWidgetBase, UWidget>(this, CollapsableWidgetClass);
 		USHItemInfo* InfoWidget = CreateWidget<USHItemInfo, UWidget>(CollapsableWidget, InfoClass);
@@ -175,8 +175,9 @@ void UItemsWindowWidgetBase::UpdateItemView(UDescriptorReference* DescriptorRefe
 
 	auto DescriptorClass = DescriptorReference->ItemDescriptorClass;
 
-	FText ItemName = UItemTooltipHandler::GetItemName(GetOwningPlayer(), FInventoryStack(1, DescriptorClass));
-	FText ItemDescription = UItemTooltipHandler::GetItemDescription(GetOwningPlayer(), FInventoryStack(1, DescriptorClass));
+	auto TooltipSubsystem = static_cast<UItemTooltipSubsystem*>(nullptr); // todo: get subsystem instance
+	FText ItemName = TooltipSubsystem->GetItemName(GetOwningPlayer(), FInventoryStack(1, DescriptorClass));
+	FText ItemDescription = TooltipSubsystem->GetItemDescription(GetOwningPlayer(), FInventoryStack(1, DescriptorClass));
 	NameWidget->SetText(ItemName);
 	DescriptionWidget->SetText(ItemDescription);
 

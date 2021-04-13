@@ -3,6 +3,7 @@
 #include "IAssetRegistry.h"
 #include "FactoryGame/Public/Resources/FGItemDescriptor.h"
 //#include "SML/util/Logging.h"
+#include "FGSchematic.h"
 #include "SHInit.h"
 #include "UI/ItemInfos/SHItemInfo.h"
 #include "FGSchematicManager.h"
