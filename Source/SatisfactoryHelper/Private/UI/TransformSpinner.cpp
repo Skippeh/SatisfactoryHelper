@@ -1,6 +1,5 @@
 #include "TransformSpinner.h"
 #include "Components/Widget.h"
-#include "util/Logging.h"
 
 void UTransformSpinner::SetTargetWidget(UWidget* TargetWidget)
 {

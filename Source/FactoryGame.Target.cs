@@ -11,7 +11,7 @@ public class FactoryGameTarget : TargetRules
 		LinkType = TargetLinkType.Modular;
 		
 		CppStandard = CppStandardVersion.Cpp17;
-		ExtraModuleNames.AddRange(new[] {"FactoryGame", "SML", "SatisfactoryHelper"});
+		ExtraModuleNames.AddRange(new[] {"FactoryGame", "SatisfactoryHelper"});
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 
 		bUseChecksInShipping = true;

@@ -1,4 +1,4 @@
-#include "SHItemInfo.h"
+#include "UI/ItemInfos/SHItemInfo.h"
 #include "Resources/FGItemDescriptor.h"
 #include "ItemInfoData/SHItemInfoSubsystem.h"
 #include "SHInit.h"

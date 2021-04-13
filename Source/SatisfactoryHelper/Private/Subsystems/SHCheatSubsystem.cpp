@@ -12,10 +12,10 @@ void ASHCheatSubsystem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ASHCheatSubsystem, EnabledCheats);
 }
 
-void ASHCheatSubsystem::SetEnabledCheats(const FEnabledCheats& EnabledCheats)
+void ASHCheatSubsystem::SetEnabledCheats(const FEnabledCheats& NewEnabledCheats)
 {
 	if (!HasAuthority())
 		return;
 
-	this->EnabledCheats = EnabledCheats;
+	EnabledCheats = NewEnabledCheats;
 }

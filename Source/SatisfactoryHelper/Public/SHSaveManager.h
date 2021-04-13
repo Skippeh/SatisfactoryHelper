@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Info.h"
 #include "FGSaveInterface.h"
-#include "DelegateCombinations.h"
 #include "Resources/FGItemDescriptor.h"
 #include "Subsystems/SHCheatSubsystem.h"
 #include "SHSaveManager.generated.h"
@@ -21,13 +20,13 @@ class SATISFACTORYHELPER_API ASHSaveManager : public AInfo, public IFGSaveInterf
 	GENERATED_BODY()
 
 #pragma region IFGSaveInterface implementation
-	void PreSaveGame_Implementation(int32 saveVersion, int32 gameVersion) override;
-	void PostSaveGame_Implementation(int32 saveVersion, int32 gameVersion) override;
-	void PreLoadGame_Implementation(int32 saveVersion, int32 gameVersion) override;
-	void PostLoadGame_Implementation(int32 saveVersion, int32 gameVersion) override;
-	void GatherDependencies_Implementation(TArray<UObject*>& out_dependentObjects) override { }
-	bool ShouldSave_Implementation() const override { return true; }
-	bool NeedTransform_Implementation() override { return false; }
+	virtual void PreSaveGame_Implementation(int32 saveVersion, int32 gameVersion) override;
+	virtual void PostSaveGame_Implementation(int32 saveVersion, int32 gameVersion) override;
+	virtual void PreLoadGame_Implementation(int32 saveVersion, int32 gameVersion) override;
+	virtual void PostLoadGame_Implementation(int32 saveVersion, int32 gameVersion) override;
+	virtual void GatherDependencies_Implementation(TArray<UObject*>& out_dependentObjects) override { }
+	virtual bool ShouldSave_Implementation() const override { return true; }
+	virtual bool NeedTransform_Implementation() override { return false; }
 #pragma endregion
 
 	ASHSaveManager();

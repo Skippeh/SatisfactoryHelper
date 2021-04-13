@@ -1,9 +1,9 @@
-#include "SHItemInfoSubsystem.h"
-#include "SHItemInfo.h"
+#include "ItemInfoData/SHItemInfoSubsystem.h"
+#include "UI/ItemInfos/SHItemInfo.h"
 #include "SHInit.h"
 #include "Content/ContentManager.h"
 #include "Resources/FGItemDescriptor.h"
-#include "util/Logging.h"
+//#include "util/Logging.h"
 #include "SHBlueprintFunctionLibrary.h"
 
 ASHItemInfoSubsystem::ASHItemInfoSubsystem()
@@ -31,7 +31,7 @@ USHItemData* ASHItemInfoSubsystem::GetItemData(TSubclassOf<UFGItemDescriptor> De
 
 		if (!ItemData->SupportsItemDescriptor(DescriptorClass))
 		{
-			SML::Logging::debug(*FString::Printf(TEXT("%s does not support item descriptor %s"), *ItemDataClass->GetName(), *USHBlueprintFunctionLibrary::GetClassInheritancePathString(DescriptorClass)));
+			//SML::Logging::debug(*FString::Printf(TEXT("%s does not support item descriptor %s"), *ItemDataClass->GetName(), *USHBlueprintFunctionLibrary::GetClassInheritancePathString(DescriptorClass)));
 			return nullptr;
 		}
 
@@ -76,7 +76,7 @@ bool ASHItemInfoSubsystem::RegisterItemInfoClass(TSubclassOf<class USHItemInfo> 
 
 	if (ItemInfoClass->HasAnyClassFlags(CLASS_Deprecated))
 	{
-		SML::Logging::debug(*FString::Printf(TEXT("Warning: Registering deprecated ItemInfo class: %s"), *ItemInfoClass->GetName()));
+		//SML::Logging::debug(*FString::Printf(TEXT("Warning: Registering deprecated ItemInfo class: %s"), *ItemInfoClass->GetName()));
 	}
 
 	ItemInfoClasses.Add(ItemInfoClass);

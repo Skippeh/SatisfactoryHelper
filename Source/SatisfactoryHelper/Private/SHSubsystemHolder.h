@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "mod/ModSubsystems.h"
+#include "Subsystem/ModSubsystemHolder.h"
 #include "SHSubsystemHolder.generated.h"
 
 UCLASS()
