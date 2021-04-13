@@ -1,7 +1,6 @@
 #include "ItemRecipeData.h"
 #include "Resources/FGBuildDescriptor.h"
 #include "FGRecipe.h"
-#include "util/Logging.h"
 #include "SHRecipeHelper.h"
 #include "SHInit.h"
 #include "FGBuildableAutomatedWorkBench.h"

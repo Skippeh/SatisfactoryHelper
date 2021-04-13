@@ -82,6 +82,7 @@ Plugins/*
 !Plugins/SML/
 !Plugins/SMLEditor/
 !Plugins/ExampleMod/
+!Plugins/SatisfactoryHelper/
 
 # Automation variables
 GamePath.txt

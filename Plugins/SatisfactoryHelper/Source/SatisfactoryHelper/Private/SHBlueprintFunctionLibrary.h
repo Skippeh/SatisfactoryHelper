@@ -4,6 +4,8 @@
 #include "FGInventoryComponent.h"
 #include "SHBlueprintFunctionLibrary.generated.h"
 
+class AFGSchematicManager;
+class AFGPlayerController;
 class UContentManager;
 class ASHInit;
 class USHRCO;

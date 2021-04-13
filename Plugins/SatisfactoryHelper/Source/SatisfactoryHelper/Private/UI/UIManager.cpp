@@ -1,7 +1,6 @@
 #include "UIManager.h"
 #include "FGPlayerController.h"
 #include "UI/ItemsWindowWidgetBase.h"
-#include "util/Logging.h"
 #include "UI/FGVirtualCursorFunctionLibrary.h"
 #include "FGHUD.h"
 

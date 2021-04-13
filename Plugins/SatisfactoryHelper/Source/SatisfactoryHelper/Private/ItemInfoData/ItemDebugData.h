@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "ItemInfoData/SHItemData.h"
+#include "SHItemData.h"
 #include "ItemDebugData.generated.h"
 
 UCLASS()

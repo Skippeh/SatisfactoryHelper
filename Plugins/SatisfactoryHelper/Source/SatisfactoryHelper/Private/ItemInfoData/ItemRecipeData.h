@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemInfoData/SHItemData.h"
+#include "SHItemData.h"
 #include "ItemRecipeData.generated.h"
 
 class UFGBuildDescriptor;

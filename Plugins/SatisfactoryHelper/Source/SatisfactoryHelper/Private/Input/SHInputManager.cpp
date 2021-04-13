@@ -1,6 +1,5 @@
 #include "SHInputManager.h"
 #include "FGPlayerController.h"
-#include "util/Logging.h"
 #include "UI/UIManager.h"
 #include "SHInit.h"
 #include "UI/ItemsWindowWidgetBase.h"

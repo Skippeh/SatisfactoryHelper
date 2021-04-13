@@ -2,7 +2,6 @@
 #include "Resources/FGItemDescriptor.h"
 #include "FGRecipe.h"
 #include "Content/ContentManager.h"
-#include "util/Logging.h"
 #include "FGBuildable.h"
 #include "FGBuildGun.h"
 #include "FGWorkBench.h"
@@ -60,7 +59,7 @@ TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByIngredient(UObject*
 template<class T>
 T InvalidClassSpecified(UClass* Class, T ReturnValue)
 {
-	SML::Logging::error(*FString::Printf(TEXT("Unknown manufacturer class given: %s"), *(USHBlueprintFunctionLibrary::GetClassInheritancePathString(Class))));
+	//SML::Logging::error(*FString::Printf(TEXT("Unknown manufacturer class given: %s"), *(USHBlueprintFunctionLibrary::GetClassInheritancePathString(Class))));
 	return ReturnValue;
 }
 

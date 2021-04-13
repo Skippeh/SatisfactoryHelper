@@ -1,6 +1,6 @@
 #include "SHSubsystemHolder.h"
 #include "Subsystems/SHCheatSubsystem.h"
-#include "ItemInfoData/SHItemInfoSubsystem.h"
+#include "SHItemInfoSubsystem.h"
 
 void USHSubsystemHolder::InitSubsystems()
 {

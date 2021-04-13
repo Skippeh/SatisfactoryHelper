@@ -4,15 +4,15 @@
 #include "SHInit.h"
 #include "SHRCO.h"
 #include "FGPlayerController.h"
-#include "mod/ModSubsystems.h"
-#include "FGSubsystem.h"
+#include "Subsystem/ModSubsystemHolder.h"
 #include "SHSubsystemHolder.h"
 #include "SHSaveManager.h"
 #include "Subsystems/SHCheatSubsystem.h"
 #include "ItemInfoData/SHItemInfoSubsystem.h"
-#include "SatisfactoryModLoader.h"
 #include "FGSchematicManager.h"
 #include "FGRecipeManager.h"
+#include "ModLoadingLibrary.h"
+#include "Configuration/ConfigManager.h"
 
 template<class T>
 T* GetManagerClass(UObject* WorldContext)
@@ -50,7 +50,7 @@ USHRCO* USHBlueprintFunctionLibrary::GetRCOFromPlayer(AFGPlayerController* Playe
 
 USHSubsystemHolder* USHBlueprintFunctionLibrary::GetSHSubsystemHolder(UObject* WorldContext)
 {
-	USHSubsystemHolder* SubsystemHolder = GetSubsystemHolder<USHSubsystemHolder>(WorldContext);
+	USHSubsystemHolder* SubsystemHolder = UModSubsystemHolder::GetSubsystemHolder<USHSubsystemHolder>(WorldContext);
 	return SubsystemHolder;
 }
 
@@ -81,7 +81,8 @@ ASHSaveManager* USHBlueprintFunctionLibrary::GetSaveManager(UObject* WorldContex
 
 bool USHBlueprintFunctionLibrary::IsDebugModeEnabled()
 {
-	return SML::GetSmlConfig().bDebugLogOutput;
+	const auto SubSystem = GEngine->GetEngineSubsystem<UModLoadingLibrary>();
+	return SubSystem->IsDevelopmentModeEnabled();
 }
 
 FString USHBlueprintFunctionLibrary::GetClassInheritancePathString(UClass* Class)
