@@ -27,7 +27,7 @@ public:
 
 	/** Adds additional velocity to the current angular velocity. Note that it will transition back to the current SpinningVelocity over time. */
 	UFUNCTION(BlueprintCallable)
-	void AddAngularVelocity(float AngularVelocity) { AddedAngularVelocity += AngularVelocity; }
+	void AddAngularVelocity(float DeltaAngularVelocity) { AddedAngularVelocity += DeltaAngularVelocity; }
 
 	/** How fast to spin at max speed (in degrees per second). 45 degrees by default. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

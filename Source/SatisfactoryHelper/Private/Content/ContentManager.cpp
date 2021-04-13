@@ -2,19 +2,14 @@
 #include "AssetRegistryModule.h"
 #include "IAssetRegistry.h"
 #include "FactoryGame/Public/Resources/FGItemDescriptor.h"
-#include "SML/util/Logging.h"
+//#include "SML/util/Logging.h"
 #include "SHInit.h"
-#include "ItemInfos/SHItemInfo.h"
-#include "Resources/FGAnyUndefinedDescriptor.h"
-#include "Resources/FGNoneDescriptor.h"
-#include "Resources/FGWildCardDescriptor.h"
-#include "Resources/FGResourceDescriptor.h"
-#include "Resources/FGOverflowDescriptor.h"
+#include "UI/ItemInfos/SHItemInfo.h"
 #include "FGSchematicManager.h"
-#include "FGUnlockRecipe.h"
+#include "Unlocks/FGUnlockRecipe.h"
 #include "SHBlueprintFunctionLibrary.h"
 
-using namespace SML;
+//using namespace SML;
 
 template<class TParentClass>
 void UContentManager::SearchAssetsForChildClasses(UClass* InBaseClass, TArray<TSoftClassPtr<TParentClass>>& OutArray)
@@ -118,7 +113,7 @@ void UContentManager::GetAllRecipes(TArray<TSubclassOf<UFGRecipe>>& OutArray)
 	{
 		CachedRecipes = new TArray<TSubclassOf<UFGRecipe>>();
 		AFGSchematicManager* SchematicManager = USHBlueprintFunctionLibrary::GetSchematicManager(GetOuter());
-		Logging::debug(TEXT("[SatisfactoryHelper] SchematicManager IsValid: "), IsValid(SchematicManager));
+		//Logging::debug(TEXT("[SatisfactoryHelper] SchematicManager IsValid: "), IsValid(SchematicManager));
 		TArray<TSubclassOf<UFGSchematic>> AllSchematics;
 		SchematicManager->GetAllSchematics(AllSchematics);
 

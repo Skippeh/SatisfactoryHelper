@@ -1,6 +1,5 @@
 #include "SHSaveManager.h"
-#include "UnrealNetwork.h"
-#include "util/Logging.h"
+#include "Net/UnrealNetwork.h"
 #include "SHBlueprintFunctionLibrary.h"
 
 #pragma region IFGSaveInterface implementation
