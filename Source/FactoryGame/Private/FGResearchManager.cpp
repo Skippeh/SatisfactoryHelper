@@ -4,10 +4,11 @@
 
 AFGResearchManager::AFGResearchManager() : Super() {
 	this->bAlwaysRelevant = true;
-	this->bReplicates = true;
+	this->SetReplicates(true);
 }
 void AFGResearchManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const{ }
 void AFGResearchManager::PreInitializeComponents(){ Super::PreInitializeComponents(); }
+AFGResearchManager* AFGResearchManager::Get( UWorld* world){ return nullptr; }
 AFGResearchManager* AFGResearchManager::Get( UObject* worldContext){ return nullptr; }
 void AFGResearchManager::PreSaveGame_Implementation(int32 saveVersion, int32 gameVersion){ }
 void AFGResearchManager::PostLoadGame_Implementation(int32 saveVersion, int32 gameVersion){ }
@@ -30,7 +31,7 @@ void AFGResearchManager::GetPendingRewards(TSubclassOf<class UFGSchematic> schem
 void AFGResearchManager::UpdateUnlockedResearchTrees(){ }
 void AFGResearchManager::UnlockResearchTree(TSubclassOf<class UFGResearchTree> researchTree){ }
 void AFGResearchManager::OnRep_OngoingResearch(){ }
-void AFGResearchManager::Client_NewResearchStarted_Implementation(TSubclassOf<  UFGSchematic > research){ }
+void AFGResearchManager::Multicast_ResearchCompleted_Implementation(TSubclassOf<  UFGSchematic > research){ }
 void AFGResearchManager::PopulateResearchTreeList(){ }
 void AFGResearchManager::StartResearch(TSubclassOf<class UFGSchematic> schematic, TSubclassOf<  UFGResearchTree> initiatingResearchTree){ }
 void AFGResearchManager::GeneratePendingReward(FResearchData& researchData){ }

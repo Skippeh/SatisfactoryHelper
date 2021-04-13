@@ -1,18 +1,10 @@
-// Copyright 2016-2019 Coffee Stain Studios. All Rights Reserved.
+// Copyright Coffee Stain Studios. All Rights Reserved.
 
 #pragma once
-#include "UObject/CoreNet.h"
-#include "Array.h"
-#include "UnrealString.h"
-#include "GameFramework/Actor.h"
-#include "SubclassOf.h"
-#include "UObject/Class.h"
 
-#include "FGBuildable.h"
-#include "../FGRemoteCallObject.h"
-#include "../FGSignificanceInterface.h"
-#include "../FGRemoteCallObject.h"
-#include "../FGFactoryConnectionComponent.h"
+#include "Buildables/FGBuildable.h"
+#include "FGRemoteCallObject.h"
+#include "FGSignificanceInterface.h"
 #include "FGBuildableConveyorBase.generated.h"
 
 
@@ -44,9 +36,6 @@ class FACTORYGAME_API UFGConveyorRemoteCallObject : public UFGRemoteCallObject
 
 	//UFUNCTION( Reliable, Server, WithValidation, Category = "Sync" )
 	//void Server_RequestCleanSync( class AFGBuildableConveyorBelt* target );
-
-public:
-	FORCEINLINE ~UFGConveyorRemoteCallObject() = default;
 };
 
 
@@ -158,7 +147,7 @@ private:
 
 
 /** Custom INetDeltaBaseState used by our custom NetDeltaSerialize. Representing a snapshot of the state, enough to calculate a delta between this state and another.*/
-class FACTORYGAME_API FConveyorBeltItemsBaseState : public INetDeltaBaseState
+class FConveyorBeltItemsBaseState : public INetDeltaBaseState
 {
 public:
 
@@ -200,7 +189,8 @@ public:
 		lastSentSpacing = other.lastSentSpacing;
 		NewestItemID = other.NewestItemID;
 		ConveyorVersion = other.ConveyorVersion;
-		return *this; // MODDING EDIT: why did it ever work without this?
+		
+		return *this; // MODDING EDIT: how does it work without this?
 	}
 
 	const FConveyorBeltItemsBaseState& operator=( FConveyorBeltItemsBaseState&& other )
@@ -212,7 +202,8 @@ public:
 
 		NewestItemID = other.NewestItemID;
 		ConveyorVersion = other.ConveyorVersion;
-		return *this; // MODDING EDIT: why did it ever work without this?
+		
+		return *this; // MODDING EDIT: how does it work without this?
 	}
 
 	//must be implemented
@@ -300,7 +291,7 @@ public:
 *   - Mapping of object references (objects that are replicated that is). Look at fast TArray replication on how to implement this if needed.
 */
 USTRUCT()
-struct FACTORYGAME_API FConveyorBeltItems
+struct FConveyorBeltItems
 {
 
 	enum class EConveyorSpawnStyle : int8
@@ -424,12 +415,12 @@ struct FACTORYGAME_API FConveyorBeltItems
 	friend FArchive& operator<<( FArchive& ar, FConveyorBeltItems& items );
 
 
-	void SetOwner( class AFGBuildableConveyorBase* _owner )
+	FORCEINLINE void SetOwner( class AFGBuildableConveyorBase* _owner )
 	{
 		Owner = _owner;
 	}
 
-	int16 GetCombinedDirtyKey()
+	FORCEINLINE int16 GetCombinedDirtyKey()
 	{
 		return ArrayReplicationKey + ArrayReplicationKeyLastSerialized;
 	}
@@ -437,7 +428,7 @@ struct FACTORYGAME_API FConveyorBeltItems
 	float ConsumeAndUpdateConveyorOffsetDebt( float dt );
 
 
-	TArray< FConveyorBeltItem >& AnimRemoveList()
+	FORCEINLINE TArray< FConveyorBeltItem >& AnimRemoveList()
 	{
 		return AnimRemoveItems;
 	}
@@ -479,26 +470,19 @@ private:
 
 
 	class AFGBuildableConveyorBase* Owner = nullptr;
-
-	friend FConveyorBeltItemsBaseState;
+	
 	friend class AFGBuildableConveyorBelt;
-
-public:
-	FORCEINLINE ~FConveyorBeltItems() = default;
 };
 
 
 /** Enable custom net delta serialization for the above struct. */
 template<>
-struct FACTORYGAME_API TStructOpsTypeTraits< FConveyorBeltItems > : public TStructOpsTypeTraitsBase2< FConveyorBeltItems >
+struct TStructOpsTypeTraits< FConveyorBeltItems > : public TStructOpsTypeTraitsBase2< FConveyorBeltItems >
 {
 	enum
 	{
 		WithNetDeltaSerializer = true
 	};
-
-public:
-	FORCEINLINE ~TStructOpsTypeTraits< FConveyorBeltItems >() = default;
 };
 
 
@@ -515,6 +499,7 @@ public:
 
 	// Begin AActor interface
 	virtual void GetLifetimeReplicatedProps( TArray< FLifetimeProperty >& OutLifetimeProps ) const override;
+	virtual void PreReplication( IRepChangedPropertyTracker& ChangedPropertyTracker ) override;
 	virtual void BeginPlay() override;
 	virtual void EndPlay( const EEndPlayReason::Type endPlayReason ) override;
 	virtual void Serialize( FArchive& ar ) override;
@@ -554,19 +539,30 @@ public:
 	/** Get the location and direction of the conveyor at the given offset. */
 	virtual void GetLocationAndDirectionAtOffset( float offset, FVector& out_location, FVector& out_direction ) const PURE_VIRTUAL( , );
 
-	virtual void PreReplication( IRepChangedPropertyTracker& ChangedPropertyTracker ) override;
-
 	void SetConveyorBucketID( int32 ID );
 
 	FORCEINLINE int32 GetConveyorBucketID() const { return mConveyorBucketID; }
 
 	/** Returns how much room there currently is on the belt. If the belt is empty it will return the length of the belt */
-	float GetAvailableSpace() const;
+	FORCEINLINE float GetAvailableSpace() const
+	{
+		for ( int32 i = mItems.Num() - 1; i >= 0; --i )
+		{
+			if ( !mItems[ i ].bIsRemoved )
+			{
+				return mItems[ i ].Offset;
+			}
+		}
+
+		return GetLength();
+	}
 
 	/** Returns how much room there was on the belt after the last factory tick. If the belt is empty it will return the length of the belt */
 	float GetCachedAvailableSpace_Threadsafe() const;
 
 	void ReportInvalidStateAndRequestConveyorRepReset();
+
+	FORCEINLINE void MarkItemTransformsDirty() { mPendingUpdateItemTransforms = true; }
 protected:
 	// Begin Factory_ interface
 	virtual bool Factory_PeekOutput_Implementation( const class UFGFactoryConnectionComponent* connection, TArray< FInventoryItem >& out_items, TSubclassOf< UFGItemDescriptor > type ) const override;
@@ -577,15 +573,12 @@ protected:
 	virtual void GetDismantleInventoryReturns( TArray< FInventoryStack >& out_returns ) const override;
 	// End AFGBuildable interface
 
-	void MarkItemTransformsDirty() { mPendingUpdateItemTransforms = true; }
-
 	/** Called when the visuals, radiation etc need to be updated. */
-	virtual void TickItemTransforms( float dt ) PURE_VIRTUAL(,);
+	virtual void TickItemTransforms( float dt, bool bOnlyTickRadioActive = true ) PURE_VIRTUAL(,);
 
-public: // MODDING EDIT accessor
-	FORCEINLINE int32 FindItemClosestToLocationAccessor(const FVector& location) const { return FindItemClosestToLocation(location); };
-protected:
-
+	/* When using the exp - conveyor renderer tick the radio activity of the items. */
+	virtual void TickRadioactivity() PURE_VIRTUAL(,);
+	
 	//@todonow These can possibly be moved to private once Belt::OnUse has been moved to base.
 	/** Find the item closest to the given location. */
 	int32 FindItemClosestToLocation( const FVector& location ) const;
@@ -595,9 +588,6 @@ protected:
 	/** Lets you know what type of item is on a specific index. */
 	const FConveyorBeltItem& Factory_PeekItemAt( int32 index ) const;
 
-public: // MODDING EDIT accessor
-	FORCEINLINE void Factory_RemoveItemAtAccessor(int32 index) { Factory_RemoveItemAt(index);};
-protected:
 	/** Remove an item from the belt at index. */
 	void Factory_RemoveItemAt( int32 index );
 
@@ -605,9 +595,6 @@ private:
 	/** Take the first element on the belt. */
 	void Factory_DequeueItem();
 
-public: // MODDING EDIT accessor
-	FORCEINLINE void Factory_EnqueueItemAccessor(const FInventoryItem& item, float initialOffset) { Factory_EnqueueItem(item, initialOffset); };
-private:
 	/** Put a new item onto the belt. */
 	void Factory_EnqueueItem( const FInventoryItem& item, float initialOffset );
 
@@ -616,7 +603,11 @@ private:
 	 *
 	 * @return true if there is enough room for an item of size itemSize
 	 */
-	bool HasRoomOnBelt( float& out_availableSpace ) const;
+	FORCEINLINE bool HasRoomOnBelt( float& out_availableSpace ) const
+	{
+		out_availableSpace = GetAvailableSpace();
+		return out_availableSpace > AFGBuildableConveyorBase::ITEM_SPACING;
+	}
 
 	/**
 	*	Thread safe version to check available room on a belt. This uses a cached position of the last item offset to ensure thread safety
@@ -627,6 +618,7 @@ private:
 	*/
 	bool HasRoomOnBelt_ThreadSafe( float& out_availableSpace ) const;
 
+	friend class AFGConveyorItemSubsystem;
 
 public:
 	/** Default height above ground for conveyors. */
@@ -635,7 +627,7 @@ public:
 	/** Spacing between each conveyor item, from origo to origo. */
 	static constexpr float ITEM_SPACING = 120.0f;
 
-public: // MODDING EDIT
+protected:
 
 	/** Speed of this conveyor. */
 	UPROPERTY( EditDefaultsOnly, Category = "Conveyor" )
@@ -668,7 +660,4 @@ private:
 	/** The id for the conveyor bucket this conveyor belongs to */
 	int32 mConveyorBucketID;
 
-
-public:
-	FORCEINLINE ~AFGBuildableConveyorBase() = default;
 };

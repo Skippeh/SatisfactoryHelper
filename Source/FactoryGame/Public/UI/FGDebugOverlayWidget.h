@@ -1,13 +1,18 @@
-// Copyright 2016-2020 Coffee Stain Studios. All Rights Reserved.
+// Copyright Coffee Stain Studios. All Rights Reserved.
 
 #pragma once
-#include "Array.h"
-#include "UnrealString.h"
-#include "UObject/Class.h"
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "FGDebugOverlayWidget.generated.h"
+
+UENUM( BlueprintType )
+enum class EDebugOverlayType : uint8
+{
+	DOT_Default,
+    DOT_Story,
+	DOT_Options
+};
 
 /**
  * 
@@ -27,12 +32,26 @@ public:
 	UFUNCTION()
     void UpdateDebugOverlay();
 
+	void SetDebugOverlayType( EDebugOverlayType type );
+
+	UFUNCTION( BlueprintPure, Category = "Debug" )
+	FORCEINLINE EDebugOverlayType GetCurrentDebugOverlayType() const { return mCurrentDebugOverlayType; }
+
+protected:
+	UFUNCTION()
+    void GetDefaultOverlayData( TArray<FString>& out_debugOverlayData );
+
+	UFUNCTION()
+	void GetStoryOverlayData( TArray<FString>& out_debugOverlayData );
+
+	UFUNCTION()
+	void GetOptionsOverlayData( TArray<FString>& out_debugOverlayData );
+	
 	UFUNCTION( BlueprintImplementableEvent, Category = "Debug" )
 	void UpdateDebugOverlayData( const TArray<FString>& debugOverlayData );
 
 private:
 	FTimerHandle mUpdateDebugOverlayTimerHandle;
 
-public:
-	FORCEINLINE ~UFGDebugOverlayWidget() = default;
+	EDebugOverlayType mCurrentDebugOverlayType;
 };

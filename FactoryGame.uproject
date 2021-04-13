@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.22.3-CSS",
+	"EngineAssociation": "4.25.3-CSS",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -8,23 +8,6 @@
 			"Name": "FactoryGame",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
-		},
-		{
-			"Name": "SML",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		},
-		{
-			"Name": "SatisfactoryHelper",
-			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"Engine",
-				"FactoryGame",
-				"SML",
-				"UMG",
-				"CoreUObject"
-			]
 		}
 	],
 	"Plugins": [
@@ -58,6 +41,10 @@
 		},
 		{
 			"Name": "RiderLink",
+			"Enabled": true
+		},
+		{
+			"Name": "SML",
 			"Enabled": true
 		}
 	],

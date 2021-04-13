@@ -1,16 +1,13 @@
+// Copyright Coffee Stain Studios. All Rights Reserved.
+
 #pragma once
-#include "FGInstancedSplineMeshComponent.h"
-#include "Engine/StaticMesh.h"
-#include "Array.h"
-#include "SubclassOf.h"
-#include "UObject/Class.h"
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Buildables/FGBuildable.h"
 #include "Components/SplineComponent.h"
-#include "../FGSignificanceInterface.h"
+#include "FGSignificanceInterface.h"
 #include "FGBuildablePipeBase.generated.h"
 
 
@@ -123,9 +120,6 @@ private:
 
 	/** Is this buildable significant, i.e. is within significance range */
 	bool mIsSignificant;
-
-public:
-	FORCEINLINE ~AFGBuildablePipeBase() = default;
 };
 
 

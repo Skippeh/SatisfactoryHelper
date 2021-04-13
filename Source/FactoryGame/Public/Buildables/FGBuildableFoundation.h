@@ -1,9 +1,8 @@
-// Copyright 2016 Coffee Stain Studios. All Rights Reserved.
+// Copyright Coffee Stain Studios. All Rights Reserved.
 
 #pragma once
-#include "UObject/Class.h"
 
-#include "FGBuildableFactoryBuilding.h"
+#include "Buildables/FGBuildableFactoryBuilding.h"
 #include "FGBuildableFoundation.generated.h"
 
 /**
@@ -36,7 +35,4 @@ public:
 	/** Disable attachment snapping on specific sides. */
 	UPROPERTY( EditDefaultsOnly, Category = "Foundation" )
 	FFoundationSideSelectionFlags mDisableAttachmentSnapOn;
-
-public:
-	FORCEINLINE ~AFGBuildableFoundation() = default;
 };

@@ -1,9 +1,6 @@
-// Copyright 2016 Coffee Stain Studios. All Rights Reserved.
+// Copyright Coffee Stain Studios. All Rights Reserved.
 
 #pragma once
-#include "Array.h"
-#include "SubclassOf.h"
-#include "UObject/Class.h"
 
 #include "ItemAmount.h"
 #include "Hologram/HologramSplinePathMode.h"
@@ -21,6 +18,13 @@ class FACTORYGAME_API UFGRecipe : public UObject
 public:
 	UFGRecipe();
 
+	// Begin UObject interface
+#if WITH_EDITOR
+	virtual bool CanEditChange( const FProperty* InProperty ) const override;
+	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+#endif
+	// End UObject interface
+
 	/** Get the display name for this recipe. */
 	UFUNCTION( BlueprintPure, Category = "FactoryGame|Recipe" )
 	static FText GetRecipeName( TSubclassOf< UFGRecipe > inClass );
@@ -32,6 +36,14 @@ public:
 	/** Get the products for this recipe. @todo remove unused allowChildRecipes. */
 	UFUNCTION( BlueprintPure, Category = "FactoryGame|Recipe" )
 	static TArray< FItemAmount > GetProducts( TSubclassOf< UFGRecipe > inClass, bool allowChildRecipes = false );
+
+	/** Returns this recipe item category. Either overridden or fetched from the produced item */
+	UFUNCTION( BlueprintPure, Category = "FactoryGame|Recipe" )
+	static TSubclassOf< UFGItemCategory > GetCategory( TSubclassOf< UFGRecipe > inClass );
+
+	/** The order we want recipes in the manufacturing menu, lower is earlier */
+	UFUNCTION( BlueprintPure, Category = "FactoryGame|Recipe" )
+	static float GetManufacturingMenuPriority( TSubclassOf< UFGRecipe > inClass );
 
 	/** Get the base manufacturing duration for this recipe. */
 	UFUNCTION( BlueprintPure, Category = "FactoryGame|Recipe" )
@@ -57,6 +69,10 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "FactoryGame|Recipe" )
 	static void SortByName( UPARAM(ref) TArray< TSubclassOf< UFGRecipe > >& recipes );
 
+	/** Sort an array dependent on their manufacturing menu priority. */
+	UFUNCTION( BlueprintCallable, Category = "FactoryGame|Recipe" )
+	static void SortByManufacturingMenuPriority( UPARAM( ref ) TArray< TSubclassOf< UFGRecipe > >& recipes );
+
 	/** Get descriptor for recipe specified 
 	* @note - This will only return the first product so recipes that produce more than one will only return the first in the array.
 	*/
@@ -75,6 +91,9 @@ public:
 	FORCEINLINE float GetManufacturingDuration() const { return mManufactoringDuration; }
 	FORCEINLINE float GetManualManufacturingDuration() const { return mManufactoringDuration * mManualManufacturingMultiplier; }
 
+	float GetPowerConsumptionConstant() const { return mVariablePowerConsumptionConstant; }
+	float GetPowerConsumptionFactor() const { return mVariablePowerConsumptionFactor; }
+
 #if WITH_EDITOR
 	/** Sets the products produced from this recipe. Only for editor use */
 	UFUNCTION( BlueprintCallable, Category = "Editor|Recipe" )
@@ -83,7 +102,6 @@ public:
 
 	EHologramSplinePathMode GetLastSplineMode();
 	void SetLastSplineMode( EHologramSplinePathMode mode );
-
 public: // MODDING EDIT: protected -> public
 	friend class FRecipeDetails;
 
@@ -105,6 +123,14 @@ public: // MODDING EDIT: protected -> public
 	UPROPERTY( EditDefaultsOnly, Category = "Recipe" )
 	TArray< FItemAmount > mProduct;
 
+	/** The overridden category. If not overridden we return the item category given by the produced item */
+	UPROPERTY( EditDefaultsOnly, Category = "Recipe" )
+	TSubclassOf< class UFGItemCategory> mOverriddenCategory;
+	 
+	/** The order in the manufacturing menu is decided by this value. Lower values means earlier in menu. Negative values are allowed. [-N..0..N]*/
+	UPROPERTY( EditDefaultsOnly, Category = "Recipe" )
+	float mManufacturingMenuPriority;
+
 	/** The time it takes to produce the output. */
 	UPROPERTY( EditDefaultsOnly, Category = "Recipe" )
 	float mManufactoringDuration;
@@ -120,6 +146,20 @@ public: // MODDING EDIT: protected -> public
 	/** The events this recipe are present in */
 	UPROPERTY( EditDefaultsOnly, Category = "Events" )
 	TArray< EEvents > mRelevantEvents;
-public:
-	FORCEINLINE ~UFGRecipe() = default;
+
+	/**
+	*	Added to the variable power consumption. If the power-consumption curve's range (all possible output values)
+	*	is normalized to [0.0, 1.0], this constant can be thought of as a power-consumption minimum.
+	*	@note Only available if "Produced In" contains any class that supports variable power consumption.
+	*/
+	UPROPERTY( EditDefaultsOnly, Category = "Recipe|Variable Power" )
+	float mVariablePowerConsumptionConstant;
+
+	/**
+	*	Multiplied into the variable power consumption. If the power-consumption curve's range (all possible output values)
+	*	is normalized to [0.0, 1.0], this value added to the power-consumption constant can be thought of as a power-consumption maximum.
+	*	@note Only available if "Produced In" contains any class that supports variable power consumption.
+	*/
+	UPROPERTY( EditDefaultsOnly, Category = "Recipe|Variable Power" )
+	float mVariablePowerConsumptionFactor;
 };

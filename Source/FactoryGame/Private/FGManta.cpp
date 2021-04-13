@@ -9,7 +9,7 @@ AFGManta::AFGManta() : Super() {
 	this->mTickTransform = true;
 	this->mIsClosedSplineLoop = true;
 	this->PrimaryActorTick.TickGroup = TG_PrePhysics; this->PrimaryActorTick.EndTickGroup = TG_PrePhysics; this->PrimaryActorTick.bTickEvenWhenPaused = false; this->PrimaryActorTick.bCanEverTick = true; this->PrimaryActorTick.bStartWithTickEnabled = true; this->PrimaryActorTick.bAllowTickOnDedicatedServer = true; this->PrimaryActorTick.TickInterval = 0;
-	this->bReplicates = true;
+	this->SetReplicates(true);
 	this->RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 }
 void AFGManta::GainedSignificance_Implementation(){ }

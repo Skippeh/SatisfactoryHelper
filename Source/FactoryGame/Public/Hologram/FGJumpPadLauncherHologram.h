@@ -1,15 +1,10 @@
-// Copyright 2016-2020 Coffee Stain Studios. All Rights Reserved.
+// Copyright Coffee Stain Studios. All Rights Reserved.
 
 #pragma once
-#include "Engine/StaticMesh.h"
-#include "Array.h"
-#include "GameFramework/Actor.h"
-#include "FGInstancedSplineMeshComponent.h"
-#include "UObject/Class.h"
 
 #include "CoreMinimal.h"
 #include "Hologram/FGJumpPadHologram.h"
-#include "FGBuildableJumpPad.h"
+#include "Buildables/FGBuildableJumppad.h"
 
 #include "FGJumpPadLauncherHologram.generated.h"
 
@@ -113,7 +108,4 @@ protected:
 	/* Number of arrows used in the instance spline mesh.*/
 	UPROPERTY( EditDefaultsOnly, Category = "Trajectory" )
 	int32 mNumArrows;
-
-public:
-	FORCEINLINE ~AFGJumpPadLauncherHologram() = default;
 };

@@ -1,11 +1,6 @@
-// Copyright 2016 Coffee Stain Studios. All Rights Reserved.
+// Copyright Coffee Stain Studios. All Rights Reserved.
 
 #pragma once
-#include "../../Plugins/Wwise/Source/AkAudio/Classes/AkAudioEvent.h"
-#include "Array.h"
-#include "GameFramework/Actor.h"
-#include "SubclassOf.h"
-#include "UObject/Class.h"
 
 #include "FGUseableInterface.h"
 #include "FGSignificanceInterface.h"
@@ -23,11 +18,10 @@ class FDebugDisplayInfo;
 
 /** Physics data we want to be able to restore, we store the bone name to be able to change the bone structure in updates */
 USTRUCT()
-struct FACTORYGAME_API FVehiclePhysicsData
+struct FVehiclePhysicsData
 {
 	GENERATED_BODY()
-
-	/** Default ctor */
+	
 	FVehiclePhysicsData() {}
 
 	// Bone that have this information
@@ -36,9 +30,6 @@ struct FACTORYGAME_API FVehiclePhysicsData
 	FRigidBodyState BodyState;
 
 	friend FArchive& operator << ( FArchive& ar, FVehiclePhysicsData& physics );
-
-public:
-	FORCEINLINE ~FVehiclePhysicsData() = default;
 };
 
 /**
@@ -50,9 +41,6 @@ class FACTORYGAME_API UFGUseState_VehicleHasDriver : public UFGUseState
 	GENERATED_BODY()
 public:
 	UFGUseState_VehicleHasDriver() : Super() { mIsUsableState = true; }
-
-public:
-	FORCEINLINE ~UFGUseState_VehicleHasDriver() = default;
 };
 
 /**
@@ -64,9 +52,6 @@ class FACTORYGAME_API UFGUseState_VehicleInWater : public UFGUseState
 	GENERATED_BODY()
 public:
 	UFGUseState_VehicleInWater() : Super() { mIsUsableState = false; }
-
-public:
-	FORCEINLINE ~UFGUseState_VehicleInWater() = default;
 };
 
 /**
@@ -78,9 +63,6 @@ class FACTORYGAME_API UFGUseState_VehicleOccupied : public UFGUseState
 	GENERATED_BODY()
 public:
 	UFGUseState_VehicleOccupied() : Super() { mIsUsableState = false; }
-
-public:
-	FORCEINLINE ~UFGUseState_VehicleOccupied() = default;
 };
 
 USTRUCT()
@@ -119,9 +101,6 @@ struct FACTORYGAME_API FVehicleSeat
 	class AFGCharacterPlayer* mCharacter;
 	UPROPERTY()
 	class AController* mController;
-
-public:
-	FORCEINLINE ~FVehicleSeat() = default;
 };
 
 /**
@@ -162,7 +141,6 @@ public:
 	//Begin IFGSignificanceInterface
 	virtual void GainedSignificance_Implementation() override;
 	virtual	void LostSignificance_Implementation() override;
-	virtual	float GetSignificanceBias() override;
 	virtual float GetSignificanceRange() override;
 	//End IFGSignificanceInterface
 
@@ -354,6 +332,10 @@ protected:
 	void ShowOutline( EOutlineColor color ) const;
 	/** Hide the outline for the vehicle. */
 	void HideOutline();
+
+	/** Called to update the camera when this vehicle is possessed by a player. */
+	UFUNCTION( BlueprintImplementableEvent )
+	void UpdateCamera( float DeltaTime );
 private:
 	/** Helpers */
 	void SetSelfDriving( bool newSelfDriving );
@@ -469,10 +451,6 @@ private:
 	/** Indicates if the vehicle is within significance distance */
 	uint8 mIsSignificant : 1;
 
-	/** A bias to the significance value */
-	UPROPERTY( EditDefaultsOnly, Category = "Significance" )
-	float mSignificanceBias;
-
 	/* Forces vehicle to be in simulation mode */
 	bool mForceSimulationMode;
 
@@ -494,7 +472,4 @@ protected:
 	/** Range after we disable simulation (remove collision) */
 	UPROPERTY( EditDefaultsOnly, Category = "Vehicle" )
 	float mSimulationDistance;
-
-public:
-	FORCEINLINE ~AFGVehicle() = default;
 };

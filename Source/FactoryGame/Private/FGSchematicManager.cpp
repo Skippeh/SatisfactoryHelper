@@ -11,7 +11,7 @@ AFGSchematicManager::AFGSchematicManager() : Super() {
 	this->mMaxAllowedTechTier = 6;
 	this->PrimaryActorTick.TickGroup = TG_PrePhysics; this->PrimaryActorTick.EndTickGroup = TG_PrePhysics; this->PrimaryActorTick.bTickEvenWhenPaused = false; this->PrimaryActorTick.bCanEverTick = true; this->PrimaryActorTick.bStartWithTickEnabled = true; this->PrimaryActorTick.bAllowTickOnDedicatedServer = true; this->PrimaryActorTick.TickInterval = 0.100000001490116;
 	this->bAlwaysRelevant = true;
-	this->bReplicates = true;
+	this->SetReplicates(true);
 }
 void AFGSchematicManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const{ }
 void AFGSchematicManager::PreInitializeComponents(){ Super::PreInitializeComponents(); }
