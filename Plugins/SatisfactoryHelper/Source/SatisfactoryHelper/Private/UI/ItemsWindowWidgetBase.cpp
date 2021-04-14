@@ -279,5 +279,5 @@ void UItemsWindowWidgetBase::OnFadeOutFinished_Implementation()
 bool UItemsWindowWidgetBase::GetShowAllRecipes()
 {
 	const auto Config = FSHConfigStruct::GetActiveConfig();
-	return Config.PersonalSettings.bShowAllRecipes;
+	return Config.ShowAllRecipes;
 }

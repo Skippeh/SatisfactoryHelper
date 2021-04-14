@@ -46,5 +46,5 @@ ASHItemInfoSubsystem* USHItemInfo::GetItemInfoSubsystem()
 bool USHItemInfo::GetShowAllItems() const
 {
 	const auto Config = FSHConfigStruct::GetActiveConfig();
-	return Config.PersonalSettings.bShowAllRecipes;
+	return Config.ShowAllRecipes;
 }
