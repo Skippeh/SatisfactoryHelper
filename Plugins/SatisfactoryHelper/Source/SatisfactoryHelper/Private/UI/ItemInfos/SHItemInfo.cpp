@@ -3,6 +3,7 @@
 #include "ItemInfoData/SHItemInfoSubsystem.h"
 #include "SHInit.h"
 #include "SHBlueprintFunctionLibrary.h"
+#include "SHConfigStruct.h"
 
 void USHItemInfo::NativeOnInitialized()
 {
@@ -44,5 +45,6 @@ ASHItemInfoSubsystem* USHItemInfo::GetItemInfoSubsystem()
 
 bool USHItemInfo::GetShowAllItems() const
 {
-	return ASHInit::GetSingleton(GetOuter())->GetUserConfig().bShowAllRecipes;
+	const auto Config = FSHConfigStruct::GetActiveConfig();
+	return Config.PersonalSettings.bShowAllRecipes;
 }

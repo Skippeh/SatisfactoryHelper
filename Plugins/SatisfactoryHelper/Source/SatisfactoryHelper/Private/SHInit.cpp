@@ -4,6 +4,7 @@
 #include "Content/ContentManager.h"
 //#include "util/Logging.h"
 #include "FGGameMode.h"
+#include "FGSchematicManager.h"
 #include "SHRCO.h"
 #include "SHBlueprintFunctionLibrary.h"
 #include "ItemInfoData/SHItemInfoSubsystem.h"
@@ -18,7 +19,6 @@ void ASHInit::BeginPlay()
 {
 	verify(IsValid(UIManagerClass));
 	verify(IsValid(InputManagerClass));
-	Config = LoadConfig();
 	ContentManager = NewObject<UContentManager>(this);
 
 	ASHItemInfoSubsystem* ItemInfoSubsystem = USHBlueprintFunctionLibrary::GetItemInfoSubsystem(GetWorld());
@@ -63,19 +63,6 @@ ASHInit* ASHInit::GetSingleton(const UObject* InWorldContext)
 		return nullptr;
 
 	return Cast<ASHInit>(FoundActors[0]);
-}
-
-FSHUserConfig ASHInit::GetUserConfig() const
-{
-	return Config.UserConfig;
-}
-
-void ASHInit::SetUserConfig(const FSHUserConfig& InUserConfig, bool bSaveToDisk)
-{
-	Config.UserConfig = InUserConfig;
-
-	if (bSaveToDisk)
-		SaveConfig(Config);
 }
 
 void ASHInit::OnPurchasedSchematic_Implementation(TSubclassOf<UFGSchematic> SchematicClass)

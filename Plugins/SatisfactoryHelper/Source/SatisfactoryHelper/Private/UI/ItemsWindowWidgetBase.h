@@ -94,9 +94,6 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void UpdateInfoPanels(TSubclassOf<UFGItemDescriptor> DescriptorClass);
 
-	UFUNCTION(BlueprintCallable)
-	void SetShowAllRecipes(bool bShowAllRecipes);
-
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool GetShowAllRecipes();
 

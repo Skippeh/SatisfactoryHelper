@@ -1,5 +1,3 @@
-// ILikeBanas
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -11,30 +9,12 @@ class ASHInputManager : public AInfo
 {
 	GENERATED_BODY()
 
-	ASHInputManager() { PrimaryActorTick.bCanEverTick = true; }
-	
-public:
-	UFUNCTION(BlueprintCallable)
-	void SetToggleItemsMenuKey(FKey NewKey) { ToggleItemsMenuKey = NewKey; }
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FKey GetToggleItemsMenuKey() const { return ToggleItemsMenuKey; }
+	ASHInputManager() { PrimaryActorTick.bCanEverTick = false; }
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
 
 private:
-	UPROPERTY()
-	class AFGPlayerController* PlayerController;
-
-	UPROPERTY()
-	FKey ToggleItemsMenuKey;
-
-	UPROPERTY()
-	class ASHInit* Init;
-
-	UFUNCTION()
-	bool AlternateKeyJustPressed() const;
+	void ToggleItemsMenuKeyPressed();
 };

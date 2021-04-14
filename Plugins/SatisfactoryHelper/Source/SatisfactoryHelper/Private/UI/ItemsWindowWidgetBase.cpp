@@ -5,6 +5,9 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 //#include "util/Logging.h"
+#include <SHConfigStruct.h>
+
+#include "ConfigManager.h"
 #include "SHInit.h"
 #include "UI/UIManager.h"
 #include "FGHUD.h"
@@ -274,20 +277,8 @@ void UItemsWindowWidgetBase::OnFadeOutFinished_Implementation()
 	SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UItemsWindowWidgetBase::SetShowAllRecipes(bool bShowAllRecipes)
-{
-	if (!IsValid(CachedInit))
-		CachedInit = ASHInit::GetSingleton(this);
-
-	FSHUserConfig UserConfig = CachedInit->GetUserConfig();
-	UserConfig.bShowAllRecipes = bShowAllRecipes;
-	CachedInit->SetUserConfig(UserConfig);
-}
-
 bool UItemsWindowWidgetBase::GetShowAllRecipes()
 {
-	if (!IsValid(CachedInit))
-		CachedInit = ASHInit::GetSingleton(this);
-
-	return CachedInit->GetUserConfig().bShowAllRecipes;
+	const auto Config = FSHConfigStruct::GetActiveConfig();
+	return Config.PersonalSettings.bShowAllRecipes;
 }
