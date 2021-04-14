@@ -1,4 +1,5 @@
 ﻿"use strict";
+
 const fs = require("fs");
 const path = require("path");
 
@@ -36,17 +37,23 @@ function CopyFileAndLog(SourceFilePath, DestinationFolder) {
             console.error(`Failed to copy file ${SourceFilePath} to ${DestinationFolder}: ${e.message}`);
         }
     }
+    else {
+        console.error(`Source file not found: ${SourceFilePath}`);
+    }
+
     return false;
 }
 
 let ModsCopied = 0;
 
 for (let ModId of ModList) {
-    let FolderName = ModId === "SML" ? "loaders" : "mods";
-    let SourceFilePathBase = `${ModLoaderRootPath}/Binaries/Win64/UE4-${ModId}-Win64-Shipping`;
+    console.info(`Copying mod: ${ModId}...`);
+
+    const FolderName = `FactoryGame/Mods/${ModId}/Binaries/Win64`;
+    const SourceFilePathBase = `${ModLoaderRootPath}/Plugins/${ModId}/Binaries/Win64/UE4-${ModId}-Win64-Shipping`;
 
     for (const SatisfactoryPath of SatisfactoryPaths) {
-        let DestinationFolder = `${SatisfactoryPath}/${FolderName}`;
+        const DestinationFolder = `${SatisfactoryPath}/${FolderName}`;
 
         if (CopyFileAndLog(`${SourceFilePathBase}.dll`, DestinationFolder)) {
             CopyFileAndLog(`${SourceFilePathBase}.pdb`, DestinationFolder);
@@ -55,6 +62,7 @@ for (let ModId of ModList) {
 
     ModsCopied++;
 }
+
 console.log(`Done. Copied ${ModsCopied} mod(s).`);
 
 if (ModsCopied !== ModList.length) {
