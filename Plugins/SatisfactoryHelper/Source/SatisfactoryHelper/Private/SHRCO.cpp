@@ -99,7 +99,8 @@ void USHRCO::SpawnVehicle_Implementation(TSubclassOf<UFGVehicleDescriptor> Vehic
 		// Vehicle won't spawn if there's no space
 		if (bSpawnWithFuel && IsValid(Vehicle))
 		{
-			TArray<UActorComponent*> Inventories = Vehicle->GetComponentsByClass(UFGInventoryComponent::StaticClass());
+			TArray<UActorComponent*> Inventories;
+			Vehicle->GetComponents(UFGInventoryComponent::StaticClass(), Inventories);
 			
 			for (UActorComponent* InventoryComponent : Inventories)
 			{
