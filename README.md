@@ -8,8 +8,8 @@ A Quality of Life mod for Satisfactory that adds:
 ### Dependencies
 - You need a custom version of Unreal Engine to develop and package the mod. It can be downloaded here: https://github.com/SatisfactoryModdingUE/UnrealEngine/releases
   - Note that you need to register your GitHub account at Epic Games to get access. It can be done here: https://www.unrealengine.com/en-US/ue4-on-github
-- Install Wwise version ```2019.1.7.7135```.
-  - Instructions can be found here: https://docs.ficsit.app/satisfactory-modding/2.1.0/Development/BeginnersGuide/dependencies.html
+- Install Wwise version ```2021.1.0.7575```.
+  - Instructions can be found here: https://docs.ficsit.app/satisfactory-modding/latest/Development/BeginnersGuide/dependencies.html
 - For playtesting you need to install the Satisfactory Mod Manager so the game will load the mod.
   - It can be downloaded here: https://github.com/satisfactorymodding/SatisfactoryModLauncher/releases
 - Visual Studio 2017 with C++ desktop and game development modules added. It does not work well with Visual Studio 2019 in my experience but if you get it to work then be my guest.
@@ -17,23 +17,21 @@ A Quality of Life mod for Satisfactory that adds:
 
 ### Project setup
 **I highly recommend putting the project on an SSD if possible to decrease compilation/linking times**
-1. First of all you need to generate the Wwise project and install the Wwise plugin to the project. Instructions on how to do this can be found here: https://docs.ficsit.app/satisfactory-modding/2.1.0/Development/BeginnersGuide/project_setup.html
+1. First of all you need to generate the Wwise project and install the Wwise plugin to the project. Instructions on how to do this can be found here: https://docs.ficsit.app/satisfactory-modding/latest/Development/BeginnersGuide/dependencies.html#_wwise
 2. Make sure you've launched the custom version of Unreal Engine that you installed above. It can most likely be found in the start menu as ```Unreal Engine - CSS``` (CSS stands for Coffee Stain Studios).
-3. Right click FactoryGame.uproject and click ```Switch Unreal Engine Version...```, select ```4.22.3-CSS``` in the dropdown list. If you can't find it you can add it manually using the ```...``` button. Browse to the CSS version of Unreal Engine that you installed earlier.
+3. Right click FactoryGame.uproject and click ```Switch Unreal Engine Version...```, select ```4.25.3-CSS``` in the dropdown list. If you can't find it you can add it manually using the ```...``` button. Browse to the CSS version of Unreal Engine that you installed earlier.
 4. Right click the FactoryGame.uproject in the root of the repository and click ```Generate Visual Studio project files```.
 5. Create a file in the root directory called GamePath.txt and type in the filepath to Satisfactory installation.
 6. Open the generated .sln file with Visual Studio and compile both ```Development Editor``` and ```Shipping``` configurations selected. You can do a batch build (found under ```Build > Batch Build...``` in the window toolbar) to do both of them after eachother automatically. This will take some time.
-7. Open FactoryGame.uproject. Make sure the selected unreal engine is still ```4.22.3-CSS```.
+7. Open FactoryGame.uproject. Make sure the selected unreal engine is still ```4.25.3-CSS```.
 7. Compile the modules if the question appears.
 8. Now you're ready to start developing.
 
 ### Playtesting/cooking mod
 1. Build the visual studio solution with the ```Shipping``` configuration if it's out of date. This will also copy the dll and pdb to the game's mods folder automatically.
 2. In the unreal editor click the Alpakit button in the top middle.
-3. Configure the path to the game and check the ```Copy Mods to Game``` checkbox. Check the ```Start Game``` checkbox if you want to launch the game after it's done cooking the mod.
-4. Add an array element to the Mods array.
-5.  Set the name of the mod to ```SatisfactoryHelper``` and fill the rest of the fields with appropriate values (nothing is enforced except the Name field as it needs to match the folder name of the mod under ```Content/```).
-6.  Click the ```Alpakit!``` button when you're ready to build.
+3. Configure the path to the game and check the ```Copy Mods to Game``` checkbox. Optionally select your game launcher and version in in the ```Launch Game After Packaging```.
+4. Click Alpakit! on the ```SatisfactoryHelper (SatisfactoryHelper)``` row to package the mod and copy it to your game directory.
 
 ### Common errors
 Here are some common errors and solutions/workarounds i've come across:
