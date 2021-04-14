@@ -2,11 +2,11 @@
 #include "UI/UIManager.h"
 #include "Input/SHInputManager.h"
 #include "Content/ContentManager.h"
-//#include "util/Logging.h"
 #include "FGGameMode.h"
 #include "FGSchematicManager.h"
 #include "SHRCO.h"
 #include "SHBlueprintFunctionLibrary.h"
+#include "SHModule.h"
 #include "ItemInfoData/SHItemInfoSubsystem.h"
 #include "SHSaveManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -22,7 +22,7 @@ void ASHInit::BeginPlay()
 	ContentManager = NewObject<UContentManager>(this);
 
 	ASHItemInfoSubsystem* ItemInfoSubsystem = USHBlueprintFunctionLibrary::GetItemInfoSubsystem(GetWorld());
-	//SML::Logging::debug(TEXT("[SatisfactoryHelper] ItemInfoSubsystem is valid: "), IsValid(ItemInfoSubsystem));
+	UE_LOG(LogSatisfactoryHelper, Log, TEXT("ItemInfoSubsystem is valid: %d"), IsValid(ItemInfoSubsystem));
 	ItemInfoSubsystem->RegisterItemInfoClasses(ItemInfoClasses);
 
 	if (GetNetMode() != ENetMode::NM_Client)

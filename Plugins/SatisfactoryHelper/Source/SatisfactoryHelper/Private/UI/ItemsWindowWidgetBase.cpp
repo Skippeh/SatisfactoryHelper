@@ -4,9 +4,7 @@
 #include "Components/ListView.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-//#include "util/Logging.h"
-#include <SHConfigStruct.h>
-
+#include "SHConfigStruct.h"
 #include "ConfigManager.h"
 #include "SHInit.h"
 #include "UI/UIManager.h"
@@ -19,6 +17,7 @@
 #include "SHRecipeHelper.h"
 #include "DescriptorReference.h"
 #include "Tooltip/ItemTooltipSubsystem.h"
+#include "SHModule.h"
 
 #pragma region Empty blueprint implementations
 void UItemsWindowWidgetBase::OnToggleWindowVisibility_Implementation(bool bIsVisible) { }
@@ -37,12 +36,12 @@ void UItemsWindowWidgetBase::NativeOnInitialized()
 	TArray<TSubclassOf<USHItemInfo>> InfoClasses;
 	ItemInfoSubsystem->GetItemInfoClasses(InfoClasses, true);
 
-	//SML::Logging::debug(*FString::Printf(TEXT("[SatisfactoryHelper] Initializing %d panels..."), InfoClasses.Num()));
+	UE_LOG(LogSatisfactoryHelper, Log, TEXT("Initializing %d panels..."), InfoClasses.Num());
 	UPanelWidget* PanelsContainer = GetPanelsContainer();
 
 	for (auto InfoClass : InfoClasses)
 	{
-		//SML::Logging::debug(*FString::Printf(TEXT("[SatisfactoryHelper] Initializing: %s"), *InfoClass.Get()->GetName()));
+		UE_LOG(LogSatisfactoryHelper, Log, TEXT("Initializing: %s"), *InfoClass.Get()->GetName());
 
 		UCollapsableWidgetBase* CollapsableWidget = CreateWidget<UCollapsableWidgetBase, UWidget>(this, CollapsableWidgetClass);
 		USHItemInfo* InfoWidget = CreateWidget<USHItemInfo, UWidget>(CollapsableWidget, InfoClass);

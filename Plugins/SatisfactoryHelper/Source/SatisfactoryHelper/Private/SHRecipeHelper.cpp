@@ -7,6 +7,7 @@
 #include "FGWorkBench.h"
 #include "SHBlueprintFunctionLibrary.h"
 #include "FGRecipeManager.h"
+#include "SHModule.h"
 
 TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByProduct(UObject* WorldContextObject, TSubclassOf<UFGItemDescriptor> ItemDescriptor, bool bIncludeLockedRecipes)
 {
@@ -59,7 +60,7 @@ TArray<TSubclassOf<UFGRecipe>> USHRecipeHelper::FindRecipesByIngredient(UObject*
 template<class T>
 T InvalidClassSpecified(UClass* Class, T ReturnValue)
 {
-	//SML::Logging::error(*FString::Printf(TEXT("Unknown manufacturer class given: %s"), *(USHBlueprintFunctionLibrary::GetClassInheritancePathString(Class))));
+	UE_LOG(LogSatisfactoryHelper, Log, TEXT("Unknown manufacturer class given: %s"), *USHBlueprintFunctionLibrary::GetClassInheritancePathString(Class));
 	return ReturnValue;
 }
 
