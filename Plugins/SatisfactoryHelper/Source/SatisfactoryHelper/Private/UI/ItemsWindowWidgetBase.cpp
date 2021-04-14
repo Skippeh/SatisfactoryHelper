@@ -178,7 +178,7 @@ void UItemsWindowWidgetBase::UpdateItemView(UDescriptorReference* DescriptorRefe
 
 	auto DescriptorClass = DescriptorReference->ItemDescriptorClass;
 
-	auto TooltipSubsystem = static_cast<UItemTooltipSubsystem*>(nullptr); // todo: get subsystem instance
+	auto TooltipSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UItemTooltipSubsystem>();
 	FText ItemName = TooltipSubsystem->GetItemName(GetOwningPlayer(), FInventoryStack(1, DescriptorClass));
 	FText ItemDescription = TooltipSubsystem->GetItemDescription(GetOwningPlayer(), FInventoryStack(1, DescriptorClass));
 	NameWidget->SetText(ItemName);
