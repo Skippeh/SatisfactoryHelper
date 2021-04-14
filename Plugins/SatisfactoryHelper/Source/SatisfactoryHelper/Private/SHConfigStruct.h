@@ -4,23 +4,13 @@
 #include "Engine/Engine.h"
 #include "SHConfigStruct.generated.h"
 
-struct FSHConfigStruct_PersonalSettings;
-
-USTRUCT(BlueprintType)
-struct FSHConfigStruct_PersonalSettings {
-    GENERATED_BODY()
-public:
-    UPROPERTY(BlueprintReadWrite)
-    bool bShowAllRecipes;
-};
-
 /* Struct generated from Mod Configuration Asset '/SatisfactoryHelper/SHConfig' */
 USTRUCT(BlueprintType)
 struct FSHConfigStruct {
     GENERATED_BODY()
 public:
     UPROPERTY(BlueprintReadWrite)
-    FSHConfigStruct_PersonalSettings PersonalSettings;
+    bool ShowAllRecipes;
 
     /* Retrieves active configuration value and returns object of this struct containing it */
     static FSHConfigStruct GetActiveConfig() {
