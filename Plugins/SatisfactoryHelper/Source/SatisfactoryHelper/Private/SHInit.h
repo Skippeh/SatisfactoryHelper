@@ -12,36 +12,6 @@ class UContentManager;
 class ASHItemInfoSubsystem;
 class ASHSaveManager;
 
-USTRUCT(BlueprintType)
-struct FSHUserConfig
-{
-	GENERATED_USTRUCT_BODY()
-
-	FSHUserConfig()
-		: bShowAllRecipes(false)
-	{
-	}
-
-	UPROPERTY(BlueprintReadWrite)
-	bool bShowAllRecipes;
-
-	UPROPERTY(BlueprintReadWrite)
-	FString ItemsMenuKey = EKeys::F2.ToString();
-};
-
-USTRUCT(BlueprintType)
-struct FSHConfig
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(BlueprintReadOnly)
-	FSHUserConfig UserConfig;
-
-	FSHConfig()
-	{
-	}
-};
-
 UCLASS(Blueprintable, Abstract)
 class ASHInit : public AInfo
 {
@@ -57,15 +27,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UContentManager* GetContentManager() const;
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void SaveConfig(const FSHConfig& InUserConfig);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FSHUserConfig GetUserConfig() const;
-
-	UFUNCTION(BlueprintCallable)
-	void SetUserConfig(const FSHUserConfig& InUserConfig, bool bSaveToDisk = true);
-
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TSubclassOf<UFGItemDescriptor> GetVehicleFuelItemClass() const { return VehicleFuelItemClass; }
 
@@ -77,9 +38,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<ASHInputManager> InputManagerClass;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	FSHConfig LoadConfig();
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<class USHItemInfo>> ItemInfoClasses;
@@ -102,9 +60,6 @@ private:
 
 	UPROPERTY()
 	ASHSaveManager* SaveManager;
-
-	UPROPERTY()
-	FSHConfig Config;
 
 #pragma region Singleton
 public:
