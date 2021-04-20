@@ -3,8 +3,8 @@
 	"Version": 2,
 	"VersionName": "2.0.0",
 	"SemVersion": "2.0.0",
-	"FriendlyName": "SatisfactoryHelper",
-	"Description": "Satisfactory Helper mod for Satisfactory",
+	"FriendlyName": "Satisfactory Helper",
+	"Description": "An item and recipe browser.",
 	"Category": "Modding",
 	"CreatedBy": "Skipcast",
 	"CreatedByURL": "https://github.com/Skippeh/SatisfactoryHelper",
@@ -20,6 +20,13 @@
 			"Name": "SatisfactoryHelper",
 			"Type": "Runtime",
 			"LoadingPhase": "PostDefault"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "SML",
+			"SemVersion": "^3.0.0",
+			"Enabled": true
 		}
 	]
 }
