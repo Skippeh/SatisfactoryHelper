@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FGSubsystem.h"
+#include "ModSubsystem.h"
 #include "ItemInfoData/SHItemData.h"
 #include "SHItemInfoSubsystem.generated.h"
 
@@ -15,7 +15,7 @@ struct FCachedItemData
 };
 
 UCLASS()
-class SATISFACTORYHELPER_API ASHItemInfoSubsystem : public AFGSubsystem
+class SATISFACTORYHELPER_API ASHItemInfoSubsystem : public AModSubsystem
 {
 	GENERATED_BODY()
 

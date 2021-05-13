@@ -1,7 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FGSubsystem.h"
+#include "ModSubsystem.h"
+
 #include "SHCheatSubsystem.generated.h"
 
 USTRUCT(BlueprintType)
@@ -28,7 +29,7 @@ struct FEnabledCheats
 };
 
 UCLASS()
-class ASHCheatSubsystem : public AFGSubsystem
+class ASHCheatSubsystem : public AModSubsystem
 {
 	GENERATED_BODY()
 	

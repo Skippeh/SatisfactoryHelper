@@ -8,8 +8,7 @@
 
 ASHItemInfoSubsystem::ASHItemInfoSubsystem()
 {
-	bReplicates = true;
-	bAlwaysRelevant = true;
+	ReplicationPolicy = ESubsystemReplicationPolicy::SpawnLocal;
 }
 
 USHItemData* ASHItemInfoSubsystem::GetItemData(TSubclassOf<UFGItemDescriptor> DescriptorClass, TSubclassOf<USHItemData> ItemDataClass)

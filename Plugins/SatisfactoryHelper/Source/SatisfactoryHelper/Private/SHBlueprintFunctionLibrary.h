@@ -33,9 +33,6 @@ public:
 	static ASHInit* GetInit(UObject* InWorldContext);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Subsystem")
-	static class USHSubsystemHolder* GetSHSubsystemHolder(UObject* WorldContext);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Subsystem")
 	static class ASHCheatSubsystem* GetCheatSubsystem(UObject* WorldContext);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Subsystem")
