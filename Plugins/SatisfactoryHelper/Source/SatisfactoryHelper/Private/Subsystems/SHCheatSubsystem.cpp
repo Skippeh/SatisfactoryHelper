@@ -3,7 +3,7 @@
 
 ASHCheatSubsystem::ASHCheatSubsystem()
 {
-	bReplicates = true; // Need to replicate to client so the client knows if cheats are enabled for certain UI elements
+	ReplicationPolicy = ESubsystemReplicationPolicy::SpawnOnServer_Replicate; // Need to replicate to client so the client knows if cheats are enabled for certain UI elements
 }
 
 void ASHCheatSubsystem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -18,4 +18,3 @@ void ASHCheatSubsystem::SetEnabledCheats(const FEnabledCheats& NewEnabledCheats)
 		return;
 
 	EnabledCheats = NewEnabledCheats;
-}

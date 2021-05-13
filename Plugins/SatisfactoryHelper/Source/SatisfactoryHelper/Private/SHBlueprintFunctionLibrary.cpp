@@ -4,14 +4,13 @@
 #include "SHInit.h"
 #include "SHRCO.h"
 #include "FGPlayerController.h"
-#include "Subsystem/ModSubsystemHolder.h"
-#include "SHSubsystemHolder.h"
 #include "SHSaveManager.h"
 #include "Subsystems/SHCheatSubsystem.h"
 #include "ItemInfoData/SHItemInfoSubsystem.h"
 #include "FGSchematicManager.h"
 #include "FGRecipeManager.h"
 #include "ModLoadingLibrary.h"
+#include "SubsystemActorManager.h"
 #include "Configuration/ConfigManager.h"
 
 template<class T>
@@ -48,20 +47,14 @@ USHRCO* USHBlueprintFunctionLibrary::GetRCOFromPlayer(AFGPlayerController* Playe
 	return RCO;
 }
 
-USHSubsystemHolder* USHBlueprintFunctionLibrary::GetSHSubsystemHolder(UObject* WorldContext)
-{
-	USHSubsystemHolder* SubsystemHolder = UModSubsystemHolder::GetSubsystemHolder<USHSubsystemHolder>(WorldContext);
-	return SubsystemHolder;
-}
-
 ASHCheatSubsystem* USHBlueprintFunctionLibrary::GetCheatSubsystem(UObject* WorldContext)
 {
-	return GetManagerClass<ASHCheatSubsystem>(WorldContext);
+	return WorldContext->GetWorld()->GetSubsystem<USubsystemActorManager>()->GetSubsystemActor<ASHCheatSubsystem>();
 }
 
 ASHItemInfoSubsystem* USHBlueprintFunctionLibrary::GetItemInfoSubsystem(UObject* WorldContext)
 {
-	return GetManagerClass<ASHItemInfoSubsystem>(WorldContext);
+	return WorldContext->GetWorld()->GetSubsystem<USubsystemActorManager>()->GetSubsystemActor<ASHItemInfoSubsystem>();
 }
 
 AFGRecipeManager* USHBlueprintFunctionLibrary::GetRecipeManager(UObject* WorldContext)
