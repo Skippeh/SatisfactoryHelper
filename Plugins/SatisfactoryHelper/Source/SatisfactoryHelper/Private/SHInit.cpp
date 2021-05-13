@@ -25,18 +25,7 @@ void ASHInit::BeginPlay()
 	UE_LOG(LogSatisfactoryHelper, Log, TEXT("ItemInfoSubsystem is valid: %d"), IsValid(ItemInfoSubsystem));
 	ItemInfoSubsystem->RegisterItemInfoClasses(ItemInfoClasses);
 
-	if (GetNetMode() != ENetMode::NM_Client)
-	{
-		SaveManager = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld());
-		
-		if (SaveManager == nullptr) // Will be null if new world or loading a save that didn't have this mod beforehand
-			SaveManager = GetWorld()->SpawnActor<ASHSaveManager>(ASHSaveManager::StaticClass());
-	}
-	else
-	{
-		SaveManager = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld()); // gets replicated host actor
-	}
-
+	SaveManager = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld());	
 	InputManager = GetWorld()->SpawnActor<ASHInputManager>(InputManagerClass);
 	UIManager = GetWorld()->SpawnActor<AUIManager>(UIManagerClass);
 	
