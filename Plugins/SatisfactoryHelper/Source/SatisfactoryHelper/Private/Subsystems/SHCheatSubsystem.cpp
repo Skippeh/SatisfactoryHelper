@@ -1,4 +1,7 @@
 #include "SHCheatSubsystem.h"
+
+#include "SHBlueprintFunctionLibrary.h"
+#include "SHSaveManager.h"
 #include "Net/UnrealNetwork.h"
 
 ASHCheatSubsystem::ASHCheatSubsystem()
@@ -18,3 +21,10 @@ void ASHCheatSubsystem::SetEnabledCheats(const FEnabledCheats& NewEnabledCheats)
 		return;
 
 	EnabledCheats = NewEnabledCheats;
+}
+
+void ASHCheatSubsystem::BeginPlay()
+{
+	const auto SavedCheats = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld())->GetEnabledCheats();
+	SetEnabledCheats(SavedCheats);
+}

@@ -44,6 +44,8 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnItemPinChanged OnItemPinChanged;
 
+	const FEnabledCheats& GetEnabledCheats() const;
+
 private:
 	UPROPERTY(SaveGame, Replicated)
 	TArray<TSubclassOf<UFGItemDescriptor>> PinnedItems;
