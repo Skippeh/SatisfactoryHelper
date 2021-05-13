@@ -25,6 +25,11 @@ void ASHCheatSubsystem::SetEnabledCheats(const FEnabledCheats& NewEnabledCheats)
 
 void ASHCheatSubsystem::BeginPlay()
 {
-	const auto SavedCheats = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld())->GetEnabledCheats();
-	SetEnabledCheats(SavedCheats);
+	Super::BeginPlay();
+
+	if (GetWorld()->GetNetMode() != NM_Client)
+	{
+		const auto SavedCheats = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld())->GetEnabledCheats();
+		SetEnabledCheats(SavedCheats);
+	}
 }
