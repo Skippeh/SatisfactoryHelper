@@ -22,8 +22,6 @@ void ASHSaveManager::PostLoadGame_Implementation(int32 saveVersion, int32 gameVe
 	{
 		PinnedItems.Remove(ItemDescriptor);
 	}
-
-	USHBlueprintFunctionLibrary::GetCheatSubsystem(this)->SetEnabledCheats(EnabledCheats);
 }
 
 void ASHSaveManager::PreSaveGame_Implementation(int32 saveVersion, int32 gameVersion)
@@ -62,6 +60,11 @@ void ASHSaveManager::RemovePinnedItem(TSubclassOf<UFGItemDescriptor> ItemDescrip
 		return;
 
 	RPC_OnToggledPinnedItem(ItemDescriptor, false);
+}
+
+const FEnabledCheats& ASHSaveManager::GetEnabledCheats() const
+{
+	return EnabledCheats;
 }
 
 void ASHSaveManager::RPC_OnToggledPinnedItem_Implementation(TSubclassOf<UFGItemDescriptor> ItemDescriptor, bool bIsPinned)

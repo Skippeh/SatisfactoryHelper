@@ -42,6 +42,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void SetEnabledCheats(const FEnabledCheats& EnabledCheats);
 
+protected:
+	virtual void BeginPlay() override;
 private:
 	UPROPERTY(Replicated)
 	FEnabledCheats EnabledCheats;
