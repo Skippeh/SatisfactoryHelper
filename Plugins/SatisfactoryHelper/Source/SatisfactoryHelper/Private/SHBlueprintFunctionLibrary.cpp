@@ -64,7 +64,7 @@ AFGRecipeManager* USHBlueprintFunctionLibrary::GetRecipeManager(UObject* WorldCo
 
 AFGSchematicManager* USHBlueprintFunctionLibrary::GetSchematicManager(UObject* WorldContext)
 {
-	return GetManagerClass<AFGSchematicManager>(WorldContext);
+	return AFGSchematicManager::Get(WorldContext);
 }
 
 ASHSaveManager* USHBlueprintFunctionLibrary::GetSaveManager(UObject* WorldContext)
