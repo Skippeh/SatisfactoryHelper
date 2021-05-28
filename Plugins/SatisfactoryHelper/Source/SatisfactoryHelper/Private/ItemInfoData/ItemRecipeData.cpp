@@ -4,6 +4,8 @@
 #include "SHRecipeHelper.h"
 #include "SHInit.h"
 #include "FGBuildableAutomatedWorkBench.h"
+#include "FGBuildGun.h"
+#include "SHModule.h"
 
 static FString AlternateString = FString(TEXT("Alternate"));
 
@@ -41,6 +43,11 @@ void UItemRecipeData::SetPropertiesFromItemDescriptor_Implementation(TSubclassOf
 			if (Manufacturer->IsChildOf(AFGBuildableAutomatedWorkBench::StaticClass())) // Same as normal workbench
 				continue;
 
+			const bool bManufacturerIsBuildGun = Manufacturer->IsChildOf(AFGBuildGun::StaticClass());
+
+			if (bFilterByBuildGun && (bManufacturerIsBuildGun && !bShowBuildGunProducts || !bManufacturerIsBuildGun && bShowBuildGunProducts))
+				continue;
+
 			FTempRecipes& ManufacturerRecipes = MapOfManufacturers.FindOrAdd(Manufacturer);
 			ManufacturerRecipes.Recipes.Add(Recipe);
 
@@ -60,5 +67,6 @@ void UItemRecipeData::SetPropertiesFromItemDescriptor_Implementation(TSubclassOf
 	{
 		FManufacturerRecipes ManufacturerRecipes(KV.Key, KV.Value.Recipes);
 		Manufacturers.Add(ManufacturerRecipes);
+		UE_LOG(LogSatisfactoryHelper, Log, TEXT("%s: Added manufacturer: %s (%i recipes)"), *GetClass()->GetName(), *ManufacturerRecipes.Manufacturer->GetName(), KV.Value.Recipes.Num());
 	}
 }

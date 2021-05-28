@@ -39,7 +39,7 @@ class UItemRecipeData : public USHItemData
 	GENERATED_BODY()
 	
 public:
-	void SetPropertiesFromItemDescriptor_Implementation(TSubclassOf<UFGItemDescriptor> ItemDescriptor) override;
+	virtual void SetPropertiesFromItemDescriptor_Implementation(TSubclassOf<UFGItemDescriptor> ItemDescriptor) override;
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FManufacturerRecipes> Manufacturers;
@@ -47,6 +47,13 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bShowByIngredients;
+
+	/** If true then only build gun products will be shown, otherwise only non-build gun products will be shown. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bShowBuildGunProducts;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bFilterByBuildGun;
 };
 
 UCLASS()
@@ -54,9 +61,25 @@ class UItemProducedByData : public UItemRecipeData
 {
 	GENERATED_BODY()
 
+protected:
 	UItemProducedByData()
 	{
 		bShowByIngredients = false;
+		bFilterByBuildGun = true;
+		bShowBuildGunProducts = false;
+	}
+};
+
+UCLASS()
+class UItemProducedByBuildGunData : public UItemProducedByData
+{
+	GENERATED_BODY()
+
+	UItemProducedByBuildGunData()
+	{
+		bShowByIngredients = false;
+		bFilterByBuildGun = true;
+		bShowBuildGunProducts = true;
 	}
 };
 
@@ -65,8 +88,24 @@ class UItemUsedByData : public UItemRecipeData
 {
 	GENERATED_BODY()
 
+protected:
 	UItemUsedByData()
 	{
 		bShowByIngredients = true;
+		bFilterByBuildGun = true;
+		bShowBuildGunProducts = false;
+	}
+};
+
+UCLASS()
+class UItemUsedByBuildGun : public UItemUsedByData
+{
+	GENERATED_BODY()
+
+	UItemUsedByBuildGun()
+	{
+		bShowByIngredients = true;
+		bFilterByBuildGun = true;
+		bShowBuildGunProducts = true;
 	}
 };
