@@ -277,8 +277,6 @@ protected:
 	UPROPERTY( SaveGame )
 	TArray<FResearchTime> mSavedOngoingResearch;
 
-public: // MODDING EDIT Accessor
-	FORCEINLINE void OnResearchTimerCompleteAccessor(TSubclassOf<class UFGSchematic> schematic) { OnResearchTimerComplete(schematic); };
 private:
 	UFUNCTION()
 	void OnResearchTimerComplete( TSubclassOf<class UFGSchematic> schematic );

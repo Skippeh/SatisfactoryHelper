@@ -88,10 +88,6 @@ public:
 	virtual void OnFluidDescriptorSet() override;
 	// End FluidIntegrant Interface
 
-	// Begin IFGDismantleInterface
-	virtual void Upgrade_Implementation( AActor* newActor ) override;
-	// End IFGDismantleInterface
-
 	/**
 	 * Split this pipeline in two.
 	 * Copied from the conveyor splitting, some modifications

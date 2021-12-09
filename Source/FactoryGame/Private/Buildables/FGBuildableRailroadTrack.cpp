@@ -7,6 +7,7 @@
 #include "Hologram/FGRailroadTrackHologram.h"
 
 FRailroadTrackPosition::FRailroadTrackPosition(){ }
+FRailroadTrackPosition::FRailroadTrackPosition( AFGBuildableRailroadTrack* track, float offset, float forward){ }
 FRailroadTrackPosition::FRailroadTrackPosition(const FRailroadTrackPosition& position){ }
 FRailroadTrackPosition::~FRailroadTrackPosition(){ }
 bool FRailroadTrackPosition::Serialize(FArchive& ar) {
