@@ -1,5 +1,6 @@
 #include "ContentManager.h"
 #include "AssetRegistryModule.h"
+#include "FGRecipe.h"
 #include "IAssetRegistry.h"
 #include "FactoryGame/Public/Resources/FGItemDescriptor.h"
 #include "FGSchematic.h"
