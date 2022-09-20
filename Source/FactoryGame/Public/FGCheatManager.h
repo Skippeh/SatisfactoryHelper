@@ -5,6 +5,7 @@
 #include "FactoryGame.h"
 #include "GameFramework/CheatManager.h"
 #include "FGGamePhaseManager.h"
+#include "FGCreatureSubsystem.h"
 #include "Interfaces/OnlineSharedCloudInterface.h"
 #include "FGCheatManager.generated.h"
 
@@ -25,18 +26,28 @@ public:
 	// For networking support
 	virtual bool ReplicateSubobjects(class UActorChannel *Channel, class FOutBunch *Bunch, FReplicationFlags *RepFlags);
 
+	virtual void InitDefaultCheats();
+	
+	bool IsClient() const;
+
+	UFUNCTION( Server, Reliable )
+	virtual void Server_NoCost( bool enabled );
 	UFUNCTION( exec, CheatBoard, Category = "Resources" )
 	virtual void NoCost( bool enabled );
 
 	UFUNCTION( exec, CheatBoard )
 	virtual bool NoCost_Get();
 
+	UFUNCTION( Server, Reliable )
+	virtual void Server_NoPower( bool enabled );
 	UFUNCTION( exec, CheatBoard, Category = "Resources" )
 	virtual void NoPower( bool enabled );
 
 	UFUNCTION( exec, CheatBoard)
 	virtual bool NoPower_Get();
 
+	UFUNCTION( Server, Reliable )
+	virtual void Server_NoFuel( bool enabled );
 	UFUNCTION( exec, CheatBoard, Category = "Resources" )
 	virtual void NoFuel( bool enabled );
 
@@ -61,14 +72,20 @@ public:
 	UFUNCTION( exec, CheatBoard, Category = "World/Time" )
 	virtual bool TurboMode_Get();
 
+	UFUNCTION( Server, Reliable )
+	virtual void Server_GiveItemStacks( class AFGCharacterPlayer* character, TSubclassOf< class UFGItemDescriptor > resource, int32 numberOfStacks );
 	UFUNCTION( exec, CheatBoard, Category = "Resources:-2", meta = ( ToolTip="Give the number of full item stacks specified. Will expand inventory if needed. Becareful with too high numbers.") )
-	virtual void GiveItemStacks( TSubclassOf< class UFGItemDescriptor > resource, int32 NumberOfStacks );
+	virtual void GiveItemStacks( TSubclassOf< class UFGItemDescriptor > resource, int32 numberOfStacks );
 
+	UFUNCTION( Server, Reliable )
+	virtual void Server_GiveItemsSingle( class AFGCharacterPlayer* character, TSubclassOf< class UFGItemDescriptor > resource, int32 numberOfItems );
 	UFUNCTION( exec, CheatBoard, Category = "Resources:-1", meta = ( ToolTip="Give the number of items specified." ))
-	virtual void GiveItemsSingle( TSubclassOf< class UFGItemDescriptor > resource, int32 NumberOfItems );
+	virtual void GiveItemsSingle( TSubclassOf< class UFGItemDescriptor > resource, int32 numberOfItems );
 
+	UFUNCTION( Server, Reliable )
+	virtual void Server_GiveResourceSinkCoupons( int32 numCoupons );
 	UFUNCTION( exec, CheatBoard, Category = "Resources", meta = ( ToolTip = "Give the number of coupons specified" ) )
-	virtual void GiveResourceSinkCoupons( int32 NumCoupons );
+	virtual void GiveResourceSinkCoupons( int32 numCoupons );
 
 	UFUNCTION( exec, CheatBoard, category = "Player" )
 	void DrawSphere( int32 radius );
@@ -76,6 +93,8 @@ public:
 	UFUNCTION( exec, CheatBoard, Category = "Player/Camera" )
 	virtual void PlayerFly( bool flyModeEnabled );
 	
+	UFUNCTION( Server, Reliable )
+	virtual void Server_PlayerAllFly( bool flyModeEnabled);
 	UFUNCTION( exec, CheatBoard, Category = "Cheat Manager" )
 	virtual void PlayerAllFly( bool flyModeEnabled);
 
@@ -93,57 +112,76 @@ public:
 	UFUNCTION( exec )
 	virtual void ClearGiveItemPopularList();
 	
+	UFUNCTION( Server, Reliable )
+	virtual void Server_GiveAllSchematics();
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	virtual void GiveAllSchematics();
 
+	UFUNCTION( Server, Reliable )
+	void Server_GiveAllSchematicsAndPhases();
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	void GiveAllSchematicsAndPhases();
 
+	UFUNCTION( Server, Reliable )
+	virtual void Server_GiveAvailableSchematics();
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	virtual void GiveAvailableSchematics();
 
+	UFUNCTION( Server, Reliable )
+	virtual void Server_GiveActiveMilestoneSchematic();
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	virtual void GiveActiveMilestoneSchematic();
 
+	UFUNCTION( Server, Reliable )
+	virtual void Server_GiveCheatSchematics();
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	virtual void GiveCheatSchematics();
 
+	UFUNCTION( Server, Reliable )
+	virtual void Server_GivePrototypeSchematics();
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	virtual void GivePrototypeSchematics();
 
+	UFUNCTION( Server, Reliable )
+	virtual void Server_GiveStorySchematics();
 	UFUNCTION( exec, CheatBoard )
 	virtual void GiveStorySchematics();
 
-	UFUNCTION( exec, CheatBoard, category = "Research" )
-	void GiveStartingResearch();
-
+	UFUNCTION( Server, Reliable )
+	void Server_GiveAllResearchTrees();
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	void GiveAllResearchTrees();
 
-	UFUNCTION( exec, CheatBoard, category = "Story" )
+	// @todok2 implement client support when we now what to do with story
+	// Removed cheatboard tag for now so we don't have them on the cheat board
+	UFUNCTION( exec, category = "Story" )
 	void TriggerNextPrimaryStoryMessageInQueue();
 
-	UFUNCTION( exec, CheatBoard, category = "Story" )
+	UFUNCTION( exec, category = "Story" )
 	void TriggerNextSecondaryStoryMessageInQueue( int32 storyQueueIndex = 0 );
 
-	UFUNCTION( exec, CheatBoard, category = "Story" )
+	UFUNCTION( exec, category = "Story" )
 	void TriggerNextFloatingMessageInPrimaryQueue();
 
-	UFUNCTION( exec, CheatBoard, category = "Story" )
+	UFUNCTION( exec, category = "Story" )
 	void TriggerRandomTriggeredBarksMessage();
 
-	UFUNCTION( exec, CheatBoard, category = "Story" )
+	UFUNCTION( exec, category = "Story" )
 	void StartNextStoryQueue();
 
-	UFUNCTION( exec, CheatBoard, category = "Story" )
+	UFUNCTION( exec, category = "Story" )
 	void ResetAllStoryQueues();
 
-	UFUNCTION( exec, CheatBoard, category = "Story" )
+	UFUNCTION( exec, category = "Story" )
 	void ResetCurrentStoryQueue();
 	
+	UFUNCTION( Server, Reliable )
+	virtual void Server_RebuildPowerCircuits();
 	UFUNCTION( exec, CheatBoard, category = "Factory|Uncommon" )
 	virtual void RebuildPowerCircuits();
 
+	UFUNCTION( Server, Reliable )
+	void Server_EnableBuildableTick( bool enable );
 	UFUNCTION( exec, CheatBoard, category = "Factory|Uncommon" )
 	void EnableBuildableTick( bool enable );
 
@@ -161,17 +199,35 @@ public:
 	void DestroyPawn();
 
 	UFUNCTION( exec )
-	void RemoveAllFoliage( int32 maxNumInstances = 999999 );
+	void RemoveFoliageOneByOne( int32 maxNumInstances = 0 );
 
-	UFUNCTION( exec, CheatBoard, category = "Player/Camera" )
-	virtual void PardonAllPlayers();
+	UFUNCTION( Server, Reliable )
+	void Server_RemoveFoliageOneByOne( int32 maxNumInstances );
 
-	UFUNCTION( exec, CheatBoard, category = "Player/Camera" )
-	virtual void ClearPardon();
+	UFUNCTION( exec )
+	void RemoveFoliageInBulk( int32 maxNumInstances = 0 );
 
+	UFUNCTION( Server, Reliable )
+	void Server_RemoveFoliageInBulk( int32 maxNumInstances );
+
+	UFUNCTION( exec )
+	void RemoveFoliageByTarget( float radius = 5000.0f );
+
+	UFUNCTION( Server, Reliable )
+	void Server_RemoveFoliageByTarget( float radius );
+
+	UFUNCTION( Server, Reliable )
+	void Server_SetCreatureHostility( ECreatureHostility hostility );
+	UFUNCTION( exec, CheatBoard, category = "Creature" )
+	void SetCreatureHostility( ECreatureHostility hostility );
+
+	UFUNCTION( Server, Reliable )
+	void Server_SetTimeOfDay( int32 hour, int32 minute = 0 );
 	UFUNCTION( exec, CheatBoard, category = "World/Time" )
 	void SetTimeOfDay( int32 hour, int32 minute = 0 );
 
+	UFUNCTION( Server, Reliable )
+    void Server_SetTimeSpeedMultiplierResetTime( int32 resetHour );
 	UFUNCTION( exec, CheatBoard, category = "World/Time" )
     void SetTimeSpeedMultiplierResetTime( int32 resetHour );
 
@@ -181,18 +237,28 @@ public:
 	UFUNCTION( exec, CheatBoard, category = "World/Time" )
 	int32 SetTimeOfDay_minute_Get();
 
+	UFUNCTION( Server, Reliable )
+	void Server_SetPlanetPosition( float value );
 	UFUNCTION( exec, CheatBoard, category = "World/Planets" )
 	void SetPlanetPosition( float value );
 
+	UFUNCTION( Server, Reliable )
+	void Server_SetPlanetPositionDeg( int32 value );
 	UFUNCTION( exec, CheatBoard, category = "World/Planets" )
 	void SetPlanetPositionDeg( int32 value );
 
+	UFUNCTION( Server, Reliable )
+	void Server_SetPlanetMovementEnabled( bool enabled );
 	UFUNCTION( exec, CheatBoard, category = "World/Planets" )
 	void SetPlanetMovementEnabled( bool enabled );
 
+	UFUNCTION( Server, Reliable )
+	void Server_SetPlanetSpeedMultiplier( float multiplier );
 	UFUNCTION( exec, CheatBoard, category = "World/Planets" )
 	void SetPlanetSpeedMultiplier( float multiplier );
 
+	UFUNCTION( Server, Reliable )
+	void Server_ShowFactoryOnly( bool environmentHidden );
 	/** Hide everything except the factory */
 	UFUNCTION( exec, CheatBoard, category = "Display" )
 	void ShowFactoryOnly( bool environmentHidden );
@@ -200,6 +266,8 @@ public:
 	UFUNCTION( exec, CheatBoard, category = "Display" )
 	bool ShowFactoryOnly_Get();
 
+	UFUNCTION( Server, Reliable )
+	void Server_HideFactoryOnly( bool factoryHidden );
 	/** Hide everything the factory */
 	UFUNCTION( exec, CheatBoard, category = "Display" )
 	void HideFactoryOnly( bool factoryHidden );
@@ -216,6 +284,8 @@ public:
 	UFUNCTION( exec, category = "Audio" )
 	void ToggleAudioDebug();
 
+	UFUNCTION( Server, Reliable )
+	void Server_SetSlomo( float slomo );
 	UFUNCTION( exec, CheatBoard, category = "World/Time" )
 	void SetSlomo( float slomo );
 
@@ -236,6 +306,8 @@ public:
 	UFUNCTION( exec, category = "Factory" )
 	void MergeAllConveyors();
 
+	UFUNCTION( Server, Reliable )
+	void Server_SetTimeSpeedMultiplier( float speed );
 	UFUNCTION( exec, CheatBoard ) 
 	void SetTimeSpeedMultiplier( float speed );
 
@@ -245,6 +317,8 @@ public:
 	UFUNCTION( exec )
 	bool SetFactoryDetailReplication_Get();
 
+	UFUNCTION( Server, Reliable )
+	void Server_ResetFuses();
 	UFUNCTION( exec, CheatBoard, category = "Factory" )
 	void ResetFuses();
 
@@ -278,21 +352,43 @@ public:
 	UFUNCTION( exec, CheatBoard, category = "Player/Camera" )
 	void Photo_ToggleSequencer();
 
+	UFUNCTION( Server, Reliable )
+	void Server_GiveSchematicsOfTier( int32 tier );
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	void GiveSchematicsOfTier( int32 tier );
 
+	UFUNCTION( Server, Reliable )
+	void Server_SetGamePhase( EGamePhase phase );
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	void SetGamePhase( EGamePhase phase );
 	
+	UFUNCTION( Server, Reliable )
+	void Server_SetNextGamePhase();
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	void SetNextGamePhase();
+
+	UFUNCTION( Server, Reliable )
+	void Server_ResetGamePhases();
+	UFUNCTION( exec, CheatBoard, category = "Research" )
+	void ResetGamePhases();
+
+	UFUNCTION( exec )
+	void DumpGamePhases();
 
 	UFUNCTION( exec )
 	void TestSharedInventoryPtr();
 
+	UFUNCTION( Server, Reliable )
+	void Server_ForceSpawnCreatures();
 	/** Forces active spawners to spawn creatures even if the creature isn't set to spawn yet ( because of day/night restrictions etc ) */
 	UFUNCTION( exec, CheatBoard, category = "World/Time" )
 	void ForceSpawnCreatures();
+
+	UFUNCTION( exec, CheatBoard, category = "Weather" )
+	void ForceSetWeatherType( TSubclassOf<class AFGWeatherReaction> Reaction );
+
+	UFUNCTION( exec, CheatBoard, category = "Weather" )
+	void LockWeather(bool bState);
 
 	UFUNCTION( exec, CheatBoard ,category = "Log" )
 	void DumpNonDormantActors();
@@ -314,6 +410,8 @@ public:
 	UFUNCTION( exec )
 	void ReplayBuildingEffects();
 
+	UFUNCTION( Server, Reliable )
+	void Server_HideAllBuildings( bool inVisibility );
 	/** Sets visibility on all buildings */
 	UFUNCTION( exec, CheatBoard, category = "Display" )
 	void HideAllBuildings( bool inVisibility );
@@ -328,17 +426,22 @@ public:
 	UFUNCTION( exec )
 	void UpdateSessionToOSS();
 
-	UFUNCTION( exec )
-	void VisitAllMapAreas();
-
+	UFUNCTION( NetMulticast, Reliable )
+	void NetMulticast_RevealMap();
+	UFUNCTION( Server, Reliable )
+	void Server_RevealMap();
 	UFUNCTION( exec, CheatBoard )
 	void RevealMap();
 
+	UFUNCTION( NetMulticast, Reliable )
+	void NetMulticast_HideMap();
+	UFUNCTION( Server, Reliable )
+	void Server_HideMap();
 	UFUNCTION( exec, CheatBoard )
 	void HideMap();
 
-	UFUNCTION( exec, CheatBoard, category = "World/Time" )
-	void SetAITickDistance( float distance );
+	UFUNCTION( exec, CheatBoard )
+	void RemoveMapMarker( int32 index );
 
 	UFUNCTION( exec, CheatBoard, category = "Log" )
 	void DumpPlayerStates();
@@ -355,18 +458,26 @@ public:
 	UFUNCTION( exec, CheatBoard, category = "Log" )
 	void DumpSignificanceManagedObjects();
 
+	UFUNCTION( Server, Reliable )
+	void Server_PurgeInactiveClientsFromSave( class AFGCharacterPlayer* characterToReceiveInventories, bool fetchInventories );
 	UFUNCTION( exec, CheatBoard, category = "Save/Load" )
 	void PurgeInactiveClientsFromSave( bool fetchInventories );
 
+	UFUNCTION( Server, Reliable )
+	void Server_PurgeAllBeaconsFromSave();
 	UFUNCTION( exec, CheatBoard, category = "Save/Load" )
 	void PurgeAllBeaconsFromSave();
 
+	UFUNCTION( Server, Reliable )
+	void Server_PurgeDeathMarkersFromSave();
 	UFUNCTION( exec, CheatBoard, category = "Save/Load" )
 	void PurgeDeathMarkersFromSave();
 
 	UFUNCTION( exec, CheatBoard, category = "Log" )
 	void ListItemPickups();
 
+	UFUNCTION( Server, Reliable )
+	void Server_SetTradingPostLevel( int32 inLevel );
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	void SetTradingPostLevel( int32 inLevel );
 
@@ -409,12 +520,18 @@ public:
 	UFUNCTION( exec )
 	void SendInviteToFriend( FString friendName );
 
+	UFUNCTION( Server, Reliable )
+	void Server_ResetHubTutorial();
 	UFUNCTION( exec )
 	void ResetHubTutorial();
 
+	UFUNCTION( Server, Reliable )
+	void Server_ResetSchematics();
 	UFUNCTION( exec )
 	void ResetSchematics();
 
+	UFUNCTION( Server, Reliable )
+	void Server_ResetRecipes();
 	UFUNCTION( exec, CheatBoard, category = "Research" )
 	void ResetRecipes();
 
@@ -424,12 +541,18 @@ public:
 	UFUNCTION( exec )
 	void PrintStaticMeshesHierarchy();
 
+	UFUNCTION( Server, Reliable )
+	void Server_FlipVehicle( class AFGWheeledVehicle* vehicle );
 	UFUNCTION( exec )
 	void FlipVehicle();
 
+	UFUNCTION( Server, Reliable )
+	void Server_ResetVehicleDeadlocks();
 	UFUNCTION( exec )
 	void ResetVehicleDeadlocks();
 
+	UFUNCTION( Server, Reliable )
+	void Server_ResetTheChosenWheeledVehicle();
 	UFUNCTION( exec )
 	void ResetTheChosenWheeledVehicle();
 
@@ -442,9 +565,13 @@ public:
 	UFUNCTION( exec )
 	void SetRandomDebugStartingPoint();
 
-	UFUNCTION( exec )
+	UFUNCTION( Server, Reliable )
+	void Server_CompleteResearch();
+	UFUNCTION( exec, CheatBoard, category = "Research" )
 	void CompleteResearch();
 
+	UFUNCTION( Server, Reliable )
+	void Server_PurgeAllTrainState();
 	UFUNCTION( exec )
 	void PurgeAllTrainState();
 
@@ -453,22 +580,22 @@ public:
 
 	UFUNCTION( exec )
 	void RebuildFactoryLegsOneTileAroundPlayer();
-
-	UFUNCTION( exec )
-	void ResetGamePhases();
-
-	UFUNCTION( exec )
-	void DumpGamePhases();
-
+	
 	UFUNCTION( exec )
 	void ToggleTrainSelfDriving();
 
+	UFUNCTION( Server, Reliable )
+	void Server_PipeFillFirstInEachNetwork();
 	UFUNCTION( exec )
 	void PipeFillFirstInEachNetwork();
 
+	UFUNCTION( Server, Reliable )
+	void Server_PipeEmptyAll();
 	UFUNCTION( exec )
 	void PipeEmptyAll();
 
+	UFUNCTION( Server, Reliable )
+	void Server_PipeResetAll();
 	UFUNCTION( exec )
 	void PipeResetAll();
 	
@@ -530,22 +657,39 @@ public:
 	UFUNCTION( exec )
 	void DumpConnectionString();
 
+	UFUNCTION( Server, Reliable )
+	void Server_FillAllFreightCars( float pct = 1.f );
 	UFUNCTION( exec )
 	void FillAllFreightCars( float pct = 1.f );
+	UFUNCTION( Server, Reliable )
+    void Server_EmptyAllFreightCars();
 	UFUNCTION( exec )
     void EmptyAllFreightCars();
 
 	UFUNCTION( exec )
 	void DumpCircuitsToLog();
 
+	UFUNCTION( Server, Reliable )
+	void Server_RerailAllTrains();
 	UFUNCTION( exec )
 	void RerailAllTrains();
 
+	UFUNCTION( Server, Reliable )
+	void Server_MarkTrackGraphsAsChanged();
 	UFUNCTION( exec )
 	void MarkTrackGraphsAsChanged();
 
+	UFUNCTION( Server, Reliable )
+	void Server_MarkTrackGraphsForRebuild();
 	UFUNCTION( exec )
 	void MarkTrackGraphsForRebuild();
+
+	UFUNCTION( exec )
+	void RunHardwareBenchmark(int32 WorkScale = 10, float CPUMultiplier = 1.0f, float GPUMultiplier = 1.0f);
+
+	/** Used to toggle cheat menu from console. Migrated here from the old FGHUD solution and kept the naming */
+	UFUNCTION( exec )
+	void Cheats();
 
 private:
 	class UActorComponent* GetOuterPlayersUseComponent() const;
@@ -559,4 +703,7 @@ public:
 	TArray< UClass* > mPopularUClassChoices;
 
 	FTimerHandle mDebugFocusTimerHandle;
+
+	/** Used to check if we have applied the default cheats this game session. */ 
+	bool mDefaultCheatsApplied = false;
 };
