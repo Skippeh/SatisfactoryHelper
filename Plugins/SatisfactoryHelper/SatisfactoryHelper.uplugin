@@ -1,8 +1,8 @@
 {
 	"FileVersion": 3,
 	"Version": 2,
-	"VersionName": "2.0.3",
-	"SemVersion": "2.0.3",
+	"VersionName": "2.0.4",
+	"SemVersion": "2.0.4",
 	"FriendlyName": "Satisfactory Helper",
 	"Description": "An item and recipe browser.",
 	"Category": "Modding",
@@ -25,7 +25,7 @@
 	"Plugins": [
 		{
 			"Name": "SML",
-			"SemVersion": "^3.2.1",
+			"SemVersion": "^3.3.2",
 			"Enabled": true
 		}
 	]
