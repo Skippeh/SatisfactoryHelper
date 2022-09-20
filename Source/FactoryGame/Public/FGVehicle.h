@@ -7,7 +7,6 @@
 #include "FGSignificanceInterface.h"
 #include "FGActorRepresentationInterface.h"
 #include "FGSaveInterface.h"
-#include "AI/FGAggroTargetInterface.h"
 #include "FGDriveablePawn.h"
 #include "FGDismantleInterface.h"
 #include "FGBlueprintFunctionLibrary.h"
@@ -16,6 +15,7 @@
 #include "FGBuildableSubsystem.h"
 #include "FGVehicle.generated.h"
 
+class UFGDamageType;
 class FDebugDisplayInfo;
 
 /** Physics data we want to be able to restore, we store the bone name to be able to change the bone structure in updates */
@@ -109,7 +109,7 @@ struct FACTORYGAME_API FVehicleSeat
  * Base class for all vehicles in the game, cars, train etc.
  */
 UCLASS()
-class FACTORYGAME_API AFGVehicle : public AFGDriveablePawn, public IFGUseableInterface, public IFGDismantleInterface, public IFGAggroTargetInterface, public IFGDockableInterface, public IFGColorInterface, public IFGSignificanceInterface, public IFGActorRepresentationInterface
+class FACTORYGAME_API AFGVehicle : public AFGDriveablePawn, public IFGUseableInterface, public IFGDismantleInterface, public IFGDockableInterface, public IFGColorInterface, public IFGSignificanceInterface
 {
 	GENERATED_BODY()
 public:
@@ -167,14 +167,14 @@ public:
 	//~ End IFGColorInterface
 
 	//~ Begin IFGDockableInterface
-	virtual bool CanDock_Implementation( EDockStationType atStation ) const override;
-	virtual class UFGInventoryComponent* GetDockInventory_Implementation() const override;
-	virtual class UFGInventoryComponent* GetDockFuelInventory_Implementation() const override;
-	virtual void WasDocked_Implementation( class AFGBuildableDockingStation* atStation ) override;
-	virtual void WasUndocked_Implementation() override;
-	virtual void OnBeginLoadVehicle_Implementation() override;
-	virtual void OnBeginUnloadVehicle_Implementation() override;
-	virtual void OnTransferComplete_Implementation() override;
+	virtual bool CanDock_Implementation( EDockStationType atStation ) const override { return false; }
+	virtual class UFGInventoryComponent* GetDockInventory_Implementation() const override { return nullptr; }
+	virtual class UFGInventoryComponent* GetDockFuelInventory_Implementation() const override { return nullptr; }
+	virtual void WasDocked_Implementation( class AFGBuildableDockingStation* atStation ) override {}
+	virtual void WasUndocked_Implementation() override {}
+	virtual void OnBeginLoadVehicle_Implementation() override {}
+	virtual void OnBeginUnloadVehicle_Implementation() override {}
+	virtual void OnTransferComplete_Implementation() override {}
 	//~ End IFGDockableInterface
 
 	//~ Begin IFGUseableInterface
@@ -200,38 +200,6 @@ public:
 	virtual void StopIsLookedAtForDismantle_Implementation( AFGCharacterPlayer* byCharacter ) override;
 	virtual void GetChildDismantleActors_Implementation( TArray< AActor* >& out_ChildDismantleActors ) const override;
 	//~ End IFGDismantleInferface
-
-	// Begin IFGAggroTargetInterface
-	virtual void RegisterIncomingAttacker_Implementation( class AFGEnemyController* forController ) override;
-	virtual void UnregisterAttacker_Implementation( class AFGEnemyController* forController ) override;
-	virtual AActor* GetActor_Implementation() override;
-	virtual float GetEnemyTargetDesirability_Implementation( class AFGEnemyController* forController ) override;
-	virtual bool ShouldAutoregisterAsTargetable_Implementation() const override;
-	virtual class UPrimitiveComponent* GetTargetComponent_Implementation() override;
-	virtual bool IsAlive_Implementation() const override;
-	virtual FVector GetAttackLocation_Implementation() const override;
-	// End IFGAggroTargetInterface
-
-	// Begin IFGActorRepresentationInterface
-	virtual bool AddAsRepresentation() override;
-	virtual bool UpdateRepresentation() override;
-	virtual bool RemoveAsRepresentation() override;
-	virtual bool IsActorStatic() override;
-	virtual FVector GetRealActorLocation() override;
-	virtual FRotator GetRealActorRotation() override;
-	virtual class UTexture2D* GetActorRepresentationTexture() override;
-	virtual FText GetActorRepresentationText() override;
-	virtual void SetActorRepresentationText( const FText& newText ) override;
-	virtual FLinearColor GetActorRepresentationColor() override;
-	virtual void SetActorRepresentationColor( FLinearColor newColor ) override;
-	virtual ERepresentationType GetActorRepresentationType() override;
-	virtual bool GetActorShouldShowInCompass() override;
-	virtual bool GetActorShouldShowOnMap() override;
-	virtual EFogOfWarRevealType GetActorFogOfWarRevealType() override;
-	virtual float GetActorFogOfWarRevealRadius() override;
-	virtual ECompassViewDistance GetActorCompassViewDistance() override;
-	virtual void SetActorCompassViewDistance( ECompassViewDistance compassViewDistance ) override;
-	// End IFGActorRepresentationInterface
 
 	/** Getter for simulation distance */
 	UFUNCTION( BlueprintPure, Category = "FactoryGame|Vehicle" )
@@ -339,6 +307,8 @@ public:
 	UFUNCTION( BlueprintNativeEvent, Category = "Buildable|Customization" )
 	void OnSkinCustomizationApplied( TSubclassOf< class UFGFactoryCustomizationDescriptor_Skin > skin );
 
+	virtual FVector GetRealActorLocation() const;
+
 protected:
 	/** Called when customization data is applied. Allows child vehicles to update their simulated vehicles to keep colors synced */
 	virtual void OnCustomizationDataApplied( const FFactoryCustomizationData& customizationData );
@@ -443,6 +413,10 @@ protected:
 	UPROPERTY( SaveGame, Replicated, VisibleAnywhere, Category = "Health" )
 	class UFGHealthComponent* mHealthComponent;
 
+	/** Keeps track of active DOT effects applied to us. */
+	UPROPERTY( VisibleAnywhere, BlueprintReadOnly )
+	class UFGDotReceiverComponent* mDOTReceiverComponent;
+
 	/** If any of these locations enters water, then we are unusable */
 	UPROPERTY( EditDefaultsOnly, Category = "Vehicle" )
 	TArray< FVector > mDisabledByWaterLocations;
@@ -516,9 +490,9 @@ private:
 	UPROPERTY( EditDefaultsOnly, Category = "Vehicle" )
 	float mSubmergedBouyantForce;
 
-	/** Gas damage typ that should be redirected to the driver*/
-	UPROPERTY( EditDefaultsOnly, Category = "Vehicle" )
-	TSubclassOf< class UFGDamageType > mGasDamageType; 
+	/** Damage types that should be redirected to the driver. Damages here act as damage multipliers (i.e setting it to gas damage with 0.5 damage will x0.5 the incoming damages */
+	UPROPERTY( EditDefaultsOnly, Category= "Vehicle" )
+	TArray< TSubclassOf< UFGDamageType > > mDamageTypesRedirectedToDriver;
 	
 	/** How much to to multiply the jump pad force with. */
 	UPROPERTY( EditDefaultsOnly, Category = "Vehicle" )
@@ -550,6 +524,7 @@ protected:
 	UPROPERTY( EditDefaultsOnly, Category = "Vehicle" )
 	float mSimulationDistance;
 
+public:
 	UPROPERTY( EditDefaultsOnly, Category = "Representation" )
 	class UTexture2D* mActorRepresentationTexture;
 

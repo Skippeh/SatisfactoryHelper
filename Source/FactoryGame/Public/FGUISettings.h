@@ -25,6 +25,10 @@ public:
 	UPROPERTY( EditAnywhere, config, Category = UI )
 	TSubclassOf<UUserWidget> mConnectAccountsWidget;
 
+	/** Widget to show the user when unlinking account */
+	UPROPERTY( EditAnywhere, config, Category = UI )
+	TSubclassOf<UUserWidget> mResetAccountLinkingWidget;
+
 	/** Widget used to show the user when enabling the debug overlay */
 	UPROPERTY( EditAnywhere, config, Category = UI )
 	TSubclassOf< class UFGDebugOverlayWidget > mDebugOverlayWidgetClass;
@@ -32,4 +36,10 @@ public:
 	/** Emote wheel widget to select a widget */
 	UPROPERTY( EditAnywhere, config, Category = UI )
 	TSubclassOf< class UFGInteractWidget > mEmoteMenuWidget;
+
+	/** Widget used to customize and spawn a map marker in the world */
+	UPROPERTY( EditAnywhere, config, Category = UI )
+	TSubclassOf< class UFGInteractWidget > mAddMapMarkerWidget;
+
+	
 };

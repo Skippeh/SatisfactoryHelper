@@ -14,6 +14,7 @@ AFGGameMode::AFGGameMode() : Super() {
 	this->mAllowPossessAny = false;
 	this->mDebugStartingPointTagName = TEXT("None");
 	this->mDefaultRemoteCallObjectsClassNames.Add(FSoftClassPath("/Game/FactoryGame/Character/Player/BP_RemoteCallObject.BP_RemoteCallObject_C"));
+	this->mDefaultRemoteCallObjectsClassNames.Add(FSoftClassPath("/Script/FactoryGame.FGBoomBoxRemoteCallObject"));
 	this->mServerRestartTimeHours = 24.0;
 	this->mIsMainMenu = false;
 	this->InactivePlayerStateLifeSpan = 0.0;
@@ -58,6 +59,7 @@ bool AFGGameMode::GetDefaultPlayerCapsuleSize(UWorld* world, float& out_capsuleR
 bool AFGGameMode::RegisterRemoteCallObjectClass(TSubclassOf< UFGRemoteCallObject > inClass){ return bool(); }
 void AFGGameMode::RegisterCallObjectOnAllCurrentPlayers(TSubclassOf<UFGRemoteCallObject> inClass){ }
 void AFGGameMode::RebootSession(){ }
+bool AFGGameMode::ShouldSkipOnboarding() const{ return bool(); }
 void AFGGameMode::SetServerRestartWorldTime(float worldTime){ }
 void AFGGameMode::TriggerWorldSave(FString saveGameName){ }
 void AFGGameMode::TriggerBundledWorldSave(FString saveGameName){ }
