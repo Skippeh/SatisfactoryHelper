@@ -3,6 +3,7 @@
 #include "Equipment/FGWeapon.h"
 #include "Equipment/FGEquipment.h"
 
+TAutoConsoleVariable<int32> CVarWeaponDebug(TEXT("CVarWeaponDebug"), 0, TEXT(""));
 void AFGWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AFGWeapon, mWeaponState);
@@ -17,7 +18,6 @@ AFGWeapon::AFGWeapon() : Super() {
 	this->mWeaponState = EWeaponState::EWS_Unequipped;
 	this->mAutomaticallyReload = false;
 	this->mAutoReloadDelay = 0.5;
-	this->mCurrentAmmoCount = 0;
 	this->mDesiredAmmoClass = nullptr;
 	this->mCurrentAmmunitionClass = nullptr;
 	this->mAttachMagazineToPlayer = false;

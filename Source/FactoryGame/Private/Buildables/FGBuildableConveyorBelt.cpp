@@ -7,6 +7,7 @@
 
 AFGBuildableConveyorBelt::AFGBuildableConveyorBelt() : Super() {
 	this->mMesh = nullptr;
+	this->mCollisionProxyMesh = nullptr;
 	this->mMeshLength = 0.0;
 	this->mSplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("SplineComponent"));
 	this->mSoundSplineComponent = nullptr;
@@ -45,6 +46,7 @@ AFGBuildableConveyorBelt* AFGBuildableConveyorBelt::Respline(AFGBuildableConveyo
 void AFGBuildableConveyorBelt::OnUseServerRepInput( AFGCharacterPlayer* byCharacter, uint32 itemRepID, float itemOffset){ }
 void AFGBuildableConveyorBelt::SetShadowCasting(bool inStateBelt, bool inStateItems){ }
 void AFGBuildableConveyorBelt::DestroyVisualItems(){ }
+void AFGBuildableConveyorBelt::PostSerializedFromBlueprint(){ }
 bool AFGBuildableConveyorBelt::VerifyDefaults(FString& out_message){ return bool(); }
 void AFGBuildableConveyorBelt::TickItemTransforms(float dt){ }
 void AFGBuildableConveyorBelt::TickRadioactivity(){ }

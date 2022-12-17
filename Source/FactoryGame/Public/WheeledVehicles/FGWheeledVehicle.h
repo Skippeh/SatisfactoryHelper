@@ -4,11 +4,9 @@
 
 #include "FactoryGame.h"
 #include "FGVehicle.h"
-#include "ItemAmount.h"
 #include "PhysXPublic.h"
 #include "WheeledVehicles/FGSplinePathMovementComponent.h"
 #include "FGVehicleSubsystem.h"
-#include "FGActorRepresentationInterface.h"
 #include "FGWheeledVehicle.generated.h"
 
 // TODO: migrate from PhysX to Chaos; in the meantime, stfu
@@ -366,6 +364,8 @@ public:
 	void DockToRefuelingStation();
 
 	void FindSurroundingLevels();
+
+	virtual void UpdatePlayerStatus() override;
 
 protected:
 	// Begin AFGVehicle interface
@@ -1012,11 +1012,11 @@ private:
 	UPROPERTY( SaveGame )
 	float mTargetWaitTime = 0.0f;
 
-	bool mIsAboveSolidGround = false;
-
 	TWeakObjectPtr< AActor > mOverlappingActor;
 
 	float mNextTimeToCheckForLost = 0.0f;
 
-	TArray< ULevel* > mSurroundingLevels;
+	bool mAreSurroundingLevelsLoaded = false;
+	TArray< AFGVehicleSubsystem::TileLevelData* > mSurroundingTiles;
+	TArray< AFGVehicleSubsystem::CaveLevelData* > mSurroundingCaves;
 };

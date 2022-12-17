@@ -3,6 +3,7 @@
 #include "FGFactorySettings.h"
 #include "Equipment/FGBuildGun.h"
 #include "Equipment/FGResourceScanner.h"
+#include "FGBlueprintShortcut.h"
 #include "FGBoomBoxPlayer.h"
 #include "FGEmoteShortcut.h"
 #include "FGFactoryCustomizationShortcut.h"
@@ -27,6 +28,7 @@ UFGFactorySettings::UFGFactorySettings() : Super() {
 	this->mDefaultPowerConnectionMesh = nullptr;
 	this->mClearanceMesh = nullptr;
 	this->mClearanceMaterial = nullptr;
+	this->mBlueprintProxyMaterial = nullptr;
 	this->mHologramLoopSound = nullptr;
 	this->mHologramSnapSound = nullptr;
 	this->mBuildGuideMesh = nullptr;
@@ -40,7 +42,6 @@ UFGFactorySettings::UFGFactorySettings() : Super() {
 	this->mBuildGunClass = AFGBuildGun::StaticClass();
 	this->mResourceScannerClass = AFGResourceScanner::StaticClass();
 	this->mResourceMinerClass = nullptr;
-	this->mBoomBoxClass = nullptr;
 	this->mBoomBoxPlayerClass = AFGBoomBoxPlayer::StaticClass();
 	this->mBoomBoxEquipmentDesc = UFGItemDescriptor::StaticClass();
 	this->mLegMesh = nullptr;
@@ -49,11 +50,10 @@ UFGFactorySettings::UFGFactorySettings() : Super() {
 	this->mRecipeShortcutClass = UFGRecipeShortcut::StaticClass();
 	this->mCustomizationShortcutClass = UFGFactoryCustomizationShortcut::StaticClass();
 	this->mEmoteShortcutClass = UFGEmoteShortcut::StaticClass();
+	this->mBlueprintShortcutClass = UFGBlueprintShortcut::StaticClass();
 	this->mNumHotbars = 2;
 	this->mNumPresetHotbars = 2;
 	this->mNumSlotsPerHotbar = 10;
-	this->mFluidToInventoryStackRate = 0;
-	this->mInventoryStackToFluidRate = 0;
 	this->mAddedPipeProductionPressure = 0.0;
 }
 UAkAudioEvent* UFGFactorySettings::GetRandomConstructionSound(){ return nullptr; }

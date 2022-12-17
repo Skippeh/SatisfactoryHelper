@@ -4,11 +4,11 @@
 #define __FACTORYGAME_H__
 
 #include "EngineMinimal.h"
-#include "EngineUtils.h"
+//#include "EngineUtils.h"
 
 #include "Net/UnrealNetwork.h"
 #include "Net/RepLayout.h"
-#include "Net/DataReplication.h"
+//#include "Net/DataReplication.h"
 #include "Engine/ActorChannel.h"
 #include "FGObjectReference.h"
 
@@ -16,14 +16,14 @@
 
 DECLARE_STATS_GROUP( TEXT( "AtmosphereUpdater" ), STATGROUP_AtmosphereUpdater, STATCAT_Advanced );
 DECLARE_STATS_GROUP( TEXT( "FactoryTick" ), STATGROUP_FactoryTick, STATCAT_Advanced );
+DECLARE_STATS_GROUP( TEXT( "FactoryQuick" ), STATGROUP_FactoryQuick, STATCAT_Advanced );
 DECLARE_STATS_GROUP( TEXT( "Sound Events auto-resume on animations" ), STATGROUP_SoundEventAutoResume, STATCAT_Advanced );
 DECLARE_STATS_GROUP( TEXT( "Execute on Interface" ), STATGROUP_ExecuteInterface, STATCAT_Advanced );
 
-static TAutoConsoleVariable<int32> CVarStressTestRadioActivity(
-	TEXT("CSS.Debug.MarkAllItemsAsRadioActive"),
-	0,
-	TEXT("CSS: Debug command to stress test radioacivity"),
-	ECVF_Cheat);
+#define FACTORY_QUICK_SCOPE_CYCLE_COUNTER(Stat) \
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT(#Stat),Stat,STATGROUP_FactoryQuick)
+
+extern TAutoConsoleVariable<int32> CVarStressTestRadioActivity; 
 
 // Useful for removing stuff that shouldn't be in public versions
 #ifndef IS_PUBLIC_BUILD
@@ -63,6 +63,7 @@ static const FName SHOWDEBUG_POOLER( TEXT( "Pooler" ) );
 static const FName SHOWDEBUG_SELF_DRIVING( TEXT( "SelfDriving" ) );
 static const FName SHOWDEBUG_FOG_OF_WAR( TEXT( "FogOfWar" ) );
 static const FName SHOWDEBUG_MAP_MARKERS( TEXT( "MapMarkers" ) );
+static const FName SHOWDEBUG_CENTRAL_STORAGE( TEXT( "CentralStorage" ) );
 
 /** Common show debug colors */
 static const FLinearColor DEBUG_TEXTWHITE( 0.9f, 0.9f, 0.9f );
@@ -115,6 +116,8 @@ DECLARE_LOG_CATEGORY_EXTERN( LogPipes, Warning, All );
 DECLARE_LOG_CATEGORY_EXTERN( LogSeasonalEvents, Log, All );
 DECLARE_LOG_CATEGORY_EXTERN( LogSigns, Log, All );
 DECLARE_LOG_CATEGORY_EXTERN( LogAnimInstanceFactory, Log, All );
+DECLARE_LOG_CATEGORY_EXTERN( LogFactoryBlueprint, Warning, All );
+DECLARE_LOG_CATEGORY_EXTERN( LogInventory, Log, All );
 
 
 /** Helpers when using interfaces */
@@ -166,10 +169,12 @@ static const FName CollisionProfileClearanceDetector( TEXT( "ClearanceDetector" 
 static const FName CollisionProfileRailroadVehicle( TEXT( "RailroadVehicle" ) );
 static const FName CollisionProfileDerailedRailroadVehicle( TEXT( "DerailedRailroadVehicle" ) );
 static const FName CollisionProfileDerailedRailroadVehicleHologram( TEXT( "DerailedRailroadVehicleHologram" ) );
+static const FName CollisionProfileBlueprintDesigner( TEXT( "BlueprintDesigner" ) );
 
 static const ECollisionChannel TC_BuildGun( ECC_GameTraceChannel5 );
 static const ECollisionChannel TC_WeaponInstantHit( ECC_GameTraceChannel6 );
 static const ECollisionChannel TC_WorldGrid( ECC_GameTraceChannel9 );
+static const ECollisionChannel TC_Interact( ECC_GameTraceChannel13 );
 
 static const ECollisionChannel OC_Projectile( ECC_GameTraceChannel1 );
 static const ECollisionChannel OC_Hologram( ECC_GameTraceChannel2 );
@@ -181,6 +186,8 @@ static const ECollisionChannel OC_WorldGrid( ECC_GameTraceChannel9 );
 static const ECollisionChannel OC_ClearanceDetector( ECC_GameTraceChannel10 );
 static const ECollisionChannel OC_RailroadVehicle( ECC_GameTraceChannel11 );
 static const ECollisionChannel OC_MapGeneration( ECC_GameTraceChannel12 );
+static const ECollisionChannel OC_BlueprintProxy( ECC_GameTraceChannel14 );
+static const ECollisionChannel OC_BlueprintDesigner( ECC_GameTraceChannel15 );
 
 /** Input Actions */
 static const FName PrimaryFireAction( TEXT( "PrimaryFire" ) );
@@ -277,16 +284,6 @@ inline FString NetmodeToString( ENetMode NM )
 #define QUICKNETMODE UE_LOG( LogTemp, Log, TEXT( "%s %s" ), *GetName(), NETMODE_STRING );
 
 #define FUNCTION_STRING ANSI_TO_TCHAR( __FUNCTION__ )
-
-/** Analytics Helper Macros */
-#define SEND_TOTAL_TRACK_COUNTER_ANALYTIC(__WORLD__, __SERVICE__, __STAT_KEY__, __STAT_ID__ , __COUNT__)	\
-if( auto* analytics = UFGGameInstance::GetAnalyticsServiceFromWorld(__WORLD__) ) analytics->SendTotalTrackedCounterAnalytic( __SERVICE__, __STAT_KEY__, __STAT_ID__, __COUNT__ )
-
-#define SEND_COUNTER_ANALYTIC(__WORLD__, __SERVICE__, __STAT_KEY__ , __COUNT__)	\
-if( auto* analytics = UFGGameInstance::GetAnalyticsServiceFromWorld(__WORLD__) ) analytics->SendCounterAnalytic( __SERVICE__, __STAT_KEY__, __COUNT__ )
-
-#define SEND_VALUE_ANALYTIC(__WORLD__, __SERVICE__, __STAT_KEY__, __STAT_ID__, __VALUE__) \
-if( auto* analytics = UFGGameInstance::GetAnalyticsServiceFromWorld(__WORLD__) ) analytics->SendValueAnalytic( __SERVICE__, __STAT_KEY__, __STAT_ID__, __VALUE__ )
 
 FORCEINLINE FString VarToFString( FVector2D var ) { return FString::Printf( TEXT( "(X=%f,Y=%f)" ), var.X, var.Y ); }
 FORCEINLINE FString VarToFString( uint64 var ) { return FString::Printf( TEXT( "%llu" ), var ); }

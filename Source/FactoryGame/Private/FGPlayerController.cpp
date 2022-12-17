@@ -35,6 +35,7 @@ void AFGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 bool AFGPlayerController::ReplicateSubobjects( UActorChannel* channel,  FOutBunch* bunch, FReplicationFlags* repFlags){ return bool(); }
 void AFGPlayerController::PostInitializeComponents(){ Super::PostInitializeComponents(); }
 void AFGPlayerController::BeginPlay(){ }
+void AFGPlayerController::EndPlay(const EEndPlayReason::Type endPlayReason){ }
 void AFGPlayerController::Destroyed(){ }
 void AFGPlayerController::OnRep_PlayerState(){ }
 void AFGPlayerController::SetPawn(APawn* inPawn){ }
@@ -69,6 +70,7 @@ void AFGPlayerController::CopyPresetHotbarToCurrentHotbar(int32 presetHotbarInde
 void AFGPlayerController::SetRecipeShortcutOnIndex(TSubclassOf<  UFGRecipe > recipe, int32 onIndex, int32 onHotbarIndex){ }
 void AFGPlayerController::SetCustomizationShortcutOnIndex(TSubclassOf<  UFGCustomizationRecipe > customizationRecipe, int32 onIndex){ }
 void AFGPlayerController::SetEmoteShortcutOnIndex(TSubclassOf<  UFGEmote > emote, int32 onIndex){ }
+void AFGPlayerController::SetBlueprintShortcutOnIndex(const FString& blueprintName, int32 onIndex){ }
 void AFGPlayerController::RemovePlayerColorPresetAtIndex(int32 index){ }
 void AFGPlayerController::Server_RemovePlayerColorPresetAtIndex_Implementation(int32 index){ }
 void AFGPlayerController::AddPlayerColorPreset(FText presetName, FLinearColor color){ }
@@ -117,7 +119,9 @@ TSubclassOf< UFGMapArea > AFGPlayerController::GetCurrentMapArea() const{ return
 void AFGPlayerController::OnAreaEnteredServer_Implementation(TSubclassOf< UFGMapArea > newArea){ }
 void AFGPlayerController::OnSecondaryFire(){ }
 void AFGPlayerController::OnBuildGunStateChanged(EBuildGunState newState){ }
+void AFGPlayerController::OnBuildGunRecipeChanged(TSubclassOf<class UFGRecipe> recipe){ }
 void AFGPlayerController::OnPauseGamePressed(){ }
+UFGGameUI* AFGPlayerController::GetGameUI() const{ return nullptr; }
 void AFGPlayerController::PonderRemoveDeadPawn(){ }
 AFGCharacterBase* AFGPlayerController::GetControlledCharacter() const{ return nullptr; }
 bool AFGPlayerController::ControlledCharacterIsAliveAndWell() const{ return bool(); }
@@ -144,13 +148,13 @@ void AFGPlayerController::TogglePhotoMode(){ }
 void AFGPlayerController::ToggleHiResPhotoMode(){ }
 void AFGPlayerController::IncrementPhotoModeFOV(){ }
 void AFGPlayerController::DecrementPhotoModeFOV(){ }
-UFGGameUI* AFGPlayerController::GetGameUI() const{ return nullptr; }
 void AFGPlayerController::SetupTutorial(){ }
 void AFGPlayerController::FinishRespawn(){ }
 void AFGPlayerController::Server_SetRecipeShortcutOnIndex_Implementation(TSubclassOf<class UFGRecipe> recipe, int32 onIndex, int32 onHotbarIndex){ }
 bool AFGPlayerController::Server_SetRecipeShortcutOnIndex_Validate(TSubclassOf<class UFGRecipe> recipe, int32 onIndex, int32 onHotbarIndex){ return bool(); }
 void AFGPlayerController::Server_SetCustomizationShortcutOnIndex_Implementation(TSubclassOf<  UFGCustomizationRecipe > customizationRecipe, int32 onIndex){ }
 void AFGPlayerController::Server_SetEmoteShortcutOnIndex_Implementation(TSubclassOf<  UFGEmote > emote, int32 onIndex){ }
+void AFGPlayerController::Server_SetBlueprintShortcutOnIndex_Implementation(const FString& blueprintName, int32 onIndex){ }
 void AFGPlayerController::Server_SetHotbarIndex_Implementation(int32 index){ }
 bool AFGPlayerController::Server_SetHotbarIndex_Validate(int32 index){ return bool(); }
 void AFGPlayerController::Server_CreatePresetHotbarFromCurrentHotbar_Implementation(const FText& presetName, int32 iconIndex){ }

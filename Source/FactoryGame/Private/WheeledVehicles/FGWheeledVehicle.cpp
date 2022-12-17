@@ -27,7 +27,6 @@ AFGWheeledVehicle::AFGWheeledVehicle() : Super() {
 	this->mIsLoadingVehicle = false;
 	this->mIsUnloadingVehicle = false;
 	this->mIsInAir = false;
-	this->mNumWheelsOnGround = 0;
 	this->mVehicleMovement = nullptr;
 	this->mDistBetweenDecals = 50.0;
 	this->mDecalLifespan = 5.0;
@@ -49,7 +48,6 @@ AFGWheeledVehicle::AFGWheeledVehicle() : Super() {
 	this->mReplicatedState.AddedAngularVelocityInputYaw = 0.0;
 	this->mFuelInventory = nullptr;
 	this->mStorageInventory = nullptr;
-	this->mInventorySize = 0;
 	this->mTireEffectSocketName = TEXT("");
 	this->mTargetNodeLinkedList = nullptr;
 	this->mAddedAngularVelocityInputPitch = 0.0;
@@ -149,6 +147,7 @@ void AFGWheeledVehicle::CalculateManualDockingState(){ }
 void AFGWheeledVehicle::SetRefuelingStation( AFGBuildableDockingStation* station){ }
 void AFGWheeledVehicle::DockToRefuelingStation(){ }
 void AFGWheeledVehicle::FindSurroundingLevels(){ }
+void AFGWheeledVehicle::UpdatePlayerStatus(){ }
 void AFGWheeledVehicle::Died(AActor* thisActor){ }
 void AFGWheeledVehicle::SetSimulated(bool newIsSimulated){ }
 void AFGWheeledVehicle::CreateInventoryItemDrops_Implementation(){ }

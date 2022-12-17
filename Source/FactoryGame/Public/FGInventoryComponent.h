@@ -39,16 +39,29 @@ public:
 	/** @return true if this item has a state; otherwise false. */
 	FORCEINLINE bool HasState() const { return ItemState.IsValid(); }
 
-public:
+	FORCEINLINE TSubclassOf< class UFGItemDescriptor > GetItemClass() const { return ItemClass; }
+
+	void SetItemClass(TSubclassOf< class UFGItemDescriptor > NewItemClass );
+
+	FORCEINLINE int32 GetItemStackSize() const { return CachedStackSize; }
+
+	// TODO make private later.
+	/** Cached size of the item */
+	mutable int32 CachedStackSize = INDEX_NONE;
+	
+private:
 	/** The type of item */
 	UPROPERTY( EditAnywhere )
 	TSubclassOf< class UFGItemDescriptor > ItemClass;
 
+
+	
+public:
 	/** Optionally store an actor, e.g. an equipment, so we can remember it's state. */
 	UPROPERTY()
 	FSharedInventoryStatePtr ItemState;
 };
-FORCEINLINE FString VarToFString( FInventoryItem var ){ return FString::Printf( TEXT( "%s: {%s}" ), *VarToFString(var.ItemClass), *VarToFString(var.ItemState) ); }
+FORCEINLINE FString VarToFString( FInventoryItem var ){ return FString::Printf( TEXT( "%s: {%s}" ), *VarToFString(var.GetItemClass()), *VarToFString(var.ItemState) ); }
 
 /** Enable custom serialization of FInventoryItem */
 template<>
@@ -91,8 +104,11 @@ public:
 	/** Number of items in this stack. */
 	UPROPERTY( EditAnywhere, SaveGame )
 	int32 NumItems;
+
+	/* */
+	int32 CachedMaxStackSize = INDEX_NONE;
 };
-FORCEINLINE bool IsValidForLoad( const FInventoryStack& element ){ return element.Item.ItemClass != nullptr; }
+FORCEINLINE bool IsValidForLoad( const FInventoryStack& element ){ return element.Item.GetItemClass() != nullptr; }
 
 template<>
 struct TStructOpsTypeTraits<FInventoryStack> : public TStructOpsTypeTraitsBase2<FInventoryStack>
@@ -252,6 +268,18 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "Inventory" )
 	virtual int32 AddStackToIndex( int32 idx, const FInventoryStack& stack, bool allowPartial = false );
 
+	FORCEINLINE int32 AddSingleItemToEmptyIndex_Unsafe( int32 idx, const FInventoryItem& item )
+	{
+		FInventoryStack& stackAtIdx = mInventoryStacks[ idx ];
+
+		stackAtIdx.Item = item;
+		stackAtIdx.NumItems = 1;
+
+		OnItemsAdded( idx, 1 );
+	
+		return 1;
+	}
+
 	/**
 	 * Get the item of a slot.
 	 * @note true if valid index, it is the callers responsibility to check if the slot contains an item or not.
@@ -308,12 +336,17 @@ public:
 	{
 		fgcheckf( mInventoryStacks.Num() > 0 , TEXT( "Inventory need to be initialized before use %s" ), SHOWVAR( mInventoryStacks.Num() ) );
 		
-		if( !IsValidIndex( idx ) )
+		if( UNLIKELY( !IsValidIndex( idx ) ) )
 		{
 			UE_LOG( LogGame, Warning, TEXT( "RemoveFromIndex failed cause invalid index (%i) in component '%s'" ), idx, *GetName() );
 			return false;
 		}
 		
+		return !mInventoryStacks[ idx ].HasItems();
+	}
+
+	FORCEINLINE bool IsIndexEmpty_Unsafe( int32 idx ) const
+	{
 		return !mInventoryStacks[ idx ].HasItems();
 	}
 	
@@ -342,7 +375,7 @@ public:
 	/**
 	 * Get the number of items we have of the specified class.
 	 *
-	 * @param itemClass - The items class.
+	 * @param itemClass - The items class. If null then all items are counted.
 	 *
 	 * @return Total amount of the item we have in the inventory.
 	 */
@@ -417,6 +450,8 @@ public:
 	/** This returns the arbitrary slot size if one is set, otherwise the stack size */
 	UFUNCTION( BlueprintPure, Category = "Slot Size" )
 	int32 GetSlotSize( int32 index, TSubclassOf< UFGItemDescriptor > itemDesc = nullptr ) const;
+	
+	int32 GetSlotSizeForItem( int32 index, TSubclassOf< UFGItemDescriptor > itemDesc = nullptr, const FInventoryItem* Item = nullptr ) const;
 
 	/**
 	 * Set the allowed item type for this slot, can only be one item.
@@ -467,6 +502,9 @@ public:
 	FORCEINLINE bool GetSurpressOnItmeAddedDelegate() const { return mSurpressOnItemAddedDelegateCalls; }
 	FORCEINLINE bool GetSurpressOnItemRemovedDelegate() const { return mSurpressOnItemRemovedDelegateCalls; }
 	
+	UFUNCTION( BlueprintCallable, Category = "Inventory" )
+	class AFGEquipment* GetStackEquipmentActorAtIdx( const int32 index ) const;
+
 protected:
 	/** Used to call OnItemAdded/OnItemRemoved on clients */
 	UFUNCTION()

@@ -158,11 +158,14 @@ public:
 	/** Adds a buildable to the buildable array. */
 	void AddBuildable( class AFGBuildable* buildable );
 
+	/**
+	 * Notify the subsystem a buildable was spawned inside the designer for any special logic that needs to run even if
+	 * the buildable is not added to the buildable tick groups
+	 */
+	void OnDesignerBuildableSpawned( AFGBuildable* buildable );
+
 	/** Adds a conveyor to the conveyor buckets */
 	void AddConveyor( AFGBuildableConveyorBase* conveyor );
-
-	/** Cleans up fog planes spawned by this buildable. */
-	void RemoveFogPlanes(class AFGBuildable* buildable);
 	
 	/** 
 	* Get the connected conveyor belt from the given connection. 
@@ -243,10 +246,9 @@ public:
 
 	/** Debug */
 	virtual void DisplayDebug( class UCanvas* canvas, const class FDebugDisplayInfo& debugDisplay, float& YL, float& YPos ) override;
-	void DebugEnableInstancing( bool enabled );
 	void DebugGetFactoryActors( TArray< AActor* >& out_actors );
 
-	static FName GetMeshMapName(UStaticMesh* mesh, UMeshComponent* sourceComponent);
+	static FName GetMeshMapName( UStaticMesh* mesh, UMeshComponent* sourceComponent );
 	
 	/** Returns the factory stat ID of the object used for the profiling tool. */
 	FORCEINLINE TStatId GetFactoryStatID( bool forDeferredUse = false ) const
@@ -311,6 +313,9 @@ public:
 		return mCurrentSubStep == mCurrentSubStepMax;
 	}
 
+	/* Get "world time" for factory simulation. */
+	FORCEINLINE float GetFactorySimulationTime() const { return mAccumulatedFactorySimulationTime; }
+
 	// Called from BuildGunPaint for previewing skin logic
 	TArray< TSubclassOf< class AFGBuildable >> GetPreviewSkinsOnBuildableList() { return mPreviewSkinsOnBuildablesList; }
 	
@@ -330,7 +335,6 @@ private:
 	void UpdateReplayEffects( float dt );
 
 	/** Internal helpers to setup a buildable that is registered. */
-	void AddBuildableMeshInstances( class AFGBuildable* buildable );
 	void AddToTickGroup( AFGBuildable* buildable );
 	void RemoveFromTickGroup( AFGBuildable* buildable );
 	void SetupColoredMeshInstances( AFGBuildable* buildable );
@@ -459,10 +463,7 @@ private:
 	/** Hierarchical instances for the factory Legs. */
 	UPROPERTY( EditAnywhere, Category = "FactoryLeg Instance Actor" )
 	AActor* mFactoryLegInstancesActor;
-
-	UPROPERTY()
-	TMap< class UStaticMesh*, class UProxyHierarchicalInstancedStaticMeshComponent* > mBuildableMeshInstances;
-
+	
 	/**/
 	UPROPERTY()
 	UFGProductionIndicatorInstanceManager* mProductionIndicatorInstanceManager = nullptr;
@@ -470,7 +471,6 @@ private:
 	/** Map of colorable static meshes to their corresponding instance manager */
 	UPROPERTY(EditAnywhere, Category="Colored Instance Managers" )
 	TMap< FName, class UFGColoredInstanceManager* > mColoredInstances;
-//	TMap< class UStaticMesh*, class UFGColoredInstanceManager* > mColoredInstances;
 
 	/** Map of factory leg meshes to their corresponding instance manager */
 	UPROPERTY( EditAnywhere, Category = "Factory Leg Instance Managers" )
@@ -602,6 +602,8 @@ private:
 	UPROPERTY()
 	TMap < int32, TSubclassOf< class UFGFactoryCustomizationDescriptor_Swatch > > mSlotToSwatchDescMigrationMap;
 
+	/* World time for the factory tick*/
+	float mAccumulatedFactorySimulationTime;
 };
 
 template< typename T >

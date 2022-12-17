@@ -10,21 +10,22 @@
 #include "UI/Message/FGMessageBase.h"
 #include "FGActorRepresentation.h"
 #include "FGHotbarShortcut.h"
+#include "FGCreatureSubsystem.h"
+#include "ShoppingList/FGShoppingListComponent.h"
 #include "FGPlayerState.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnBuildableConstructedNew, TSubclassOf< class UFGItemDescriptor >, itemDesc );
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnHotbarUpdatedForMaterialDescriptor, TSubclassOf< class UFGFactoryCustomizationDescriptor_Material >, materialDesc );
 DECLARE_DELEGATE( FOnHotbarReplicated );
 DECLARE_DYNAMIC_MULTICAST_DELEGATE( FOnPublicTodoListUpdated );
-DECLARE_DYNAMIC_MULTICAST_DELEGATE( FOnShoppingListUpdated );
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnSlotDataUpdated, class AFGPlayerState*, playerState  );
 
 
 /**
- * Collected data for a slot that is specified
+ * The color data for a player
  */
 USTRUCT( BlueprintType )
-struct FACTORYGAME_API FSlotData
+struct FACTORYGAME_API FPlayerColorData
 {
 	GENERATED_BODY();
 
@@ -36,7 +37,7 @@ struct FACTORYGAME_API FSlotData
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Color")
 	FLinearColor NametagColor;
 
-	FORCEINLINE bool operator==( const FSlotData& other ) const{
+	FORCEINLINE bool operator==( const FPlayerColorData& other ) const{
 		return other.PingColor == PingColor && other.NametagColor == NametagColor;
 	}
 };
@@ -145,6 +146,16 @@ struct FShoppingListSettings
 	float Size;
 };
 
+USTRUCT( BlueprintType )
+struct FPlayerRules
+{
+	GENERATED_BODY()
+
+	/** What kind of hostility creatures should have agaisnt this player. */
+	UPROPERTY( SaveGame, BlueprintReadOnly )
+	EPlayerHostilityMode CreatureHostilityMode;
+};
+
 UCLASS()
 class FACTORYGAME_API AFGPlayerState : public APlayerState, public IFGSaveInterface
 {
@@ -196,10 +207,21 @@ public:
 	FORCEINLINE void SetSlotNum( int32 slotNr ){ mSlotNum = slotNr; }
 	
 	/** Set the color data for this player */
-	void SetSlotData( FSlotData slotData );
+	void SetPlayerColorData( FPlayerColorData slotData );
 
 	/** get the color data for this player */
-	FORCEINLINE FSlotData GetSlotData() const { return mSlotData; }
+	FORCEINLINE FPlayerColorData GetSlotData() const { return mPlayerColorData; }
+
+	/** Gets the player rules for this player. */
+	UFUNCTION( BlueprintPure, Category="FactoryGame|Rules" )
+	const FPlayerRules& GetPlayerRules() const { return mPlayerRules; }
+
+	/** Used to set the creature hostility against this player. */
+	UFUNCTION( BlueprintCallable, Category="FactoryGame|Rules" )
+	void SetCreatureHostility( EPlayerHostilityMode hostility );
+
+	UFUNCTION( Server, Reliable )
+	void Server_SetCreatureHostility( EPlayerHostilityMode hostility );
 
 	/** Get the unique ID of the user from the online subsystem */
 	UFUNCTION( BlueprintPure, Category="FactoryGame|Networking" )
@@ -335,6 +357,9 @@ public:
 	/** Set the emote shortcut on the index if valid */
 	void SetEmoteShortcutOnIndex( TSubclassOf< class UFGEmote > emote, int32 onIndex );
 
+	/** Set the blueprint shortcut on the index if it's valid */
+	void SetBlueprintShortcutOnIndex( const FString& blueprintName, int32 onIndex );
+
 	/** Get the current value of first time equipped and then sets the value to false. */
 	bool GetAndSetFirstTimeEquipped( class AFGEquipment* equipment );
 
@@ -381,6 +406,10 @@ public:
 	/** Let server set if we only should show affordable recipes in manufacturing widgets */
 	UFUNCTION( Server, Reliable, WithValidation, Category = "FactoryGame|Recipes" )
 	void Server_SetOnlyShowAffordableRecipes( bool enabled );
+
+	/** Get if we should we try to take items from inventory before central storage when building or crafting */
+	UFUNCTION( BlueprintPure, Category = "FactoryGame|CentralStorage" )
+	FORCEINLINE bool GetTakeFromInventoryBeforeCentralStorage() { return true; }
 
 	/** Get the item categories that the user have collapsed in manufacturing widgets  */
 	UFUNCTION( BlueprintPure, Category = "FactoryGame|ItemCategory" )
@@ -431,10 +460,10 @@ public:
 	void Server_SetMapCategoryCollapsed( ERepresentationType mapCategory, bool collapsed );
 
 	UFUNCTION( BlueprintPure, Category = "FactoryGame|Color" )
-	FORCEINLINE FLinearColor GetPingColor() const { return mSlotData.PingColor; }
+	FORCEINLINE FLinearColor GetPingColor() const { return mPlayerColorData.PingColor; }
 	
 	UFUNCTION( BlueprintPure, Category = "FactoryGame|Color" )
-	FORCEINLINE FLinearColor GetNametagColor() const { return mSlotData.NametagColor; }
+	FORCEINLINE FLinearColor GetNametagColor() const { return mPlayerColorData.NametagColor; }
 
 	void UpdateOwningPawnActorRepresentation() const;
 
@@ -572,8 +601,27 @@ public:
 	UFUNCTION( Server, Reliable )
 	void Server_SetWidgetHasBeenOpened( TSubclassOf< class UUserWidget > widget );
 
-	/** Checks if the player state is in the player array. Tried to use IsInactive but it's not updated when a palyer state is loaded an is inactive.
-	 *  And I don't want to start chaning that logic since other things might depend on it. -K2
+	UFUNCTION( BlueprintPure, Category = "Shopping List"  )
+	UFGShoppingListComponent* GetShoppingListComponent() const { return mShoppingListComponent; }
+
+	// On recipe constructed could mean both constructing buildings and crafting items
+	UFUNCTION( Client, Reliable )
+	void Client_OnRecipeConstructed( TSubclassOf< class UFGRecipe > recipe, int32 numConstructed );
+	void Native_OnRecipeConstructed( TSubclassOf< class UFGRecipe > recipe, int32 numConstructed );
+	void Native_OnBlueprintConstructed( const FString& blueprintName, int32 numConstructed );
+
+	// Not the prettiest solution but handles when blueprints are removed. We should have an event in blueprint subsystem instead
+	UFUNCTION( Server, Reliable, BlueprintCallable )
+	void Server_OnBlueprintRemoved( const FString& blueprintName );
+	UFUNCTION( Client, Reliable )
+	void Client_OnBlueprintRemoved( const FString& blueprintName );
+
+	// Only for migration purposes.
+	UFUNCTION( BlueprintImplementableEvent )
+	TArray< FShoppingListRecipeEntry > GetAndClearShoppingListForMigration();
+	
+	/** Checks if the player state is in the player array. Tried to use IsInactive but it's not updated when a player state is loaded and is inactive.
+	 *  And I don't want to start chancing that logic since other things might depend on it. -K2
 	 */
 	bool IsInPlayerArray();
 
@@ -590,12 +638,23 @@ protected:
 	void OnRep_CurrentHotbarIndex();
 	
 	UFUNCTION()
-	void OnRep_SlotData();
+	void OnRep_PlayerColorData();
+
+	UFUNCTION()
+	void OnRep_PlayerRules();
 
 private:
 	/** Server function for updating number observed inventory slots */
 	UFUNCTION( Server, Reliable, WithValidation )
 	void Server_UpdateNumObservedInventorySlots();
+
+	void Native_OnPlayerColorDataUpdated();
+
+	void SetupPlayerRules();
+
+	void PushRulesToGameModesSubssytem();
+
+	void OnCreatureHostilityModeUpdated( FString strId, FVariant value );
 
 public:
 	/** Broadcast when a buildable or decor has been constructed. */
@@ -615,8 +674,8 @@ public:
 	UPROPERTY( BlueprintAssignable, BlueprintCallable, Category = "Shopping List")
 	FOnShoppingListUpdated mOnShoppingListUpdated;
 
-	UPROPERTY( BlueprintAssignable, Category = "SlotData")
-	FOnSlotDataUpdated mOnSlotDataUpdated;
+	UPROPERTY( BlueprintAssignable, Category = "ColorData")
+	FOnSlotDataUpdated mOnColorDataUpdated;
 
 protected:
 	/** All hotbar actions assigned */
@@ -655,8 +714,12 @@ protected:
 	int32 mSlotNum;
 
 	/** This players color container */
-	UPROPERTY( ReplicatedUsing=OnRep_SlotData )
-	FSlotData mSlotData;
+	UPROPERTY( ReplicatedUsing=OnRep_PlayerColorData )
+	FPlayerColorData mPlayerColorData;
+
+	/** Gameplay Rules set specifically for this player. */
+	UPROPERTY( SaveGame, ReplicatedUsing=OnRep_PlayerRules )
+	FPlayerRules mPlayerRules;
 
 	/** Pawn we should take control of when rejoining game/loading game */
 	UPROPERTY( SaveGame )
@@ -704,7 +767,7 @@ private:
 	/** True if we only should show affordable recipes in manufacturing widgets  */
 	UPROPERTY( SaveGame, Replicated )
 	bool mOnlyShowAffordableRecipes;
-
+	
 	/** The item categories that the user have collapsed in manufacturing widgets  */
 	UPROPERTY( SaveGame, Replicated )
 	TArray< TSubclassOf< class UFGItemCategory > > mCollapsedItemCategories;
@@ -738,6 +801,9 @@ private:
 	/** The personal todolist. Only replicated on initial send. Then RPCed back to server for saving. */
 	UPROPERTY( SaveGame, Replicated )
 	FString mPrivateTodoList;
+	
+	UPROPERTY( SaveGame, Replicated )
+	class UFGShoppingListComponent* mShoppingListComponent;
 
 	/** The current factory clipboard. Used to copy and paste settings between buildings. Buildings with the same key use can copy/paste between each other.
 	 *	The key is usually the most derived class for the building/object but can be changed by developers to share key with other buildings. Key could be any UObject subclass.
@@ -745,7 +811,7 @@ private:
 	UPROPERTY( Transient )
 	TMap< TSubclassOf<UObject>, class UFGFactoryClipboardSettings* > mFactoryClipboard;
 
-	/** Track wheter or not we opened a widget */
+	/** Track whether or not we opened a widget */
 	UPROPERTY( Transient ) 
 	TArray< TSubclassOf< class UUserWidget > > mOpenedWidgetsThisSession;
 	UPROPERTY( SaveGame, Replicated ) 

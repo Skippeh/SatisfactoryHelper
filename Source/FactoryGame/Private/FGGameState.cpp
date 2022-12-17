@@ -18,7 +18,6 @@ AFGGameState::AFGGameState() : Super() {
 	this->mMapManager = nullptr;
 	this->mRadioactivitySubsystem = nullptr;
 	this->mChatManager = nullptr;
-	this->mCentralStorageSubsystem = nullptr;
 	this->mPipeSubsystem = nullptr;
 	this->mUnlockSubsystem = nullptr;
 	this->mResourceSinkSubsystem = nullptr;
@@ -31,9 +30,8 @@ AFGGameState::AFGGameState() : Super() {
 	this->mSignSubsystem = nullptr;
 	this->mCreatureSubsystem = nullptr;
 	this->mScannableSubsystem = nullptr;
-	this->mPlayDurationWhenLoaded = 0;
+	this->mBlueprintSubsystem = nullptr;
 	this->mReplicatedSessionName = TEXT("");
-	this->mReplicadedOnlineNumPubliclConnections = 0;
 	this->mUnlockCustomizerSchematic = nullptr;
 	this->mPlannedRestartTime = 24.0;
 	this->mHubPartClass = nullptr;
@@ -44,7 +42,6 @@ AFGGameState::AFGGameState() : Super() {
 	this->mIsTradingPostBuilt = false;
 	this->mHasInitalTradingPostLandAnimPlayed = false;
 	this->mIsSpaceElevatorBuilt = false;
-	this->mServerLocalDateTimeTicksAtInit = 0LL;
 	this->mPublicTodoList = TEXT("");
 	this->PrimaryActorTick.TickGroup = ETickingGroup::TG_PrePhysics;
 	this->PrimaryActorTick.EndTickGroup = ETickingGroup::TG_PrePhysics;
@@ -76,7 +73,9 @@ void AFGGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(AFGGameState, mEventSubsystem);
 	DOREPLIFETIME(AFGGameState, mDroneSubsystem);
 	DOREPLIFETIME(AFGGameState, mSignSubsystem);
+	DOREPLIFETIME(AFGGameState, mCreatureSubsystem);
 	DOREPLIFETIME(AFGGameState, mScannableSubsystem);
+	DOREPLIFETIME(AFGGameState, mBlueprintSubsystem);
 	DOREPLIFETIME(AFGGameState, mVisitedMapAreas);
 	DOREPLIFETIME(AFGGameState, mPickedUpItems);
 	DOREPLIFETIME(AFGGameState, mPlayDurationWhenLoaded);
@@ -123,6 +122,9 @@ void AFGGameState::GetVisitedMapAreas(TArray< TSubclassOf< UFGMapArea > >& out_V
 bool AFGGameState::IsMapAreaVisisted(TSubclassOf< UFGMapArea > inArea){ return bool(); }
 void AFGGameState::AddUniqueVisistedMapArea(TSubclassOf< UFGMapArea > mapArea){ }
 void AFGGameState::OnRep_MapAreaVisited(){ }
+void AFGGameState::SetCheatNoPower(bool noPower){ }
+void AFGGameState::SetCheatNoCost(bool noCost){ }
+void AFGGameState::SetCheatNoFuel(bool noFuel){ }
 void AFGGameState::NotifyPlayerAdded( AFGCharacterPlayer* inPlayer){ }
 void AFGGameState::SendMessageToAllPlayers(TSubclassOf<  UFGMessageBase > inMessage){ }
 void AFGGameState::SendMessageToPlayer(TSubclassOf<  UFGMessageBase > inMessage,  APlayerController* controller){ }
@@ -152,3 +154,5 @@ void AFGGameState::OnRep_TetrominoLeaderBoard(){ }
 void AFGGameState::Server_SetPublicTodoList(const FString& newTodoList){ }
 void AFGGameState::CheckRestartTime(){ }
 void AFGGameState::OnRep_PlannedRestartTime(){ }
+void AFGGameState::SubmitNumPlayersTelemetry() const{ }
+void AFGGameState::SubmitCheatTelemetry() const{ }

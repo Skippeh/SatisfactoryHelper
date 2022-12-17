@@ -41,7 +41,7 @@ AActor* AFGCreatureController::GetRandomWeightedTarget(ETargetVisibilityRequirem
 AActor* AFGCreatureController::GetRandomTarget(ETargetVisibilityRequirement visibilityRequirement, float minimumAggro) const{ return nullptr; }
 AActor* AFGCreatureController::GetNearestAlertTarget() const{ return nullptr; }
 bool AFGCreatureController::GetNearestAlertLocation(FVector& out_location) const{ return bool(); }
-UNavigationPath* AFGCreatureController::GetCachedPathToTarget(AActor* target, float cacheLifetime){ return nullptr; }
+UNavigationPath* AFGCreatureController::GetCachedPathToTarget(AActor* target, float cacheLifetime , TSubclassOf< UNavigationQueryFilter > queryFilter){ return nullptr; }
 float AFGCreatureController::GetAggroForTarget(const AActor* target) const{ return float(); }
 float AFGCreatureController::GetVisibilityLevelForTarget(const AActor* target) const{ return float(); }
 bool AFGCreatureController::IsTargetFullyVisible(const AActor* target) const{ return bool(); }
@@ -54,8 +54,8 @@ void AFGCreatureController::SetStressLevelToMax(bool bImmediateStateUpdate){ }
 void AFGCreatureController::ModifyStressLevel(float stressModification, bool bImmediateStateUpdate){ }
 bool AFGCreatureController::GetStimulusLocationToInvestigate(FVector& outLocation) const{ return bool(); }
 bool AFGCreatureController::TryUnstuckCreature(){ return bool(); }
+void AFGCreatureController::OnCreatureStuckInGeometry(){ }
 void AFGCreatureController::OnInterruptActionFinished_Implementation(bool success){ }
-void AFGCreatureController::OnHostilityModeUpdated(ECreatureHostility hostility){ }
 void AFGCreatureController::SetCurrentAction( UFGCreatureAction* action){ }
 void AFGCreatureController::OnActionSelectionComplete( UFGAction* selectedAction){ }
 void AFGCreatureController::OnCreatureMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode){ }
@@ -88,3 +88,4 @@ void AFGCreatureController::OnCreatureStunChanged(bool isStunned){ }
 void AFGCreatureController::ClearOutdatedRecentDamageTaken(){ }
 void AFGCreatureController::SenseActor(AActor* perceivedActor, const FAIStimulus& stimulus){ }
 AActor* AFGCreatureController::GetActualPerceivedActor(AActor* inActor) const{ return nullptr; }
+bool AFGCreatureController::CanBeHostileAgainstPlayer(const  AFGCharacterPlayer* player) const{ return bool(); }

@@ -31,6 +31,7 @@ void AFGSchematicManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 }
 void AFGSchematicManager::PreInitializeComponents(){ Super::PreInitializeComponents(); }
 void AFGSchematicManager::BeginPlay(){ }
+void AFGSchematicManager::EndPlay(const EEndPlayReason::Type endPlayReason){ }
 void AFGSchematicManager::Tick(float dt){ }
 void AFGSchematicManager::PreSaveGame_Implementation(int32 saveVersion, int32 gameVersion){ }
 void AFGSchematicManager::PostSaveGame_Implementation(int32 saveVersion, int32 gameVersion){ }
@@ -73,9 +74,11 @@ void AFGSchematicManager::GetVisibleSchematicCategoryData(ESchematicType schemat
 void AFGSchematicManager::PopulateSchematicsLists(){ }
 void AFGSchematicManager::PopulateAvailableSchematicsList(){ }
 void AFGSchematicManager::OnRep_ActiveSchematic(){ }
-void AFGSchematicManager::OnRep_PurchasedSchematic(){ }
+void AFGSchematicManager::OnRep_PurchasedSchematic(TArray< TSubclassOf< UFGSchematic > > lastPurchasedSchematics){ }
 void AFGSchematicManager::OnRep_PaidOffOnSchematic(){ }
 int32 AFGSchematicManager::FindHighestAvailableTechTier(){ return int32(); }
 FSchematicCost* AFGSchematicManager::FindSchematicPayOff(TSubclassOf<  UFGSchematic > schematic){ return nullptr; }
 void AFGSchematicManager::AddSchematicPayOff(TSubclassOf<  UFGSchematic > schematic, const TArray< FItemAmount >& amount){ }
 void AFGSchematicManager::RemoveSchematicPayOff(TSubclassOf<  UFGSchematic > schematic){ }
+void AFGSchematicManager::SubmitUnlockSchematicTelemetry(TSubclassOf< UFGSchematic > schematicClass){ }
+void AFGSchematicManager::SubmitMilestoneTelemetry(TSubclassOf< UFGSchematic > activeSchematic){ }

@@ -11,6 +11,8 @@
 #include "AI/FGStimulusAccumulator.h"
 #include "AI/FGDamageTypeAccumulator.h"
 
+#include "AI/Navigation/NavQueryFilter.h"
+
 #include "FGCreatureController.generated.h"
 
 namespace FGBBKeys
@@ -90,10 +92,11 @@ struct FFGCreaturePathToTarget
 
 	FFGCreaturePathToTarget() {}
 
-	FFGCreaturePathToTarget( AActor* target, float timeStamp, UNavigationPath* path )
+	FFGCreaturePathToTarget( AActor* target, float timeStamp, UNavigationPath* path, TSubclassOf< UNavigationQueryFilter > queryFilter )
 		: Target( target )
 		, TimeCached( timeStamp )
 		, PathObject( path )
+		, QueryFilter( queryFilter )
 	{}
 
 	UPROPERTY( BlueprintReadOnly )
@@ -104,6 +107,9 @@ struct FFGCreaturePathToTarget
 
 	UPROPERTY( BlueprintReadOnly )
 	UNavigationPath* PathObject = nullptr;
+
+	UPROPERTY( BlueprintReadOnly )
+	TSubclassOf< UNavigationQueryFilter > QueryFilter = nullptr;
 };
 
 USTRUCT( BlueprintType )
@@ -245,7 +251,7 @@ public:
 	bool GetNearestAlertLocation( FVector& out_location ) const;
 
 	UFUNCTION( BlueprintCallable, Category = "AI" )
-	UNavigationPath* GetCachedPathToTarget(AActor* target, float cacheLifetime = 0.2f);
+	UNavigationPath* GetCachedPathToTarget( AActor* target, float cacheLifetime = 0.2f, TSubclassOf< UNavigationQueryFilter > queryFilter = nullptr );
 
 	/** Gets the aggro of the specified target actor. */
 	UFUNCTION( BlueprintPure, Category = "AI" )
@@ -289,15 +295,18 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "AI" )
 	bool TryUnstuckCreature();
 
+	void OnCreatureStuckInGeometry();
+
+	/** Whether or not the creature is currently stuck and can't move. */
+	UFUNCTION( BlueprintPure, Category = "AI" )
+	bool IsStuck() const { return mIsStuck; }
+
 	/** Whether or not the creature is currently fleeing. */
 	UFUNCTION( BlueprintPure, Category = "AI" )
 	bool IsFleeing() const { return mIsFleeing; }
 
 	UFUNCTION( BlueprintNativeEvent, Category = "AI" )
 	void OnInterruptActionFinished(bool success);
-
-	/** Called when the hostility mode has been changed in the creature subsystem. */
-	void OnHostilityModeUpdated( ECreatureHostility hostility );
 
 	/** Gets the current action being performed by the creature. */
 	UFUNCTION( BlueprintPure, Category = "AI" )
@@ -424,6 +433,8 @@ private:
 	/** Sometimes a stimulus might come from an actor which belongs to another, such as a weapon which belongs to the player. This function would in that case return the player. */
 	AActor* GetActualPerceivedActor( AActor* inActor ) const;
 
+	bool CanBeHostileAgainstPlayer( const class AFGCharacterPlayer* player ) const;
+
 public:
 	/** Called whenever the creature state changes. */
 	UPROPERTY( BlueprintAssignable, Category = "AI" )
@@ -460,6 +471,10 @@ protected:
 	
 	UPROPERTY()
 	TArray< FFGCreatureAggroData > mAggroTargets;
+
+	/** Controllers who have been responsible for damaging us recently. */
+	UPROPERTY()
+	TArray< AController* > mAggressors;
 
 	UPROPERTY()
 	TArray< FFGCreatureVisibilityData > mVisibleTargets;
@@ -510,4 +525,7 @@ private:
 
 	/** Timer responsible for preventing the creature from being stunned by damage while the cooldown is active. */
 	FTimerHandle mStunDamageCooldownTimerHandle;
+
+	/** Will be true if the creature fails to unstuck and cant move. */
+	bool mIsStuck;
 };

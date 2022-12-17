@@ -2,6 +2,7 @@
 #include "Alpakit.h"
 #include "AlpakitModEntry.h"
 #include "Interfaces/IPluginManager.h"
+#include "Slate.h"
 
 #define LOCTEXT_NAMESPACE "AlpakitModListEntry"
 
@@ -26,16 +27,21 @@ void SAlpakitModEntryList::Construct(const FArguments& Args) {
                 .OnClicked(this,& SAlpakitModEntryList::UncheckAllMods)
             ]
         ]
-        + SVerticalBox::Slot().AutoHeight()[
-            SAssignNew(ModList, SListView<TSharedRef<IPlugin>>)
-            .SelectionMode(ESelectionMode::None)
-            .ListItemsSource(&FilteredMods)
-            .OnGenerateRow_Lambda(
-               [this](TSharedRef<IPlugin> Mod, const TSharedRef<STableViewBase>& List) {
-                   return SNew(STableRow<TSharedRef<IPlugin>>, List)[
-                       SNew(SAlpakitModEntry, Mod, SharedThis(this))
-                   ];
-               })
+        + SVerticalBox::Slot().FillHeight(1.0f)[
+            SNew(SScrollBox)
+                .Orientation(Orient_Vertical)
+                .ScrollBarAlwaysVisible(true)
+                + SScrollBox::Slot()[
+                    SAssignNew(ModList, SListView<TSharedRef<IPlugin>>)
+                    .SelectionMode(ESelectionMode::None)
+                    .ListItemsSource(&FilteredMods)
+                    .OnGenerateRow_Lambda(
+                        [this](TSharedRef<IPlugin> Mod, const TSharedRef<STableViewBase>& List) {
+                            return SNew(STableRow<TSharedRef<IPlugin>>, List)[
+                                SNew(SAlpakitModEntry, Mod, SharedThis(this))
+                            ];
+                        })
+                ]
         ]];
 
     LoadMods();
@@ -67,6 +73,14 @@ void SAlpakitModEntryList::LoadMods() {
     for (TSharedRef<IPlugin> Plugin : EnabledPlugins) {
         //Skip WWise, it is already shipped with the game
         if (Plugin->GetName() == TEXT("WWise")) {
+            continue;
+        }
+        //Skip AbstractInstance, it is already shipped with the game
+        if (Plugin->GetName() == TEXT("AbstractInstance")) {
+            continue;
+        }
+        //Skip SMLEditor, editor-only plugin
+        if (Plugin->GetName() == TEXT("SMLEditor")) {
             continue;
         }
         //Only include project plugins for now

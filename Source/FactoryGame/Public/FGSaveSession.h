@@ -295,6 +295,9 @@ public:
 	UFUNCTION( BlueprintPure, Category = "Factory Game|SaveSession" )
 	FORCEINLINE FString GetModMetadata() { return mModMetadata; }
 
+	/** Returns the unique identifier for this save. */
+	FORCEINLINE FString GetSaveIdentifier() { return mSaveHeader.SaveIdentifier; }
+
 	/** Logs all Unresolved object references stored in the Destroyed Actors array */
 	void DumpUnresolvedDestroyedActors();
 
@@ -306,6 +309,8 @@ public:
 	const TMap< FString, FPerLevelSaveData* >& GetPerLevelDataMap() const { return mPerLevelDataMap; }
 
 protected:
+	friend class AFGBlueprintSubsystem;
+	
 	// Load a save game that was created before the LevelStreaming save era
 	bool LoadPreLevelStreamingSave( FString saveName );
 

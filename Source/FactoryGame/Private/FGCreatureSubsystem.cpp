@@ -2,13 +2,9 @@
 
 #include "FGCreatureSubsystem.h"
 
-#if WITH_EDITOR
-void AFGCreatureSubsystem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent){ Super::PostEditChangeProperty(PropertyChangedEvent); }
-#endif 
 AFGCreatureSubsystem::AFGCreatureSubsystem() : Super() {
 	this->mMaxNumCreatures = 20;
 	this->mCreaturesCanAttackEachother = false;
-	this->mCreatureHostilityMode = ECreatureHostility::CH_Default;
 	this->PrimaryActorTick.TickGroup = ETickingGroup::TG_PrePhysics;
 	this->PrimaryActorTick.EndTickGroup = ETickingGroup::TG_PrePhysics;
 	this->PrimaryActorTick.bTickEvenWhenPaused = false;
@@ -23,8 +19,11 @@ void AFGCreatureSubsystem::RegisterSpawner( AFGCreatureSpawner* spawner){ }
 void AFGCreatureSubsystem::UnregisterSpawner( AFGCreatureSpawner* spawner){ }
 void AFGCreatureSubsystem::RegisterCreature( AFGCreature* creature){ }
 void AFGCreatureSubsystem::UnregisterCreature( AFGCreature* creature){ }
-void AFGCreatureSubsystem::SetCreatureHostility(ECreatureHostility hostility){ }
+void AFGCreatureSubsystem::RegisterFlyingBabyCrab( AFGFlyingBabyCrab* babyCrab){ }
+void AFGCreatureSubsystem::UnregisterFlyingBabyCrab( AFGFlyingBabyCrab* babyCrab){ }
+void AFGCreatureSubsystem::ForceTriggerSpawnersInRange(){ }
 bool AFGCreatureSubsystem::IsProtectedCreature(TSubclassOf<  AFGCreature > creatureClass) const{ return bool(); }
+void AFGCreatureSubsystem::SetCreatureStressEnabled(bool enabled){ }
 AFGCreatureSubsystem* AFGCreatureSubsystem::Get(UWorld* world){ return nullptr; }
 AFGCreatureSubsystem* AFGCreatureSubsystem::Get(UObject* worldContext){ return nullptr; }
 TSubclassOf< class UFGNoise > AFGCreatureSubsystem::GetNoiseClassFromFName(const FName& name) const{ return TSubclassOf<class UFGNoise>(); }

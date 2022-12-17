@@ -9,6 +9,7 @@
 #include "FGHUD.h"
 #include "FGOutlineComponent.h"
 #include "FGActorRepresentationInterface.h"
+#include "Equipment/FGBuildGun.h"
 #include "Creature/FGCreature.h"
 #include "FGInventoryComponentEquipment.h"
 
@@ -23,6 +24,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams( FOnBestUseableActorUpdated, bool, 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnReviveStarted, bool, isReviver );
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnReviveEnded, bool, isReviveCompleted );
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnPickupToCollectStateUpdated, bool, isActive );
+DECLARE_DELEGATE_OneParam( FOnEquipmentSpawned, class AFGEquipment* );
 
 UENUM( BlueprintType )
 enum class ECameraMode : uint8
@@ -93,7 +95,6 @@ public:
 	uint8 mEmote : 1;
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, category = "Input" )
 	uint8 mPhotoMode : 1;
-	
 };
 
 /**
@@ -119,28 +120,23 @@ public:
 };
 
 USTRUCT( BlueprintType )
-struct FACTORYGAME_API FFGCreaturePlayerPerceptionInfo
+struct FACTORYGAME_API FFGActorPlayerPerceptionInfo
 {
 	GENERATED_BODY()
 
-	FFGCreaturePlayerPerceptionInfo()
-		: Creature( nullptr )
+	FFGActorPlayerPerceptionInfo()
+		: Actor( nullptr )
 		, AggroLevel( 0.0f )
-		, VisibilityLevel( 0.0f )
 		, HasCalledInfoAddedEvent( false )
 	{}
 
-	/** The creature which is perceiving us. */
+	/** The actor which is perceiving us. */
 	UPROPERTY( BlueprintReadOnly )
-	class AFGCreature* Creature;
+	class AActor* Actor;
 	
 	/** Value representing the current aggro level of the creature. */
 	UPROPERTY( BlueprintReadOnly )
 	float AggroLevel;
-
-	/** Value representing the visibility level of the creature. */
-	UPROPERTY( BlueprintReadOnly )
-	float VisibilityLevel;
 
 private:
 	friend class AFGCharacterPlayer;
@@ -149,9 +145,9 @@ private:
 	bool HasCalledInfoAddedEvent;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnCreaturePerceptionInfoAdded, const FFGCreaturePlayerPerceptionInfo&, perceptionInfo );
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnCreaturePerceptionInfoRemoved, const FFGCreaturePlayerPerceptionInfo&, perceptionInfo );
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams( FOnCreaturePerceptionStateChanged, const FFGCreaturePlayerPerceptionInfo&, perceptionInfo, ECreatureState, newState );
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnActorPerceptionInfoAdded, const FFGActorPlayerPerceptionInfo&, perceptionInfo );
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnActorPerceptionInfoRemoved, const FFGActorPlayerPerceptionInfo&, perceptionInfo );
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams( FOnCreaturePerceptionStateChanged, const FFGActorPlayerPerceptionInfo&, perceptionInfo, ECreatureState, newState );
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnActiveEquipmentChangedInSlot, EEquipmentSlot, Slot );
 /**
  * Base class for all player characters in the game.
@@ -186,7 +182,7 @@ public:
 	virtual void Jump() override;
 	virtual void OnJumped_Implementation() override;
 
-	virtual bool CanJumpInternal_Implementation() const;
+	virtual bool CanJumpInternal_Implementation() const override;
 	// End Pawn Interface
 
 	// Begin ACharacter Interface
@@ -217,9 +213,10 @@ public:
 	// End IFGUseableInterface
 
 	// Begin IFGRadiationInterface
-	virtual void ReceiveRadiation_Implementation( float amount, float duration, FVector direction, TSubclassOf< UFGDamageType > damageType );
+	virtual void ReceiveRadiation_Implementation( float amount, float duration, FVector direction, TSubclassOf< UFGDamageType > damageType ) override;
+	virtual bool CanReceiveRadiation_Implementation() const override;
 	// End IFGRadiationInterface
-
+	
 	//~Begin IFGSaveInterface
 	virtual bool ShouldSave_Implementation() const override;
 	virtual void PostLoadGame_Implementation( int32 saveVersion, int32 gameVersion ) override;
@@ -246,18 +243,20 @@ public:
 	virtual void SetActorCompassViewDistance( ECompassViewDistance compassViewDistance ) override;
 	// End IFGActorRepresentationInterface
 
-	// Setup run when this player ahve been possessed.
+	// Setup run when this player have been possessed.
 	void OnPossessedSetup();
 
 	/** Blueprint function that ticks visual things not needed on dedicated server */
 	UFUNCTION( BlueprintImplementableEvent, BlueprintCosmetic, Category = "Character" )
 	void TickVisuals( float dt );
 
-	/** Used by a creature to tell the player that they are being seen. */
-	void RegisterPerceivingCreature( class AFGCreature* creature );
+	/** Used by an actor to tell the player that they are being seen by it. */
+	UFUNCTION( BlueprintCallable, Category = "AI" )
+	void RegisterPerceivingActor( class AActor* actor );
 
-	/** Wrapper for updating creature perception info. Should return false if info should be removed. */
-	bool UpdateCreaturePerceptionInfo( FFGCreaturePlayerPerceptionInfo& info );
+	/** Used by an actor to tell the player that they are no longer being by it. */
+	UFUNCTION( BlueprintCallable, Category = "AI" )
+	void UnregisterPerceivingActor( class AActor* actor );
 
 	/** Called on server whenever a creature which is perceiving us gets a state update. */
 	UFUNCTION()
@@ -265,10 +264,10 @@ public:
 
 	/** Gets the list of perception info for creatures that perceive us. */
 	UFUNCTION( BlueprintPure, Category = "UI" )
-	const TArray< FFGCreaturePlayerPerceptionInfo >& GetCreaturePerceptionInfoArray() const { return mCreaturePerceptionInfo; }
+	const TArray< FFGActorPlayerPerceptionInfo >& GetActorPerceptionInfoArray() const { return mActorPerceptionInfo; }
 	
 	/** Used to get the perception info for a creature. */
-	const FFGCreaturePlayerPerceptionInfo* GetPerceptionInfoForCreature( AFGCreature* creature ) const;
+	const FFGActorPlayerPerceptionInfo* GetPerceptionInfoForActor( class AActor* actor ) const;
 	
 	/** Must be called on the owning client for the client to be able to switch the weapon */
 	UFUNCTION( BlueprintCallable, Category = "Equipment" )
@@ -285,7 +284,7 @@ public:
 	/**
 	 * Set/clear override the active equipment in a slot.
 	 * This must be called on both server and client (simulated)
-	 * @param The equipment, cannot be null and must have a valid slot set.
+	 * @param equipment cannot be null and must have a valid slot set.
 	 */
 	void SetOverrideEquipment( AFGEquipment* equipment );
 	void ClearOverrideEquipment( AFGEquipment* equipment );
@@ -351,23 +350,27 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "Equipment" )
 	void ToggleBuildGunPaint();
 
-	/** Instantly goes to build mode for selected recipe */
+	/** Instantly goes to build mode for selected recipe, If already set we unequip the build gun */
 	UFUNCTION( BlueprintCallable, Category = "Equipment" )
 	void HotKeyRecipe( TSubclassOf< class UFGRecipe > recipe );
 
-	/** Instantly goes to dismantle mode */
+	/** Instantly goes to dismantle mode. If already set we unequip the build gun */
 	UFUNCTION( BlueprintCallable, Category = "Equipment" )
 	void HotKeyDismantle();
 
-	/** Instantly goes to build mode for selected recipe */
+	/** Instantly goes to build mode for selected customization recipe. If already set we unequip build gun */
 	UFUNCTION( BlueprintCallable, Category = "Equipment" )
 	void HotKeyPaint( TSubclassOf< class UFGCustomizationRecipe > customization );
 
-	/** Returns Mesh1P subobject **/
+	/** Instantly goes to build mode for blueprint with the given name. If already set we unequip the build gun */
+	UFUNCTION( BlueprintCallable, Category = "Equipment" )
+	void HotKeyBlueprint( const FString& blueprintName );
+
+	/** Returns Mesh1P SubObject **/
 	UFUNCTION( BlueprintPure, Category = "Mesh" )
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return GetMesh(); }
 
-	/** Returns Mesh3P subobject */
+	/** Returns Mesh3P SubObject */
 	virtual USkeletalMeshComponent* GetMesh3P() const override;
 
 	/** Returns 1p or 3p mesh */
@@ -490,7 +493,7 @@ public:
 	void StartDriving( class AFGDriveablePawn* vehicle );
 	void StopDriving( class AFGDriveablePawn* vehicle );
 
-	UFGGameUI* GetGameUI();
+	UFGGameUI* GetGameUI() const;
 
 	/** See if we have spawned our initial gear, if not, spawn it here */
 	void TrySpawnInitialGear();
@@ -509,13 +512,14 @@ public:
 
 	/**
 	 * Picks up a boom box. Only works as long as the player has a free hand slot, so the boombox gets equipped right away. 
-	 */ 
-	void PickUpBoomBox( class AFGBoomBox* boomBox );
+	 */
+	UFUNCTION( BlueprintCallable )
+	void PickUpBoomBox( class AFGBoomBoxPlayer* boomBox );
 
 	//** The target of a pickup, this is only set if the pickup has a collection time */
 	void SetPickupToCollect( class AFGItemPickup* itemPickup );
 
-	FORCEINLINE class AFGFoliagePickup* GetFoliagePickupProxy() { return mFoliagePickupProxy; }
+	FORCEINLINE class AFGFoliagePickup* GetFoliagePickupProxy() const { return mFoliagePickupProxy; }
 
 	/** @return This players inventory. */
 	UFUNCTION( BlueprintPure, Category = "Inventory" )
@@ -528,10 +532,10 @@ public:
 	/** @return This players belt inventory. */
 	UFUNCTION( BlueprintPure, Category = "Inventory" )
 	FORCEINLINE class UFGInventoryComponentBeltSlot* GetBeltSlot() const { return mBeltSlot; }
-
+	
 	/** @return This players resource scanner. */
 	UFUNCTION( BlueprintPure, Category = "Equipment" )
-	FORCEINLINE AFGResourceScanner* GetResourceScanner() const { return mResourceScanner; }
+	FORCEINLINE class AFGResourceScanner* GetResourceScanner() const { return mResourceScanner; }
 
 	/** @return This players resource miner. */
 	UFUNCTION( BlueprintPure, Category = "Equipment" )
@@ -547,11 +551,11 @@ public:
 	/** Ticks drown damage. Tests drown interval and applies drown damage when appropriate */
 	void TickDrownDamage( float delta );
 
-	/** Ticks healt regen */
+	/** Ticks health regen */
 	void TickHealthGeneration( float delta );
 
 	/** returns the foliage pickup proxy, duh */
-	class AFGFoliagePickup* GetFoliagePickupData() { return mFoliagePickupProxy; }
+	class AFGFoliagePickup* GetFoliagePickupData() const { return mFoliagePickupProxy; }
 
 	/** returns currently cached use state, duh */
 	FUseState* GetCachedUseState() { return &mCachedUseState; }
@@ -568,8 +572,8 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "Movement" )
 	TSubclassOf< class UMatineeCameraShake > GetDesiredWalkHeadBobShake();
 
-	/**Gets a precasted movement component. We should be able to optimzie this by ensuring that this component is the right type when assigning it and then do a free cast here ans have it faster. So making this way of fetching it now. Even though it's not really faster atm, it can be optimized later.*/
-	class UFGCharacterMovementComponent* GetFGMovementComponent();
+	/** Gets a PreCasted movement component. We should be able to optimize this by ensuring that this component is the right type when assigning it and then do a free cast here ans have it faster. So making this way of fetching it now. Even though it's not really faster atm, it can be optimized later.*/
+	class UFGCharacterMovementComponent* GetFGMovementComponent() const;
 
 	/** Setter for mWantsSprintBobbing */
 	UFUNCTION( BlueprintCallable, Category = "Movement" ) 
@@ -577,18 +581,16 @@ public:
 
 	/** Getter for mWantsSprintBobbing */
 	UFUNCTION( BlueprintPure, Category = "Movement" ) 
-	FORCEINLINE bool GetWantSprintBobbing() { return mWantsSprintBobbing; }
+	FORCEINLINE bool GetWantSprintBobbing() const { return mWantsSprintBobbing; }
 
 	/** Getter for the world location of the Camera component */
-	FORCEINLINE FVector GetCameraComponentWorldLocation() { return mCameraComponent->GetComponentToWorld().GetLocation(); }
+	FORCEINLINE FVector GetCameraComponentWorldLocation() const { return mCameraComponent->GetComponentToWorld().GetLocation(); }
 
 	/** Getter for the world location of the Camera component */
-	FORCEINLINE FVector GetCameraComponentForwardVector() { return mCameraComponent->GetForwardVector(); }
+	FORCEINLINE FVector GetCameraComponentForwardVector() const { return mCameraComponent->GetForwardVector(); }
 
 	/** Where to drop a inventory item if we drop one */
-	UFUNCTION( BlueprintNativeEvent, Category = "Inventory" )
-	FVector GetInventoryDropLocation( const class UFGInventoryComponent* component, FInventoryStack stack );
-
+	FVector GetInventoryDropLocation() const;
 
 	/** Adds or removes an amount of radiation */
 	UFUNCTION( BlueprintCallable, Category = "Radiation" )
@@ -597,8 +599,7 @@ public:
 	/** Sets an amount of radiation */
 	UFUNCTION( BlueprintCallable, Category = "Radiation" )
 	void SetRadiationImmunity( float newImmunity );
-
-
+	
 	//Cheats
 	virtual void ClientCheatWalk_Implementation() override;
 	UFUNCTION( Server, Reliable )
@@ -655,7 +656,7 @@ public:
 	void Client_HyperTubeEnd( FVector point, FVector velocity, float startTime );
 
 	void ZiplineStart( AActor* ziplineActor, FVector actorForward );
-	void ZiplineEnd( FVector exitForce = FVector::ZeroVector );
+	void ZiplineEnd( const FVector &exitForce = FVector::ZeroVector ) const;
 
 	UFUNCTION( BlueprintCosmetic,BlueprintImplementableEvent, Category = "Zipline" )
 	void StartZiplineEffects();
@@ -669,14 +670,14 @@ public:
     void Multicast_ZiplineEnd( FVector exitForce = FVector::ZeroVector );
 
 	/** Spawn particle for now */
-	void PlayZiplineEffects( FVector inLocation );
+	void PlayZiplineEffects( const FVector &inLocation ) const;
 
 	// Cheat for all players to fly
 	UFUNCTION( NetMulticast, Reliable )
 	void NetMulticast_CheatFly();
 	virtual void NetMulticast_CheatFly_Implementation();
 
-	/** Returns the Cinematic Camera subobject used in photomode **/
+	/** Returns the Cinematic Camera SubObject used in PhotoMode **/
 	UFUNCTION( BlueprintPure, Category = "Camera" )
 	FORCEINLINE class UFGCineCameraComponent* GetCinematicCameraComponent() const { return mCinematicCameraComponent; }
 
@@ -701,9 +702,11 @@ public:
 	void OnBuildSamplePressed();
 	
 protected:
-	
 	void CopyFactoryClipboard();
 	void PasteFactoryClipboard();
+#if !IS_PUBLIC_BUILD
+	void UndoPressed();
+#endif
 	
 	// APawn interface
 	virtual void SetupPlayerInputComponent( class UInputComponent* InputComponent ) override;
@@ -748,6 +751,9 @@ protected:
 	UFUNCTION()
 	void OnItemAddedToInventory( TSubclassOf<UFGItemDescriptor> itemClass, int32 numAdded );
 
+	UFUNCTION()
+	void OnInventorySlotUpdated( int32 Index );
+
 	/** Hand out the starting resources. */
 	void AddDefaultInventoryItems();
 
@@ -773,7 +779,7 @@ protected:
 	void OnUseStop();
 
 	/** Checks if what we hit can be picked up */
-	bool CanBePickedUp( const FHitResult& hitResult );
+	bool CanBePickedUp( const FHitResult& hitResult ) const;
 
 	/** Handles moving forward/backward */
 	void MoveForward( float Val );
@@ -793,11 +799,11 @@ protected:
 	 */
 	void LookUpAtRate( float Rate );
 
-	/** Returns Camera subobject **/
+	/** Returns Camera SubObject **/
 	UFUNCTION( BlueprintPure, Category = "Camera" )
 	FORCEINLINE class UCameraComponent* GetCameraComponent() const { return mCameraComponent; }
 
-	/** Returns spring arm subobject **/
+	/** Returns spring arm SubObject **/
 	UFUNCTION( BlueprintPure, Category = "Camera" )
 	FORCEINLINE class USpringArmComponent* GetSpringArmComponent() const { return mSpringArmComponent; }
 
@@ -817,7 +823,7 @@ protected:
 
 	/** returns the progress of reviving a player 0..1 */
 	UFUNCTION( BlueprintPure, Category="Revive" )
-	float GetReviveProgress();
+	float GetReviveProgress() const;
 
 	/** called when a revive process is complete. Called on the player being revived. */
 	UFUNCTION( BlueprintImplementableEvent, Category = "Revive" )
@@ -837,7 +843,7 @@ protected:
 
 	/** returns the progress of reviving a player 0..1 */
 	UFUNCTION( BlueprintPure, Category = "Use" )
-	float GetPickupProgress();
+	float GetPickupProgress() const;
 
 	/** Called when we start receiving radiation. */
 	UFUNCTION( BlueprintImplementableEvent, Category = "Radiation" )
@@ -861,7 +867,7 @@ protected:
 	UFUNCTION()
 	void StopReceivingRadiation();
 
-	/** Called when we respawn but didn't get a death crate, so we can find our last death location. */
+	/** Called when we respawn but did not get a death crate, so we can find our last death location. */
 	UFUNCTION( BlueprintImplementableEvent, Category = "Death" )
 	void OnSpawnDeathMarker();
 
@@ -869,7 +875,7 @@ protected:
 	UFUNCTION( BlueprintPure, Category = "Radiation" )
 	FORCEINLINE float GetRadiationIntensity() const { return mRadiationIntensity; }
 
-	/** Returns accumulated radioation immunity **/
+	/** Returns accumulated radiation immunity **/
 	UFUNCTION( BlueprintPure, Category = "Radiation" )
 	FORCEINLINE float GetRadiationImmunity() const { return mRadiationImmunity; }
 
@@ -878,7 +884,7 @@ protected:
 	FORCEINLINE float GetRadiationDamageAngle() const { return mRadiationDamageAngle; }
 
 	UFUNCTION( BlueprintPure, Category = "Radiation" )
-	FORCEINLINE bool IsInRadioActiveZone() { return mInRadioactiveZone; }
+	FORCEINLINE bool IsInRadioActiveZone() const { return mInRadioactiveZone; }
 
 	/** Start the pending removal of the character */
 	virtual void TornOff() override;
@@ -886,6 +892,14 @@ protected:
 	/** Returns the arm bone location offset we want to use depending on crouch/stand state **/
 	UFUNCTION( BlueprintPure, Category = "Movement" )
 	FORCEINLINE float GetArmBoneLocation() const { return mArmBoneLocation; }
+
+	/** Called when some state changed so we can update name tag location */
+	UFUNCTION( BlueprintImplementableEvent, Category = "Online" )
+	void UpdatePlayerNameTagLocation();
+
+	/** True if player is online. By online we mean this player or the driven vehicle has a player state and someone is controlling it */
+	UFUNCTION( BlueprintPure, Category = "Radiation" )
+	FORCEINLINE bool IsPlayerOnline() const { return mIsPlayerOnline.IsSet() ? mIsPlayerOnline.GetValue() : false; }
 
 	/** Called when we update the best useable actor */
 	UPROPERTY( BlueprintAssignable, Category = "UI"  )
@@ -906,7 +920,8 @@ protected:
 	UPROPERTY( BlueprintAssignable, Category = "Equipment" )
 	FOnActiveEquipmentChangedInSlot mOnActiveEquipmentChangedInSlot;
 
-	void DebugBuildablesInFrustum();
+	void DebugBuildablesInFrustum() const;
+	
 public:
 	// Callbacks used by the replication graph to build dependency lists
 	/** Event for when equipment that is should always be replicated on the player is spawned */
@@ -921,21 +936,24 @@ public:
 	/** Event when the foliage pickup proxy has spawned */
 	static FOnFoliagePickupSpawned OnFoliagePickupSpawned;
 
-	/** Called whenever a creature perception info is added. */
+	/** Called whenever an actor perception info is added. */
 	UPROPERTY( BlueprintAssignable, Category = "UI" )
-	FOnCreaturePerceptionInfoAdded mOnCreaturePerceptionInfoAdded;
+	FOnActorPerceptionInfoAdded mOnActorPerceptionInfoAdded;
 
-	/** Called whenever a creature perception info is removed. */
+	/** Called whenever an actor perception info is removed. */
 	UPROPERTY( BlueprintAssignable, Category = "UI" )
-	FOnCreaturePerceptionInfoRemoved mOnCreaturePerceptionInfoRemoved;
+	FOnActorPerceptionInfoRemoved mOnActorPerceptionInfoRemoved;
 
 	/** Called whenever a creature which is perceiving us has a state change. */
 	UPROPERTY( BlueprintAssignable, Category = "UI" )
 	FOnCreaturePerceptionStateChanged mOnCreaturePerceptionStateChanged;
 
+	/** Called just after a new equipment actor has been spawned, before it eventually gets equipped. */
+	FOnEquipmentSpawned mOnEquipmentSpawned;
+
 	/** The best usable actor nearby. */
 	UFUNCTION( BlueprintPure, Category = "Use" )
-	FORCEINLINE	class AActor* GetBestUsableActor() { return mBestUsableActor; }
+	FORCEINLINE	class AActor* GetBestUsableActor() const { return mBestUsableActor; }
 
 	/** Triggers the OnBestUseableActorUpdated delegate with the cached best useable actor. Used to update UI when best useable actor changes */
 	UFUNCTION( BlueprintCallable, Category = "Use" )
@@ -949,16 +967,24 @@ public:
 	bool IsSliding() const;
 
 	/** Gets mTryToUnSlide */
-	inline bool IsTryingToUnslide(){ return mTryToUnSlide; }
+	inline bool IsTryingToUnslide() const { return mTryToUnSlide; }
 
-	bool IsInPumpiMode();
+	bool IsInPumpiMode() const;
+
+	/** Update name and color on player name widget */
+	UFUNCTION( BlueprintCallable, Category = "Player Name" )
+	void UpdatePlayerNameWidget();
+
+	/** Update the status of the player s we can update appearances and UI */
+	void UpdatePlayerStatus();
+	
 private:
 	/**
 	 * Spawn a new equipment.
 	 * @param equipmentClass Class to spawn.
 	 * @param owner Optionally pass an owner, only use this in combination with persistent equipments.
 	 */
-	AFGEquipment* SpawnEquipment( TSubclassOf< AFGEquipment > equipmentClass, AActor* owner = nullptr );
+	AFGEquipment* SpawnEquipment( TSubclassOf< AFGEquipment > equipmentClass, AActor* owner = nullptr ) const;
 
 	template< typename T >
 	T* SpawnEquipment( TSubclassOf< AFGEquipment > equipmentClass, AActor* owner = nullptr )
@@ -968,9 +994,15 @@ private:
 	}
 
 	/* Spawns the attachment for this equipment */
-	AFGEquipmentAttachment* SpawnAttachmentForEquipment( AFGEquipment* equipment );
+	AFGEquipmentAttachment* SpawnAttachmentForEquipment( const AFGEquipment* equipment );
 	/* Spawns the secondary attachment for this equipment */
-	AFGEquipmentAttachment* SpawnSecondaryAttachmentForEquipment( AFGEquipment* equipment );
+	AFGEquipmentAttachment* SpawnSecondaryAttachmentForEquipment( const AFGEquipment* equipment );
+
+	/** Wrapper for updating actor perception info. Should return false if info should be removed. */
+	bool UpdateActorPerceptionInfo( FFGActorPlayerPerceptionInfo& info ) const;
+	
+	/** Used to properly remove perception info for an actor */
+	void RemoveActorPerceptionInfo( const FFGActorPlayerPerceptionInfo& info );
 
 	/** Custom ticks */
 	void UpdateHeadBob();
@@ -981,7 +1013,7 @@ private:
 	void UpdateGameUIRadiationStatus();
 
 	/** Update the UI with radiation intensity*/
-	void UpdateGameUIRadiationIntensity();
+	void UpdateGameUIRadiationIntensity() const;
 
 	UFUNCTION( BlueprintPure, Category = "General" )
 	int32 GetTotalPlayerInventorySlots() const;
@@ -1006,7 +1038,7 @@ private:
 	UFUNCTION( Reliable, Server, WithValidation )
 	void Server_PickUpItem( class AFGItemPickup* itemPickup );
 	UFUNCTION( Reliable, Server )
-	void Server_PickUpBoomBox( class AFGBoomBox* boomBox );
+	void Server_PickUpBoomBoxPlayer( class AFGBoomBoxPlayer* boomBox );
 
 	UFUNCTION( Client, Reliable )
 	void Client_OnPerceivingCreatureStateChange( AFGCreature* creature, ECreatureState newState );
@@ -1043,15 +1075,26 @@ private:
 	void OnRep_HeadEquipmentSlot();
 	UFUNCTION()
 	void OnRep_BodyEquipmentSlot();
+	UFUNCTION()
+	void OnRep_PlayerInventory();
 	
 	UFUNCTION()
-	void OnRep_CreaturePerceptionInfo( const TArray< FFGCreaturePlayerPerceptionInfo >& OldValues );
+	void OnRep_ActorPerceptionInfo( const TArray< FFGActorPlayerPerceptionInfo >& OldValues );
 	
 	/** Migrate number of inventory and arm equipment slots saved before BU3 to unlock subsystem */
 	void MigrateNumSavedSlots();
 
 	/** Check if we have items picked up that isn't registered as picked up. Fixes issues on old saves before we saved picked up items */
-	void CheckItemPickedUp();
+	void CheckItemPickedUp() const;
+	
+	virtual void OnRep_IsPossessed() override;
+	virtual void OnRep_PlayerState() override;
+	
+	void SetOnlineState( bool isOnline );
+
+	/** Gets the players state for this player. Either from this character or the driven vehicle */
+	UFUNCTION( BlueprintPure, Category = "General" )
+	class AFGPlayerState* GetControllingPlayerState() const;
 
 public:
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
@@ -1071,6 +1114,10 @@ protected:
 	UPROPERTY( VisibleDefaultsOnly, Category = Mesh )
 	class USkeletalMeshComponent* mMesh3P;
 
+	/** The widget component used to show the players name */
+	UPROPERTY( VisibleAnywhere, BlueprintReadOnly, Category = "Player Name" )
+	class UWidgetComponent* mPlayerNameWidgetComponent;
+
 	/** As we have no foliage actor to actually put pickup code in, we use this actor as a proxy */
 	UPROPERTY( EditDefaultsOnly, Category = "Use" )
 	TSubclassOf< class AFGFoliagePickup > mFoliagePickupProxyClass;
@@ -1085,7 +1132,7 @@ protected:
 
 	/*Reference to the resource scanner */
 	UPROPERTY( SaveGame, Replicated )
-	class AFGResourceScanner* mResourceScanner;
+	AFGResourceScanner* mResourceScanner;
 
 	/* Reference to the resource miner */
 	UPROPERTY( SaveGame, Replicated )
@@ -1139,7 +1186,7 @@ protected:
 	UPROPERTY( BlueprintReadOnly, Category = "Use" )
 	class AFGItemPickup* mPickupToCollect;
 
-	/** Default effects to play when a foot hits the ground when the material doesn't exist in m1PFootstepEffect */
+	/** Default effects to play when a foot hits the ground when the material does not exist in m1PFootstepEffect */
 	UPROPERTY( EditDefaultsOnly, Category = "Footstep" )
 	FFootstepEffect m1PDefaultFootstepEffect;
 
@@ -1152,13 +1199,13 @@ protected:
 	TArray<class UAkAudioEvent*> m1PFootstepEvent;
 
 	/** Info about creatures which currently perceive us. */
-	UPROPERTY( BlueprintReadOnly, ReplicatedUsing = OnRep_CreaturePerceptionInfo, Category = "UI" )
-	TArray< FFGCreaturePlayerPerceptionInfo > mCreaturePerceptionInfo;
+	UPROPERTY( BlueprintReadOnly, ReplicatedUsing = OnRep_ActorPerceptionInfo, Category = "UI" )
+	TArray< FFGActorPlayerPerceptionInfo > mActorPerceptionInfo;
 	
 	/** latest safe ground location check timer */
 	float mLastSafeGroundCheckTimer;
 
-	static const int32 MAX_SAFE_GROUND_POS_BUFFER_SIZE = 3;
+	static constexpr int32 MAX_SAFE_GROUND_POS_BUFFER_SIZE = 3;
 
 	/** latest safe ground location positions */
 	UPROPERTY( SaveGame )
@@ -1232,9 +1279,11 @@ private:
 	ECameraMode mPlayerPreferredCameraMode;
 
 	/** The players inventory. */
-	UPROPERTY( SaveGame, Replicated )
+	UPROPERTY( SaveGame, ReplicatedUsing=OnRep_PlayerInventory )
 	class UFGInventoryComponent* mInventory;
 
+	bool mIsShoppingListDelegateBound = false;
+	
 	/** Storing equipment inventory components in individual variables instead of using a TArray since OnRep functions are somewhat unreliable for the later. So not the most elegant solution but the most robust one. */
 	static_assert( static_cast<int32>( EEquipmentSlot::ES_MAX ) == 6, "Adding or removing equipment slot variables might be needed" );
 
@@ -1403,13 +1452,13 @@ private:
 	/* Old offset we are interpolating from */
 	float mOldCameraRelativeOffset;
 
-	float mSpringArmOffsetX; //Feched during begin play from the spring arm, and used to be able to restore it's valu later on
+	float mSpringArmOffsetX; // Fetched during begin play from the spring arm, and used to be able to restore it's value later on.
 
 	/** New offset that we want to have */
 	float mCurrentCameraPipeOffset = 0;
 
 
-	/** Reprecentation of user setting */
+	/** Representation of user setting */
 	float mCameraMoveFeedback = 0;
 
 
@@ -1431,7 +1480,7 @@ private:
 	/** We are trying to raise capsule collision to default size after a slide has ended */
 	bool mTryToUnSlide;
 
-	/** If enable th einput vector will use the look direction as the forward vector */
+	/** If enable the input vector will use the look direction as the forward vector */
 	bool mIsUsingFull3DInput = false;
 
 	/** How many enemies are engaged in combat with this character */
@@ -1457,7 +1506,7 @@ private:
 	class USkeletalMeshComponent* mEmoteSkelMeshComp;
 
 	FTimerHandle mEmoteSkelMeshTimer;
-	
+
 public:
 	UPROPERTY( BlueprintReadWrite, Category = "FactoryGame|Movement|Crouch" )
 	bool mNoUpdate;
@@ -1469,9 +1518,22 @@ private:
 	UPROPERTY( EditDefaultsOnly, Category = "Representation" )
 	class UTexture2D* mActorRepresentationTextureDead;
 
+	/** This players actor representation */
+	UPROPERTY( Transient )
+	class UFGActorRepresentation* mCachedActorRepresentation;
+
 	/** The indexed of the holstered hand equipment, if we have any. Replicated for UI use */
 	UPROPERTY( SaveGame, Replicated )
 	int32 mHolsteredEquipmentIndex = INDEX_NONE;
 
 	TSet< EEquipmentSlot > mQueuedEquipmentChangedInSlotNotifies;
+
+	/** The player name of the last logged in player that possessed this pawn */
+	UPROPERTY( SaveGame, Replicated )
+	FString mCachedPlayerName;
+
+	/** True if player is online. Update on both server and client By online we mean this player or the driven vehicle has a player state and someone is controlling it.
+	 *	It does not care about platform logins */
+	TOptional<bool> mIsPlayerOnline;
+	
 };

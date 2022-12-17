@@ -11,8 +11,8 @@
 void UItemTooltipSubsystem::ApplyItemOverridesToTooltip(UWidget* TooltipWidget, APlayerController* OwningPlayer, const FInventoryStack& InventoryStack) {
     //Gather UProperty exposed by tooltip widget
     UClass* TooltipWidgetClass = TooltipWidget->GetClass();
-    UObjectProperty* TitleWidgetProperty = Cast<UObjectProperty>(TooltipWidgetClass->FindPropertyByName(TEXT("mTitle")));
-    UObjectProperty* DescriptionWidgetProperty = Cast<UObjectProperty>(TooltipWidgetClass->FindPropertyByName(TEXT("mDescription")));
+    FObjectProperty* TitleWidgetProperty = Cast<FObjectProperty>(TooltipWidgetClass->FindPropertyByName(TEXT("mTitle")));
+    FObjectProperty* DescriptionWidgetProperty = Cast<FObjectProperty>(TooltipWidgetClass->FindPropertyByName(TEXT("mDescription")));
     check(TitleWidgetProperty && DescriptionWidgetProperty);
     
     //Retrieve references to some stuff
@@ -41,8 +41,8 @@ void UItemTooltipSubsystem::ApplyItemOverridesToTooltip(UWidget* TooltipWidget, 
 
 FInventoryStack GetStackFromSlot(UObject* SlotWidget) {
     //Retrieve fields relevant to owner inventory
-    UObjectProperty* InventoryProperty = Cast<UObjectProperty>(SlotWidget->GetClass()->FindPropertyByName(TEXT("mCachedInventoryComponent")));
-    UIntProperty* SlotIndexProperty = Cast<UIntProperty>(SlotWidget->GetClass()->FindPropertyByName(TEXT("mSlotIdx")));
+    FObjectProperty* InventoryProperty = Cast<FObjectProperty>(SlotWidget->GetClass()->FindPropertyByName(TEXT("mCachedInventoryComponent")));
+    FIntProperty* SlotIndexProperty = Cast<FIntProperty>(SlotWidget->GetClass()->FindPropertyByName(TEXT("mSlotIdx")));
     check(InventoryProperty && SlotIndexProperty);
     
     FInventoryStack ResultStack{};
@@ -63,7 +63,7 @@ void UItemTooltipSubsystem::InitializePatches() {
 
     UBlueprintHookManager* HookManager = GEngine->GetEngineSubsystem<UBlueprintHookManager>();
     HookManager->HookBlueprintFunction(Function, [](FBlueprintHookHelper& HookHelper) {
-        UUserWidget* TooltipWidget = Cast<UUserWidget>(*HookHelper.GetOutVariablePtr<UObjectProperty>());
+        UUserWidget* TooltipWidget = Cast<UUserWidget>(*HookHelper.GetOutVariablePtr<FObjectProperty>());
         UUserWidget* SlotWidget = Cast<UUserWidget>(HookHelper.GetContext());
         
         if (TooltipWidget != nullptr) {
@@ -86,7 +86,7 @@ void UItemTooltipSubsystem::RegisterGlobalTooltipProvider(const FString& ModRefe
 }
 
 FText UItemTooltipSubsystem::GetItemName(APlayerController* OwningPlayer, const FInventoryStack& InventoryStack) {
-    UClass* ItemClass = InventoryStack.Item.ItemClass;
+    UClass* ItemClass = InventoryStack.Item.GetItemClass();
     if (ItemClass != NULL) {
         UObject* ItemObject = ItemClass->GetDefaultObject();
         if (ItemObject->Implements<USMLItemDisplayInterface>()) {
@@ -97,7 +97,7 @@ FText UItemTooltipSubsystem::GetItemName(APlayerController* OwningPlayer, const 
 }
 
 FText UItemTooltipSubsystem::GetItemDescription(APlayerController* OwningPlayer, const FInventoryStack& InventoryStack) {
-    UClass* ItemClass = InventoryStack.Item.ItemClass;
+    UClass* ItemClass = InventoryStack.Item.GetItemClass();
     TArray<FString> DescriptionText;
 
     const FString VanillaDescription = UFGItemDescriptor::GetItemDescription(ItemClass).ToString();
@@ -127,7 +127,7 @@ FText UItemTooltipSubsystem::GetItemDescription(APlayerController* OwningPlayer,
 
 TArray<UWidget*> UItemTooltipSubsystem::CreateDescriptionWidgets(APlayerController* OwningPlayer, const FInventoryStack& InventoryStack) {
     TArray<UWidget*> ResultWidgets;
-    UClass* ItemClass = InventoryStack.Item.ItemClass;
+    UClass* ItemClass = InventoryStack.Item.GetItemClass();
     
     if (ItemClass != NULL) {
         UObject* ItemObject = ItemClass->GetDefaultObject();

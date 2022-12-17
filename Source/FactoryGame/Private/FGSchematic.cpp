@@ -13,13 +13,14 @@ void UFGSchematic::UpdateAssetBundleData(){ }
 void UFGSchematic::AddRecipe(TSubclassOf< UFGSchematic > inClass, TSubclassOf<  UFGRecipe > recipe){ }
 void UFGSchematic::MigrateDataToNewDependencySystem(){ }
 #endif 
+#if WITH_EDITORONLY_DATA
+#endif 
 UFGSchematic::UFGSchematic() : Super() {
 	this->mType = ESchematicType::EST_Custom;
 	this->mDisplayName = INVTEXT("");
 	this->mDescription = INVTEXT("");
 	this->mSchematicCategory = nullptr;
 	this->mMenuPriority = 0.0;
-	this->mTechTier = 0;
 	this->mTimeToComplete = 600.0;
 	this->mSmallSchematicIcon = nullptr;
 	this->mDependenciesBlocksSchematicAccess = false;
@@ -30,7 +31,7 @@ UFGSchematic::UFGSchematic() : Super() {
 void UFGSchematic::PostLoad(){ Super::PostLoad(); }
 void UFGSchematic::Serialize(FArchive& ar){ Super::Serialize(ar); }
 FPrimaryAssetId UFGSchematic::GetPrimaryAssetId() const {
-	return FPrimaryAssetId(StaticClass()->GetFName(), FPackageName::GetShortFName(GetOutermost()->GetFName()));
+  return FPrimaryAssetId(StaticClass()->GetFName(), FPackageName::GetShortFName(GetOutermost()->GetFName()));
 }
 ESchematicType UFGSchematic::GetType(TSubclassOf< UFGSchematic > inClass) {
 	if (inClass)

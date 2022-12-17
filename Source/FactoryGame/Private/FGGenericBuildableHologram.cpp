@@ -4,6 +4,7 @@
 
 AFGGenericBuildableHologram::AFGGenericBuildableHologram() : Super() {
 	this->mIsWallRotationAllowed = true;
+	this->mAllowGranularRotation = false;
 	this->mCanSnapToFoundationFloor = true;
 	this->mCanSnapToFoundationCeiling = false;
 	this->mCanSnapToFoundationSide = false;
@@ -11,7 +12,6 @@ AFGGenericBuildableHologram::AFGGenericBuildableHologram() : Super() {
 	this->mCanSnapToAngularWalls = true;
 	this->mBeamSnappingMode = EBeamSnappingMode::BSM_None;
 	this->mPillarSnappingMode = EPillarSnappingMode::PSM_None;
-	this->mRotationStep = 0;
 	this->mWallSnapOffset = FVector2D::ZeroVector;
 	this->mSnapAxis = EAxis::Z;
 	this->mFoundationSnappingInset = 0.0;
@@ -19,4 +19,4 @@ AFGGenericBuildableHologram::AFGGenericBuildableHologram() : Super() {
 void AFGGenericBuildableHologram::BeginPlay(){ }
 bool AFGGenericBuildableHologram::TrySnapToActor(const FHitResult& hitResult){ return bool(); }
 int32 AFGGenericBuildableHologram::GetRotationStep() const{ return int32(); }
-bool AFGGenericBuildableHologram::IsHologramIdenticalToBuildable(AFGBuildable* buildable, const FVector& hologramLocationOffset) const{ return bool(); }
+bool AFGGenericBuildableHologram::IsHologramIdenticalToActor(AActor* actor, const FVector& hologramLocationOffset) const{ return bool(); }

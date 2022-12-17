@@ -140,7 +140,7 @@ public:
 	FORCEINLINE class AFGStorySubsystem* GetStorySubsystem() const { return mStorySubsystem; }
 	FORCEINLINE class AFGRadioactivitySubsystem* GetRadioactivitySubsystem() const { return mRadioactivitySubsystem; }
 	FORCEINLINE class AFGChatManager* GetChatManager() const { return mChatManager; }
-	FORCEINLINE class AFGCentralStorageSubsystem* GetCentralStorageSubsystem() const { return mCentralStorageSubsystem; }
+	FORCEINLINE class AFGCentralStorageSubsystem* GetCentralStorageSubsystem() const { return nullptr; }
 	FORCEINLINE class AFGRecipeManager* GetRecipeManager() const { return mRecipeManager; }
 	FORCEINLINE class AFGMapManager* GetMapManager() const { return mMapManager; }
 	FORCEINLINE class AFGUnlockSubsystem* GetUnlockSubsystem() const { return mUnlockSubsystem; }
@@ -154,6 +154,8 @@ public:
 	FORCEINLINE class AFGSignSubsystem* GetSignSubsystem() const { return mSignSubsystem; }
 	FORCEINLINE class AFGCreatureSubsystem* GetCreatureSubsystem() const { return mCreatureSubsystem; }
 	FORCEINLINE class AFGScannableSubsystem* GetScannableSubsystem() const { return mScannableSubsystem; }
+	FORCEINLINE class AFGBlueprintSubsystem* GetBlueprintSubsystem() const { return mBlueprintSubsystem; }
+
 
 
 	/** Helper to access the actor representation manager */
@@ -202,15 +204,15 @@ public:
 
 	/** Setter for no power */
 	UFUNCTION( BlueprintCallable, Category = "FactoryGame|Cheat" )
-	void SetCheatNoPower( bool noPower ) { mCheatNoPower = noPower; }
+	void SetCheatNoPower( bool noPower );
 	
 	/** Setter for no cost */
 	UFUNCTION( BlueprintCallable, Category = "FactoryGame|Cheat" )
-	void SetCheatNoCost( bool noCost ) { mCheatNoCost = noCost; }
+	void SetCheatNoCost( bool noCost );
 	
 	/** Setter for no fuel */
 	UFUNCTION( BlueprintCallable, Category = "FactoryGame|Cheat" )
-	void SetCheatNoFuel( bool noFuel ) { mCheatNoFuel = noFuel; }
+	void SetCheatNoFuel( bool noFuel );
 
 	UFUNCTION()
 	void NotifyPlayerAdded( class AFGCharacterPlayer* inPlayer );
@@ -369,6 +371,9 @@ private:
 		fgcheck( out_spawnedSubsystem );
 	}
 
+	void SubmitNumPlayersTelemetry() const;
+	void SubmitCheatTelemetry() const;
+
 public:
 	//@todo When was this used last time? Cleanup?
 	UPROPERTY( EditDefaultsOnly, Category = "Cheat" )
@@ -426,8 +431,6 @@ private:
 	class AFGRadioactivitySubsystem* mRadioactivitySubsystem;
 	UPROPERTY( Replicated )
 	class AFGChatManager* mChatManager;
-	UPROPERTY()
-	class AFGCentralStorageSubsystem* mCentralStorageSubsystem;
 	UPROPERTY( SaveGame, Replicated )
 	class AFGPipeSubsystem* mPipeSubsystem;
 	UPROPERTY( SaveGame, Replicated )
@@ -448,10 +451,12 @@ private:
 	class AFGStatisticsSubsystem* mStatisticsSubsystem;
 	UPROPERTY( Replicated )
 	class AFGSignSubsystem* mSignSubsystem;
-	UPROPERTY()
+	UPROPERTY( Replicated )
 	class AFGCreatureSubsystem* mCreatureSubsystem;
 	UPROPERTY( Replicated )
 	class AFGScannableSubsystem* mScannableSubsystem;
+	UPROPERTY( SaveGame, Replicated )
+	class AFGBlueprintSubsystem* mBlueprintSubsystem;
 
 	
 	
@@ -507,10 +512,10 @@ private:
 	bool mHasInitializedColorSlots;
 
 	/** The different colors to represent players over the network. We keep this if we need to loop back over the colors again*/
-	TArray< FSlotData > mPlayerColors;
+	TArray< FPlayerColorData > mPlayerColors;
 
 	/** The remaining colors to represent players over the network */
-	TArray< FSlotData > mAvailablePlayerColors;
+	TArray< FPlayerColorData > mAvailablePlayerColors;
 
 	/** Next time the server is planned to restart */
 	UPROPERTY( VisibleInstanceOnly, Replicated, ReplicatedUsing = OnRep_PlannedRestartTime, Category="Server" )

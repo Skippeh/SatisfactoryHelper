@@ -33,19 +33,6 @@ enum class ESelfDrivingLocomotiveError : uint8
 };
 
 /**
- * Signal aspects used for signaling and ATC points.
- */
-UENUM( BlueprintType )
-enum class ERailroadSignalAspect : uint8
-{
-	RSA_None			UMETA( DisplayName = "None" ),
-	RSA_Clear			UMETA( DisplayName = "Clear" ),
-	RSA_Stop			UMETA( DisplayName = "Stop" ),
-	RSA_Dock			UMETA( DisplayName = "Dock" )
-	//RSA_Reserved		UMETA( DisplayName = "Reserved" )
-};
-
-/**
  * Docked state.
  */
 UENUM( BlueprintType )
@@ -116,7 +103,7 @@ GENERATED_BODY()
 public:
 	/** The vehicles in this consist. */
 	UPROPERTY( BlueprintReadOnly )
-	TArray< TSubclassOf< AFGRailroadVehicle > > Vehicles;
+	TArray< AFGRailroadVehicle* > Vehicles;
 
 	/** Length of the consist, [cm] */
 	UPROPERTY( BlueprintReadOnly )
@@ -560,8 +547,9 @@ public:
 	void OnDocked( AFGBuildableRailroadStation* station );
 	void OnDockingComplete();
 
-	/** Connect this train to the third rail given. */
-	void ConnectToThirdRail( class UFGPowerConnectionComponent* thirdRail );
+	/** Connect/disconnect this train to/from the third rail given. */
+	void ConnectToThirdRail();
+	void DisconnectFromThirdRail();
 	
 	/** Called when the vehicles in the train are changed so it can reconnect to the third rail etc. */
 	void OnVehiclesChanged();
@@ -644,6 +632,9 @@ private:
 	float CalcTargetAcceleration( float currentSpeed, float targetSpeed, float distance ) const;
 	float CalcTargetDeceleration( float currentSpeed, float targetSpeed, float distance ) const;
 
+	/** Called on the server when the MU master has changed. */
+	void OnMultipleUnitMasterChanged();
+
 	/** On reps */
 	UFUNCTION()
 	void OnRep_DockingState();
@@ -655,6 +646,8 @@ private:
 	void OnRep_IsDerailed();
 	UFUNCTION()
 	void OnRep_TrainStatus();
+	UFUNCTION()
+	void OnRep_MultipleUnitMaster();
 	
 #if WITH_CHEATS
 	void Cheat_Teleport( class AFGBuildableRailroadStation* station );
@@ -720,7 +713,7 @@ public: //@todo-trains private
 	class AFGRailroadVehicle* LastVehicle;
 
 	/** This is the master locomotives that sends its input (throttle/brake/etc) to all other locomotives in the train. */
-	UPROPERTY( Replicated )
+	UPROPERTY( ReplicatedUsing = OnRep_MultipleUnitMaster )
 	class AFGLocomotive* mMultipleUnitMaster;
 
 	/** This trains time table. */

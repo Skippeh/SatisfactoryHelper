@@ -91,17 +91,22 @@ bool UModLoadingLibrary::IsModLoaded(const FString& Name) {
     return GetLoadedModInfo(Name, LoadedModInfo);
 }
 
+bool ModSorter(FModInfo const& lhs, FModInfo const& rhs) {
+    return lhs.FriendlyName < rhs.FriendlyName;
+}
+
 TArray<FModInfo> UModLoadingLibrary::GetLoadedMods() {
     TArray<FModInfo> OutModInfoList;
     OutModInfoList.Add(CreateFactoryGameModInfo());
-    
+
     const TArray<TSharedRef<IPlugin>> EnabledPlugins = IPluginManager::Get().GetEnabledPlugins();
     for (const TSharedRef<IPlugin>& Plugin : EnabledPlugins) {
         if (IsPluginAMod(Plugin.Get())) {
             PopulatePluginModInfo(Plugin.Get(), OutModInfoList.AddDefaulted_GetRef());
         }
     }
-    
+
+    OutModInfoList.Sort(&ModSorter);
     return OutModInfoList;
 }
 
@@ -244,6 +249,9 @@ void UModLoadingLibrary::PopulatePluginModInfo(IPlugin& Plugin, FModInfo& OutMod
     OutModInfo.FriendlyName = PluginDescriptor.FriendlyName;
     OutModInfo.Description = PluginDescriptor.Description;
     OutModInfo.CreatedBy = PluginDescriptor.CreatedBy;
+
+    OutModInfo.DocsURL = PluginDescriptor.DocsURL;
+    OutModInfo.SupportURL = PluginDescriptor.SupportURL;
 
     OutModInfo.bAcceptsAnyRemoteVersion = PluginDescriptorMetadata.bAcceptsAnyRemoteVersion;
     OutModInfo.RemoteVersionRange = PluginDescriptorMetadata.RemoteVersionRange;

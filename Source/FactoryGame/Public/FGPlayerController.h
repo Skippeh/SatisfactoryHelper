@@ -44,6 +44,7 @@ public:
 	virtual bool ReplicateSubobjects( class UActorChannel* channel, class FOutBunch* bunch, FReplicationFlags* repFlags ) override;
 	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
+	virtual void EndPlay( const EEndPlayReason::Type endPlayReason ) override;
 	virtual void Destroyed() override;
 	// End AActor interface
 
@@ -170,6 +171,10 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "Shortcut" )
 	void SetEmoteShortcutOnIndex( TSubclassOf< class UFGEmote > emote, int32 onIndex );
 
+	/** Set the blueprint hotbar shortcut on the index if it's valid */
+	UFUNCTION( BlueprintCallable, Category = "Shortcut" )
+	void SetBlueprintShortcutOnIndex( const FString& blueprintName, int32 onIndex );
+
 	/** Remove a saved color preset */
 	UFUNCTION( BlueprintCallable, Category = "FactoryGame|GlobalColorPresets" )
 	void RemovePlayerColorPresetAtIndex( int32 index );
@@ -232,7 +237,7 @@ public:
 	UPROPERTY( BlueprintAssignable )
 	FOnShortcutSet OnShortcutSet;
 
-	/** Notify that the hotbars should refresh */
+	/** Notify that the hotbars should refresh. Uses a brute force approach but we only update the 10 visible ones so shouldn't be noticed */
 	UPROPERTY( BlueprintAssignable )
 	FRefreshHotbarShortcuts OnRefreshHotbarShortcuts;
 
@@ -415,6 +420,10 @@ public:
 	UFUNCTION()
 	void OnBuildGunStateChanged( EBuildGunState newState );
 
+	/** Notified from the build gun that the recipe has changed */
+	UFUNCTION()
+	void OnBuildGunRecipeChanged( TSubclassOf<class UFGRecipe> recipe );
+
 	UFUNCTION( BlueprintImplementableEvent, Category = "Photo Mode" )
 	class UFGPhotoModeWidget* GetPhotoModeWidget() const;
 	
@@ -429,6 +438,8 @@ public:
 
 	/** Handle pause game input and routes it to game UI */
 	void OnPauseGamePressed();
+
+	class UFGGameUI* GetGameUI() const;
 	
 protected:
 	/** Pontentially spawns deathcreate when disconnecting if we are dead */
@@ -533,8 +544,6 @@ protected:
 	UFUNCTION( BlueprintPure, Category = "Photo Mode" )
 	bool GetHiResPhotoModeEnabled() { return mHiResPhotoMode; }
 
-	class UFGGameUI* GetGameUI() const;
-
 #if WITH_CHEATS
 	void ToggleCheatBoard();
 #endif
@@ -552,6 +561,8 @@ private:
 	void Server_SetCustomizationShortcutOnIndex( TSubclassOf< class UFGCustomizationRecipe > customizationRecipe, int32 onIndex );
 	UFUNCTION( Reliable, Server )
 	void Server_SetEmoteShortcutOnIndex( TSubclassOf< class UFGEmote > emote, int32 onIndex );
+	UFUNCTION( Reliable, Server )
+	void Server_SetBlueprintShortcutOnIndex( const FString& blueprintName, int32 onIndex );
 	UFUNCTION( Reliable, Server, WithValidation )
 	void Server_SetHotbarIndex( int32 index );
 	UFUNCTION( Reliable, Server, WithValidation )
