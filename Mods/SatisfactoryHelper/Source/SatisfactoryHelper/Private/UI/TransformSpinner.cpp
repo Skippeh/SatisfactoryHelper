@@ -24,14 +24,14 @@ void UTransformSpinner::Tick(float DeltaTime)
 	}
 
 	AngularVelocity = FMath::Lerp(AngularVelocity, TargetAngularVelocity, (bIsSpinning ? SpinUpStrength : SpinDownStrength) * DeltaTime);
-	Widget->RenderTransform.Angle += (AngularVelocity + AddedAngularVelocity) * DeltaTime;
-
-	FWidgetTransform RenderTransform = Widget->RenderTransform;
-
-	if (RenderTransform.Angle >= 360)
-		RenderTransform.Angle -= 360;
-	else if (RenderTransform.Angle <= -360)
-		RenderTransform.Angle += 360;
-
-	Widget->SetRenderTransform(RenderTransform);
+	
+	auto WidgetAngle = Widget->GetRenderTransformAngle();
+	WidgetAngle += (AngularVelocity + AddedAngularVelocity) * DeltaTime;
+	
+	if (WidgetAngle >= 360)
+		WidgetAngle -= 360;
+	else if (WidgetAngle <= -360)
+		WidgetAngle += 360;
+	
+	Widget->SetRenderTransformAngle(WidgetAngle);
 }
