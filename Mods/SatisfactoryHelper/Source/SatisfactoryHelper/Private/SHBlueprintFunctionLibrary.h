@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "FGInventoryComponent.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "SHBlueprintFunctionLibrary.generated.h"
 
 class AFGSchematicManager;
@@ -17,9 +18,6 @@ class USHBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	USHBlueprintFunctionLibrary() { }
-	~USHBlueprintFunctionLibrary() { }
-
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper |")
 	static UContentManager* GetContentManager(UObject* InWorldContext);
 
