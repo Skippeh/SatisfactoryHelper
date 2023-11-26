@@ -43,8 +43,8 @@ void UItemsWindowWidgetBase::NativeOnInitialized()
 	{
 		UE_LOG(LogSatisfactoryHelper, Log, TEXT("Initializing: %s"), *InfoClass.Get()->GetName());
 
-		UCollapsableWidgetBase* CollapsableWidget = CreateWidget<UCollapsableWidgetBase, UWidget>(this, CollapsableWidgetClass);
-		USHItemInfo* InfoWidget = CreateWidget<USHItemInfo, UWidget>(CollapsableWidget, InfoClass);
+		UCollapsableWidgetBase* CollapsableWidget = CreateWidget<UCollapsableWidgetBase>(this, CollapsableWidgetClass);
+		USHItemInfo* InfoWidget = CreateWidget<USHItemInfo>(CollapsableWidget, InfoClass);
 
 		CollapsableWidget->SetContent(InfoWidget);
 		CollapsableWidget->SetTitle(InfoWidget->GetTitle());
