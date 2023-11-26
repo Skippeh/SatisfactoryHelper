@@ -74,8 +74,9 @@ ASHSaveManager* USHBlueprintFunctionLibrary::GetSaveManager(UObject* WorldContex
 
 bool USHBlueprintFunctionLibrary::IsDebugModeEnabled()
 {
-	const auto SubSystem = GEngine->GetEngineSubsystem<UModLoadingLibrary>();
-	return SubSystem->IsDevelopmentModeEnabled();
+	// This used to return true if SML development mode was enabled, but it was
+	// removed at some point. Now we're just returning false instead.
+	return false;
 }
 
 FString USHBlueprintFunctionLibrary::GetClassInheritancePathString(UClass* Class)
