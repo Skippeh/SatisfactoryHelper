@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "Configuration/ConfigManager.h"
 #include "Engine/Engine.h"
+#include "Engine/GameInstance.h"
 #include "SHConfigStruct.generated.h"
 
 /* Struct generated from Mod Configuration Asset '/SatisfactoryHelper/SHConfig' */
@@ -10,14 +11,20 @@ struct FSHConfigStruct {
     GENERATED_BODY()
 public:
     UPROPERTY(BlueprintReadWrite)
-    bool ShowAllRecipes;
+    bool ShowAllRecipes{};
 
     /* Retrieves active configuration value and returns object of this struct containing it */
-    static FSHConfigStruct GetActiveConfig() {
-        FSHConfigStruct ConfigStruct{};
-        FConfigId ConfigId{"SatisfactoryHelper", ""};
-        UConfigManager* ConfigManager = GEngine->GetEngineSubsystem<UConfigManager>();
-        ConfigManager->FillConfigurationStruct(ConfigId, FDynamicStructInfo{FSHConfigStruct::StaticStruct(), &ConfigStruct});
+    static FSHConfigStruct GetActiveConfig(const UObject* WorldContext) {
+        FSHConfigStruct ConfigStruct;
+
+        if (const UWorld* World = GEngine->GetWorldFromContextObject(WorldContext, EGetWorldErrorMode::ReturnNull))
+        {
+            UConfigManager* ConfigManager = World->GetGameInstance()->GetSubsystem<UConfigManager>();
+            
+            const FConfigId ConfigId {"SatisfactoryHelper", ""};
+            ConfigManager->FillConfigurationStruct(ConfigId, FDynamicStructInfo{FSHConfigStruct::StaticStruct(), &ConfigStruct});
+        }
+
         return ConfigStruct;
     }
 };
