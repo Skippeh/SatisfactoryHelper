@@ -17,6 +17,9 @@
 #include "SHRecipeHelper.h"
 #include "DescriptorReference.h"
 #include "Tooltip/ItemTooltipSubsystem.h"
+#include "Engine/Texture2D.h"
+#include "Components/WidgetSwitcher.h"
+#include "TimerManager.h"
 #include "SHModule.h"
 
 #pragma region Empty blueprint implementations
