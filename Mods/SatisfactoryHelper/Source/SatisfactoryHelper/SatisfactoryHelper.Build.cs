@@ -1,9 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-using UnrealBuildTool;
-using System.IO;
 using System;
-using Tools.DotNETCommon;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+using EpicGames.Core;
+using UnrealBuildTool;
 
 public class SatisfactoryHelper : ModuleRules
 {
@@ -12,40 +14,60 @@ public class SatisfactoryHelper : ModuleRules
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         bLegacyPublicIncludePaths = true;
         ShadowVariableWarningLevel = WarningLevel.Warning;
-        
-        PublicDependencyModuleNames.AddRange(new[]
-        {
-	        "SML",
-	        "FactoryGame"
+
+        PublicDependencyModuleNames.AddRange(new[] {
+            "SML",
+            "FactoryGame"
         });
 
+        // FactoryGame transitive dependencies
+        // Not all of these are required, but including the extra ones saves you from having to add them later.
         PublicDependencyModuleNames.AddRange(new string[] {
             "Core", "CoreUObject",
             "Engine",
+            "DeveloperSettings",
+            "PhysicsCore",
             "InputCore",
-            "OnlineSubsystem", "OnlineSubsystemUtils", "OnlineSubsystemNULL",
+            "OnlineSubsystem", "OnlineSubsystemUtils", "OnlineSubsystemNull",
             "SignificanceManager",
-            "PhysX", "APEX", "PhysXVehicles", "ApexDestruction",
-            "AkAudio",
-            "ReplicationGraph",
-            "UMG",
-            "AIModule",
-            "NavigationSystem",
-            "AssetRegistry",
-            "GameplayTasks",
+            "GeometryCollectionEngine",
+            "ChaosVehiclesCore", "ChaosVehicles", "ChaosSolverEngine",
             "AnimGraphRuntime",
-            "Slate", "SlateCore"});
-			
-		if (Target.Type == TargetRules.TargetType.Editor) {
-			PublicDependencyModuleNames.AddRange(new string[] {"OnlineBlueprintSupport", "AnimGraph", "UnrealEd", "BlueprintGraph", "Kismet", "UMGEditor", "MovieScene"});
-		}
+            "AkAudio",
+            "AssetRegistry",
+            "NavigationSystem",
+            "ReplicationGraph",
+            "AIModule",
+            "GameplayTasks",
+            "SlateCore", "Slate", "UMG",
+            "RenderCore",
+            "CinematicCamera",
+            "Foliage",
+            "Niagara",
+            "EnhancedInput",
+            "GameplayCameras",
+            "TemplateSequence",
+            "NetCore",
+            "GameplayTags"
+        });
 
-        PublicDependencyModuleNames.AddRange(new string[] {"FactoryGame", "SML"});
-        
-        // Workaround for build errors
-        // https://discord.com/channels/555424930502541343/555515791592652823/831559486158012487 (sorry for discord link but its the only source)
-        // Discord message above can be found in the satisfactory modding server.
-        var factoryGamePchPath = new DirectoryReference(Path.Combine(Target.ProjectFile.Directory.ToString(), "Source", "FactoryGame", "Public", "FactoryGame.h"));
-        PrivatePCHHeaderFile = factoryGamePchPath.MakeRelativeTo(new DirectoryReference(ModuleDirectory));
+        // FactoryGame plugins
+        PublicDependencyModuleNames.AddRange(new[] {
+            "AbstractInstance",
+            "SignificanceISPC"
+        });
+
+        // Header stubs
+        PublicDependencyModuleNames.AddRange(new[] {
+            "DummyHeaders",
+        });
+
+        if (Target.Type == TargetRules.TargetType.Editor)
+        {
+            PublicDependencyModuleNames.AddRange(new string[] {
+                "OnlineBlueprintSupport",
+                "AnimGraph"
+            });
+        }
     }
 }
