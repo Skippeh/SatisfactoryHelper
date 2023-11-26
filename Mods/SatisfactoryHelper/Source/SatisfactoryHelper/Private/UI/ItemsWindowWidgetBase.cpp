@@ -190,8 +190,8 @@ void UItemsWindowWidgetBase::UpdateItemView(UDescriptorReference* DescriptorRefe
 		BigIcon = MissingIconTexture;
 	}
 
-	ImageWidget->Brush.SetResourceObject(BigIcon);
-	ImageWidget->Brush.ImageSize = FVector2D(BigIcon->GetSizeX(), BigIcon->GetSizeY());
+	ImageWidget->SetBrushResourceObject(BigIcon);
+	ImageWidget->SetDesiredSizeOverride(FVector2D(BigIcon->GetSizeX(), BigIcon->GetSizeY()));
 
 	PinnedItemSwitcher->SetActiveWidgetIndex(DescriptorReference->bIsPinned ? 1 : 0);
 
