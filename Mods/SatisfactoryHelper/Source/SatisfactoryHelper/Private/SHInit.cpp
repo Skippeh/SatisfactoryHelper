@@ -12,13 +12,11 @@
 #include "Kismet/GameplayStatics.h"
 
 AUIManager* ASHInit::GetUIManager() const { return UIManager; }
-ASHInputManager* ASHInit::GetInputManager() const { return InputManager; }
 UContentManager* ASHInit::GetContentManager() const { return ContentManager; }
 
 void ASHInit::BeginPlay()
 {
 	verify(IsValid(UIManagerClass));
-	verify(IsValid(InputManagerClass));
 	ContentManager = NewObject<UContentManager>(this);
 
 	ASHItemInfoSubsystem* ItemInfoSubsystem = USHBlueprintFunctionLibrary::GetItemInfoSubsystem(GetWorld());
@@ -26,7 +24,6 @@ void ASHInit::BeginPlay()
 	ItemInfoSubsystem->RegisterItemInfoClasses(ItemInfoClasses);
 
 	SaveManager = USHBlueprintFunctionLibrary::GetSaveManager(GetWorld());	
-	InputManager = GetWorld()->SpawnActor<ASHInputManager>(InputManagerClass);
 	UIManager = GetWorld()->SpawnActor<AUIManager>(UIManagerClass);
 	
 	if (GetNetMode() != ENetMode::NM_Client)

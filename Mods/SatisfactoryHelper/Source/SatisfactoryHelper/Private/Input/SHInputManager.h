@@ -4,17 +4,22 @@
 #include "GameFramework/Info.h"
 #include "SHInputManager.generated.h"
 
+class AFGCharacterPlayer;
+class UInputAction;
+
 UCLASS(Blueprintable, Abstract)
 class ASHInputManager : public AInfo
 {
 	GENERATED_BODY()
 
-	ASHInputManager() { PrimaryActorTick.bCanEverTick = false; }
+public:
+	ASHInputManager();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* ToggleMenuAction;
 
 private:
+	void OnPlayerInputInitialized(AFGCharacterPlayer* Player, UInputComponent* Input);
 	void ToggleItemsMenuKeyPressed();
 };

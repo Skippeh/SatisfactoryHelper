@@ -27,6 +27,10 @@
 			"Name": "SML",
 			"SemVersion": "^3.4.1",
 			"Enabled": true
+		},
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
 		}
 	]
 }

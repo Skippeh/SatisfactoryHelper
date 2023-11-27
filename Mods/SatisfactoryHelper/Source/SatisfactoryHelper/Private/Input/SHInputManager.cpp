@@ -1,19 +1,35 @@
 #include "SHInputManager.h"
+#include "FGCharacterPlayer.h"
+#include "FGEnhancedInputComponent.h"
 #include "FGPlayerController.h"
 #include "UI/UIManager.h"
 #include "SHInit.h"
+#include "SHModule.h"
 #include "UI/ItemsWindowWidgetBase.h"
+#include "Components/InputComponent.h"
 
-// Called when the game starts or when spawned
-void ASHInputManager::BeginPlay()
+ASHInputManager::ASHInputManager()
 {
-	Super::BeginPlay();
-	auto PlayerController = CastChecked<AFGPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
+	PrimaryActorTick.bCanEverTick = false;
+	AFGCharacterPlayer::OnPlayerInputInitialized.AddUObject(this, &ASHInputManager::OnPlayerInputInitialized);
+}
 
-	PlayerController->InputComponent->BindAction("SatisfactoryHelper.ToggleItemsMenu", IE_Pressed, this, &ASHInputManager::ToggleItemsMenuKeyPressed);
+void ASHInputManager::OnPlayerInputInitialized(AFGCharacterPlayer* Player, UInputComponent* Input)
+{
+	if (UFGEnhancedInputComponent* EnhancedInput = CastChecked<UFGEnhancedInputComponent>(Input))
+	{
+		EnhancedInput->BindAction(ToggleMenuAction, ETriggerEvent::Triggered, this, &ASHInputManager::ToggleItemsMenuKeyPressed);
+	}
+	else
+	{
+		UE_LOG(LogSatisfactoryHelper, Display, TEXT("Could not cast to UFGEnhancedInputComponent, Input class = %s"), *Input->GetClass()->GetFullName());
+	}
 }
 
 void ASHInputManager::ToggleItemsMenuKeyPressed()
 {
-	ASHInit::GetSingleton(GetWorld())->GetUIManager()->GetItemsWindow()->ToggleWindowVisibility();
+	if (const auto Init = ASHInit::GetSingleton(GetWorld()))
+	{
+		Init->GetUIManager()->GetItemsWindow()->ToggleWindowVisibility();
+	}
 }

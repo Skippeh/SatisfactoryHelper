@@ -7,7 +7,6 @@
 class UFGSchematic;
 class UFGItemDescriptor;
 class AUIManager;
-class ASHInputManager;
 class UContentManager;
 class ASHItemInfoSubsystem;
 class ASHSaveManager;
@@ -22,9 +21,6 @@ public:
 	AUIManager* GetUIManager() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ASHInputManager* GetInputManager() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UContentManager* GetContentManager() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -35,9 +31,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<AUIManager> UIManagerClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<ASHInputManager> InputManagerClass;
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<class USHItemInfo>> ItemInfoClasses;
@@ -51,9 +44,6 @@ protected:
 private:
 	UPROPERTY()
 	AUIManager* UIManager;
-
-	UPROPERTY()
-	ASHInputManager* InputManager;
 
 	UPROPERTY()
 	UContentManager* ContentManager;
