@@ -10,6 +10,7 @@
 #include "FGSchematicManager.h"
 #include "FGRecipeManager.h"
 #include "ModLoadingLibrary.h"
+#include "SHConfigStruct.h"
 #include "SubsystemActorManager.h"
 #include "Configuration/ConfigManager.h"
 
@@ -72,11 +73,11 @@ ASHSaveManager* USHBlueprintFunctionLibrary::GetSaveManager(UObject* WorldContex
 	return GetManagerClass<ASHSaveManager>(WorldContext);
 }
 
-bool USHBlueprintFunctionLibrary::IsDebugModeEnabled()
+bool USHBlueprintFunctionLibrary::IsDevelopmentModeEnabled(UObject* WorldContext)
 {
 	// This used to return true if SML development mode was enabled, but it was
-	// removed at some point. Now we're just returning false instead.
-	return false;
+	// removed at some point. Now we're using a custom config option.
+	return FSHConfigStruct::GetActiveConfig(WorldContext).DevelopmentMode;
 }
 
 FString USHBlueprintFunctionLibrary::GetClassInheritancePathString(UClass* Class)

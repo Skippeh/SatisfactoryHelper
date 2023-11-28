@@ -45,9 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Save")
 	static ASHSaveManager* GetSaveManager(UObject* WorldContext);
 
-	/** Returns true if SML debug mode is enabled. */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | SML")
-	static bool IsDebugModeEnabled();
+	/** Returns true if the development mode option is checked. */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Debugging")
+	static bool IsDevelopmentModeEnabled(UObject* WorldContext);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SatisfactoryHelper | Debugging")
 	static FString GetClassInheritancePathString(UClass* Class);

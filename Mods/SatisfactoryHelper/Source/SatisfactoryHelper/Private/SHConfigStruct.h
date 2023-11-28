@@ -13,6 +13,9 @@ public:
     UPROPERTY(BlueprintReadWrite)
     bool ShowAllRecipes{};
 
+    UPROPERTY(BlueprintReadWrite)
+    bool DevelopmentMode{};
+
     /* Retrieves active configuration value and returns object of this struct containing it */
     static FSHConfigStruct GetActiveConfig(const UObject* WorldContext) {
         FSHConfigStruct ConfigStruct;
