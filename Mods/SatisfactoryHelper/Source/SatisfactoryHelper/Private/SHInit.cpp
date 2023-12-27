@@ -51,6 +51,8 @@ void ASHInit::Tick(float DeltaSeconds)
 
 			// No point in ticking anymore
 			SetActorTickEnabled(false);
+			
+			RegisteredPurchasedSchematicEvent = true;
 		}
 	}
 }
