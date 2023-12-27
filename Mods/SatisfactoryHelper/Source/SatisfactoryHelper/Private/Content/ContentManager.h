@@ -13,10 +13,10 @@ class UContentManager : public UObject
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void FindAllDescriptors(TArray<TSubclassOf<class UFGItemDescriptor>>& OutArray, bool bSortByDisplayName);
+	bool FindAllDescriptors(TArray<TSubclassOf<class UFGItemDescriptor>>& OutArray, bool bSortByDisplayName);
 
 	UFUNCTION(BlueprintCallable)
-	void GetAllRecipes(TArray<TSubclassOf<class UFGRecipe>>& OutArray);
+	bool GetAllRecipes(TArray<TSubclassOf<class UFGRecipe>>& OutArray);
 
 	static UContentManager* GetSingleton(UObject* InWorldContext);
 

@@ -17,6 +17,11 @@ class ASHInit : public AInfo
 	GENERATED_BODY()
 	
 public:
+	ASHInit()
+	{
+		PrimaryActorTick.bCanEverTick = true;
+	}
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AUIManager* GetUIManager() const;
 
@@ -28,6 +33,7 @@ public:
 
 protected:
 	void BeginPlay() override;
+	void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<AUIManager> UIManagerClass;
@@ -50,6 +56,9 @@ private:
 
 	UPROPERTY()
 	ASHSaveManager* SaveManager;
+
+	UPROPERTY()
+	bool RegisteredPurchasedSchematicEvent;
 
 #pragma region Singleton
 public:

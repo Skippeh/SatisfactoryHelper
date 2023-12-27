@@ -68,14 +68,20 @@ void UContentManager::SearchAssetsForChildClasses(UClass* InBaseClass, TArray<TS
 	}
 }
 
-void UContentManager::FindAllDescriptors(TArray<TSubclassOf<UFGItemDescriptor>>& OutArray, bool bSortByDisplayName)
+bool UContentManager::FindAllDescriptors(TArray<TSubclassOf<UFGItemDescriptor>>& OutArray, bool bSortByDisplayName)
 {
 	if (!CachedDescriptors)
 	{
 		CachedDescriptors = new TArray<TSubclassOf<UFGItemDescriptor>>();
 		TSet<TSubclassOf<UFGItemDescriptor>> ItemDescriptorSet;
 		TArray<TSubclassOf<UFGRecipe>> AllRecipes;
-		GetAllRecipes(AllRecipes);
+
+		if (!GetAllRecipes(AllRecipes))
+		{
+			UE_LOG(LogSatisfactoryHelper, Log, TEXT("GetAllRecipes could not find any recipes, FindAllDescriptors returning 0 descriptors"));			
+			CachedDescriptors = nullptr;
+			return false;
+		}
 
 		for (TSubclassOf<UFGRecipe> Recipe : AllRecipes)
 		{
@@ -91,6 +97,8 @@ void UContentManager::FindAllDescriptors(TArray<TSubclassOf<UFGItemDescriptor>>&
 		}
 
 		CachedDescriptors->Append(ItemDescriptorSet.Array());
+
+		UE_LOG(LogSatisfactoryHelper, Log, TEXT("Cached %d item descriptors"), CachedDescriptors->Num());
 	}
 
 	OutArray.Append(*CachedDescriptors);
@@ -105,15 +113,26 @@ void UContentManager::FindAllDescriptors(TArray<TSubclassOf<UFGItemDescriptor>>&
 			return NameA < NameB;
 		});
 	}
+
+	return true;
 }
 
-void UContentManager::GetAllRecipes(TArray<TSubclassOf<UFGRecipe>>& OutArray)
+bool UContentManager::GetAllRecipes(TArray<TSubclassOf<UFGRecipe>>& OutArray)
 {
 	if (!CachedRecipes)
 	{
 		CachedRecipes = new TArray<TSubclassOf<UFGRecipe>>();
 		AFGSchematicManager* SchematicManager = USHBlueprintFunctionLibrary::GetSchematicManager(GetOuter());
 		UE_LOG(LogSatisfactoryHelper, Log, TEXT("SchematicManager IsValid: %d"), IsValid(SchematicManager));
+
+		// SchematicManager might be null if we're a client and it hasn't been replicated yet
+		if (!SchematicManager)
+		{
+			UE_LOG(LogSatisfactoryHelper, Log, TEXT("SchematicManager is null, GetAllRecipes returning 0 recipes"));
+			CachedRecipes = nullptr;
+			return false;
+		}
+		
 		TArray<TSubclassOf<UFGSchematic>> AllSchematics;
 		SchematicManager->GetAllSchematics(AllSchematics);
 
@@ -141,9 +160,12 @@ void UContentManager::GetAllRecipes(TArray<TSubclassOf<UFGRecipe>>& OutArray)
 				CachedRecipes->Append(RecipeUnlock->GetRecipesToUnlock());
 			}
 		}
+
+		UE_LOG(LogSatisfactoryHelper, Log, TEXT("Cached %d recipes"), CachedRecipes->Num());
 	}
 
 	OutArray.Append(*CachedRecipes);
+	return true;
 }
 
 UContentManager::~UContentManager()

@@ -35,9 +35,24 @@ void ASHInit::BeginPlay()
 	// Cache all item descriptors (subsequent calls returns from cache instead of searching assets again)
 	TArray<TSubclassOf<UFGItemDescriptor>> Descriptors;
 	ContentManager->FindAllDescriptors(Descriptors, false);
+}
 
-	auto SchematicManager = USHBlueprintFunctionLibrary::GetSchematicManager(GetWorld());
-	SchematicManager->PurchasedSchematicDelegate.AddDynamic(this, &ASHInit::OnPurchasedSchematic);
+void ASHInit::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	
+	if (!RegisteredPurchasedSchematicEvent)
+	{
+		auto SchematicManager = USHBlueprintFunctionLibrary::GetSchematicManager(GetWorld());
+
+		if (SchematicManager)
+		{
+			SchematicManager->PurchasedSchematicDelegate.AddDynamic(this, &ASHInit::OnPurchasedSchematic);
+
+			// No point in ticking anymore
+			SetActorTickEnabled(false);
+		}
+	}
 }
 
 ASHInit* ASHInit::GetSingleton(const UObject* InWorldContext)
