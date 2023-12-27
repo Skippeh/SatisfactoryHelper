@@ -1,8 +1,8 @@
 {
 	"FileVersion": 3,
 	"Version": 2,
-	"VersionName": "2.0.6",
-	"SemVersion": "2.0.6",
+	"VersionName": "2.0.7",
+	"SemVersion": "2.0.7",
 	"FriendlyName": "Satisfactory Helper",
 	"Description": "An item and recipe browser.",
 	"Category": "Modding",
